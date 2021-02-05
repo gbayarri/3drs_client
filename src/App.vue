@@ -1,30 +1,39 @@
 <template>
   <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+    <div class="p-grid">
+      <div class="p-col-fixed" id="main-logo">
+        <router-link :to="{ name: 'About'}" ><img alt="Vue logo" src="@/assets/img/minilogo.png"></router-link>
+      </div>
+      <div class="p-col">
+        <TabMenu :model="items" />
+      </div>
+    </div>
+    <div id="logo-mobile" class="p-mb-2 p-mt-2">
+      <img alt="Vue logo" src="@/assets/img/logo.png">
+    </div>  
+    <Breadcrumb :home="home" :model="breadcrumbs" />  
   </div>
   <router-view/>
 </template>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+<script>
+export default {
+  components: {  },
+  setup() {
+    const items = [
+        { label: 'About', icon: 'pi pi-fw pi-info-circle', to: '/' },
+        { label: 'Launch', icon: 'fas fa-rocket', to: '/launch' },
+        { label: 'Contact', icon: 'pi pi-fw pi-envelope', class: 'tabmenu-right', to: '/contact' },
+    ]
+    // make a composable???
+    // restyle!!
+    const home = { icon: 'pi pi-home', to: { name: 'About'} }
+    const breadcrumbs = [
+        { label: 'About', to: { name: 'About'}},
+        { label: 'Launch', to: { name: 'Launch'}},
+        { label: 'Contact', to: { name: 'Contact'}}
+    ]
+    return { items, home, breadcrumbs }
+  }
 }
-
-#nav {
-  padding: 30px;
-}
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
-</style>
+</script>

@@ -1,6 +1,61 @@
 import { createApp } from 'vue'
+
+// import PrimeVue and components
+import PrimeVue from 'primevue/config'
+import TabMenu from 'primevue/tabmenu';
+import Tooltip from 'primevue/tooltip'
+import Panel from 'primevue/panel';
+import Card from 'primevue/card';
+import TabView from 'primevue/tabview';
+import TabPanel from 'primevue/tabpanel';
+import AutoComplete from 'primevue/autocomplete';
+import Button from 'primevue/button';
+import FileUpload from 'primevue/fileupload';
+import Breadcrumb from 'primevue/breadcrumb';
+//import Toast from 'primevue/toast'
+//import ToastService from 'primevue/toastservice'
+
+// generic components
+import Footer from '@/components/Footer'
+
+// import App, router and Vuex store
 import App from './App.vue'
 import router from './router'
 import store from './store'
 
-createApp(App).use(store).use(router).mount('#app')
+// import PrimeVue resources
+import 'primevue/resources/themes/saga-blue/theme.css'      
+import 'primevue/resources/primevue.min.css'                
+import 'primeicons/primeicons.css'                          
+import 'primeflex/primeflex.css'
+// import font awesome
+import '@fortawesome/fontawesome-free/css/all.css'
+
+// main css
+import './css/main.css'
+
+// create app
+const app = createApp(App)
+app.use(store)
+app.use(router)
+app.use(PrimeVue, {ripple: true})
+//app.use(ToastService)
+
+// create global components
+app.component('TabMenu', TabMenu)
+app.component('Footer', Footer)
+app.component('Panel', Panel)
+app.component('Card', Card)
+app.component('TabView', TabView)
+app.component('TabPanel', TabPanel)
+app.component('AutoComplete', AutoComplete)
+app.component('Button', Button)
+app.component('FileUpload', FileUpload)
+app.component('Breadcrumb', Breadcrumb)
+
+
+// create directives
+app.directive('tooltip', Tooltip)
+
+//mount app
+app.mount('#app')
