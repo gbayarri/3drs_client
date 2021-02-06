@@ -1,19 +1,22 @@
 <template>
-  <div id="nav">
-    <div class="p-grid">
-      <div class="p-col-fixed" id="main-logo">
-        <router-link :to="{ name: 'About'}" ><img alt="Vue logo" src="@/assets/img/minilogo.png"></router-link>
-      </div>
-      <div class="p-col">
-        <TabMenu :model="items" />
+
+    <div id="top">
+      <div id="nav">
+        <div class="p-grid">
+          <div class="p-col-fixed" id="main-logo">
+            <router-link :to="{ name: 'About'}" ><img alt="Vue logo" src="@/assets/img/minilogo.png"></router-link>
+          </div>
+          <div class="p-col">
+            <TabMenu :model="items" />
+          </div>
+        </div>
+        <div id="logo-mobile" class="p-mb-2 p-mt-2">
+          <img alt="Vue logo" src="@/assets/img/logo.png">
+        </div> 
       </div>
     </div>
-    <div id="logo-mobile" class="p-mb-2 p-mt-2">
-      <img alt="Vue logo" src="@/assets/img/logo.png">
-    </div>  
-    <Breadcrumb :home="home" :model="breadcrumbs" />  
-  </div>
   <router-view/>
+
 </template>
 
 <script>
@@ -25,15 +28,7 @@ export default {
         { label: 'Launch', icon: 'fas fa-rocket', to: '/launch' },
         { label: 'Contact', icon: 'pi pi-fw pi-envelope', class: 'tabmenu-right', to: '/contact' },
     ]
-    // make a composable???
-    // restyle!!
-    const home = { icon: 'pi pi-home', to: { name: 'About'} }
-    const breadcrumbs = [
-        { label: 'About', to: { name: 'About'}},
-        { label: 'Launch', to: { name: 'Launch'}},
-        { label: 'Contact', to: { name: 'Contact'}}
-    ]
-    return { items, home, breadcrumbs }
+    return { items }
   }
 }
 </script>
