@@ -1,6 +1,6 @@
 <template>
   <div class="main container">
-    <h1>Contact Us</h1>
+    <h1>{{ header }}</h1>
     <Breadcrumb :home="home" :model="breadcrumbs" class="p-mb-3" />  
     <Panel :header="contactPanel.header" class="p-shadow-2 p-mb-3" id="header-contact">
       <div class="p-grid">
@@ -18,6 +18,8 @@ export default {
   components: {  },
   setup() {
 
+    const header = "Contact Us"
+
     const home = { icon: 'pi pi-home', to: { name: 'About'} }
     const breadcrumbs = [
         { label: 'Contact', to: { name: 'Contact'}}
@@ -28,7 +30,7 @@ export default {
       description: `<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolores fuga veniam inventore, sapiente labore pariatur deserunt! </p>`
     }
 
-    return { contactPanel, home, breadcrumbs }
+    return { header, contactPanel, home, breadcrumbs }
   }
 }
 </script>
