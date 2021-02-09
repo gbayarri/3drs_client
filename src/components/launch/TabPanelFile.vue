@@ -1,29 +1,13 @@
 <template>
     <p>{{ texts.desc }}</p>
-    <!--<FileUpload 
-    name="files[]"
-    url="upload/file/"
-    @uploader="null"
-    @upload="onUpload" 
-    :customUpload="false"
-    :multiple="true" 
-    accept=".pdb" 
-    :maxFileSize="1000000"
-    chooseLabel="Select">
-        <template #empty>
-            <p v-html="texts.int_desc"></p>
-        </template>
-    </FileUpload>-->
     <FileUpload 
-    id="kk"
-    name="files[]"
-    url=""
     @uploader="uploader"
-    @upload="onUpload" 
+    @select="selector"
+    accept=".pdb" 
     :customUpload="true"
     :multiple="true" 
-    accept=".pdb" 
-    :maxFileSize="1000000"
+    :maxFileSize="52428800"
+    :disabled="disableFileUpload"
     chooseLabel="Select">
         <template #empty>
             <p v-html="texts.int_desc"></p>
@@ -32,68 +16,66 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { inject, ref } from 'vue'
 export default {
     props: ['texts'],
-    data() {
-		return {
-      
-		}
-  },
-	methods: {
-        uploader(e) {
-            // TO FINISH!!!!!
-            console.log(Object.assign([], e.files)[0])
-            let formData = new FormData();
-            formData.append('file1', Object.assign([], e.files)[0])
-            for (var key of formData.entries()) {
-                console.log(key[0] + ', ' + key[1]);
-            }
-            axios.post(process.env.VUE_APP_API_LOCATION + 'upload/file/', formData)
-            .then(function (response) {
-                console.log(response);
-            })
-        },
-        onUpload() {
-        // muntar la api o una api mock per tractar tot aquest tema
-        console.log('uploaded!!!!')
+    setup() {
+
+        const $axios = inject('$axios');
+        const $router = inject('$router');
+
+        let disableFileUpload = ref(false)
+
+        const selector = () => {
+            setTimeout(function(){
+                const rows = document.getElementsByClassName("p-fileupload-row")
+                for(var item of rows){
+                    item.getElementsByTagName("div")[0].innerHTML = '<img role="presentation" src="' + require(`@/assets/img/pdb.png`) + '" width="100">'
+                }
+            }, 20);
         }
-    }
-    /*setup() {
 
         const uploader = (e) => {
+            disableFileUpload.value = true
+            let filesList =  Object.assign([], e.files)
+            let formData = new FormData();
+            let resp = null
 
-            console.log(e.files)
+            for (const [key, value] of filesList.entries()) {
+                formData.append('file' + key, value)
+            }
 
-            //let formData = new FormData();
-
-       //for (const item in e.files) {
-        //   console.log(e.files[item])
-       //    formData.append('files[' + item + ']', e.files[item])
-       // }
-
-        //formData.append('files[0]', Object.assign([], e.files)[0])
-
-            //console.log(formData)
-
-            //console.log(Object.assign([], e.files))
-            axios.post(process.env.VUE_APP_API_LOCATION + 'upload/file/', e.files)
-            .then(function (response) {
-                console.log(response);
-            })
-            
+            $axios
+                .post(process.env.VUE_APP_API_LOCATION + 'upload/file/', formData)
+                .then(function (response) {
+                    //console.log(response);
+                    resp = response.data
+                })
+                .catch(err => console.error(err.message))
+                .finally( () => {
+                    // CONTROL ERRORS WHEN EMPTY FILE, FOR EXAMPLE
+                    //router.push({ name: 'Contact', params: { id } }) 
+                    //$router.push({ path: `/representation/${id}` }) 
+                    console.log(resp)
+                })
         }
 
-        // upload files
-        const onUpload = (e) => {
-            console.log(e)
-        }
-
-        return { uploader, onUpload }
-    }*/
+        return { disableFileUpload, selector, uploader }
+    }
 }
 </script>
 
 <style>
-
+    .p-fileupload.p-fileupload-advanced.p-component {
+        padding: 12px 20px 15px;
+        border: 1px solid #dee2e6;
+    }
+    .p-fileupload .p-fileupload-buttonbar {
+        background: none!important;
+        border:none!important;
+    }
+    .p-fileupload .p-fileupload-content {
+        border:none!important;
+        border-top: 1px solid #dee2e6!important;
+    }
 </style>

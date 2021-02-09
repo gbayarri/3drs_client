@@ -20,11 +20,12 @@
 </template>
 
 <script>
-import { ref } from "vue"
-import axios from 'axios'
+import { inject, ref } from "vue"
 export default {
     props: ['texts'],
     setup() {
+
+        const $axios = inject('$axios');
 
         let selectedStructures = ref([])
         let filteredStructures = ref([])
@@ -32,7 +33,7 @@ export default {
 
         // call API to get PDB's with given query
         const searchStructure = (event) => {
-            axios
+            $axios
                 .get(process.env.VUE_APP_API_LOCATION + 'pdb/' + event.query.toLowerCase())
                 .then(response => filteredStructures.value = response.data)
                 .catch(err => console.log(err.message))
@@ -52,12 +53,13 @@ export default {
         // submit list of PDB's
         const submitPDB = () => {
             //console.log(Object.assign([], selectedStructures.value))
-            axios.post(process.env.VUE_APP_API_LOCATION + 'upload/pdb/', {
-                structures: Object.assign([], selectedStructures.value)
-            })
-            .then(function (response) {
-                console.log(response);
-            })
+            $axios
+                .post(process.env.VUE_APP_API_LOCATION + 'upload/pdb/', {
+                    structures: Object.assign([], selectedStructures.value)
+                })
+                .then(function (response) {
+                    console.log(response);
+                })
         }
 
         return { selectedStructures, filteredStructures, searchStructure, formDisabled, 
@@ -67,5 +69,8 @@ export default {
 </script>
 
 <style>
-
+    .p-autocomplete .p-autocomplete-multiple-container .p-autocomplete-token {
+        background: #6f96a9!important;
+        color:#fff!important;
+    }
 </style>

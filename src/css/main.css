@@ -8,6 +8,7 @@ body, .p-component { font-family: Open Sans; }
 label { font-size:14px; }
 hr { border: none; height: 1px; background-color: #dee2e6; margin:0 0 15px 0 }
 h1 { color: #5e738b; font-size: 30px; font-weight: 400; }
+h2 { color: #5e738b; font-size: 25px; font-weight: 400; }
 
 #app {
     -webkit-font-smoothing: antialiased;
@@ -83,7 +84,9 @@ h1 { color: #5e738b; font-size: 30px; font-weight: 400; }
 .p-breadcrumb ul li.p-breadcrumb-chevron { font-size: 10px; color: #95a5a6; }
 
 /* panels */
-.p-panel-header { color:#6c757d!important; }
+.p-panel.p-component { padding: 12px 20px 15px; }
+.p-panel .p-panel-header { color:#6c757d!important; background: #fff!important; border: none; border-bottom: 1px solid #dee2e6; }
+.p-panel .p-panel-content { border:none;}
 
 /* tab panels */
 .p-tabview .p-tabview-nav li .p-tabview-nav-link:not(.p-disabled):focus {

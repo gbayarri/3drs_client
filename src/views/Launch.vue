@@ -87,7 +87,7 @@ export default {
         file: {
             header: "Upload your own structure",
             desc: "Please click or drag and drop files:",
-            int_desc: "Click <strong>Choose button</strong> above or drag and drop files to here to upload."
+            int_desc: "Click <strong>Select button</strong> above or drag and drop files to here to upload."
         }
       }
 

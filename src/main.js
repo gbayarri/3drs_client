@@ -12,6 +12,7 @@ import AutoComplete from 'primevue/autocomplete';
 import Button from 'primevue/button';
 import FileUpload from 'primevue/fileupload';
 import Breadcrumb from 'primevue/breadcrumb';
+import Sidebar from 'primevue/sidebar';
 //import Toast from 'primevue/toast'
 //import ToastService from 'primevue/toastservice'
 
@@ -19,9 +20,9 @@ import Breadcrumb from 'primevue/breadcrumb';
 import Footer from '@/components/global/Footer'
 
 // import App, router and Vuex store
-import App from './App.vue'
-import router from './router'
-import store from './store'
+import App from '@/App.vue'
+import router from '@/router'
+import store from '@/store'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 
@@ -34,7 +35,7 @@ import 'primeflex/primeflex.css'
 import '@fortawesome/fontawesome-free/css/all.css'
 
 // main css
-import './css/main.css'
+import '@/css/main.css'
 
 // create app
 const app = createApp(App)
@@ -55,10 +56,13 @@ app.component('AutoComplete', AutoComplete)
 app.component('Button', Button)
 app.component('FileUpload', FileUpload)
 app.component('Breadcrumb', Breadcrumb)
-
+app.component('Sidebar', Sidebar)
 
 // create directives
 app.directive('tooltip', Tooltip)
 
 //mount app
 app.mount('#app')
+// provide / inject globallly axios & router
+app.provide('$axios', axios)
+app.provide('$router', router)
