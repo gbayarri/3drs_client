@@ -2,7 +2,10 @@
   <div class="main container">
     <h1>{{ header }}</h1>
     <Breadcrumb :home="home" :model="breadcrumbs" class="p-mb-3" />  
-    <Panel :header="contactPanel.header" class="p-shadow-2 p-mb-3" id="header-contact">
+    <Panel class="p-shadow-2 p-mb-3" id="header-contact">
+      <template #header>
+          <i class="fas fa-paper-plane"></i> <div class="p-panel-title">{{contactPanel.header }}</div>
+      </template>
       <div class="p-grid">
         <div class="p-col">
           <div v-html="contactPanel.description"></div>
@@ -36,9 +39,5 @@ export default {
 </script>
 
 <style>
-/* inject font awesome into panel */
-#header-contact .p-panel-header span.p-panel-title::before {
-  font-family: 'Font Awesome 5 Free';
-  content: "\f1d8";
-}
+
 </style>

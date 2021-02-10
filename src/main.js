@@ -13,6 +13,8 @@ import Button from 'primevue/button';
 import FileUpload from 'primevue/fileupload';
 import Breadcrumb from 'primevue/breadcrumb';
 import Sidebar from 'primevue/sidebar';
+import Dropdown from 'primevue/dropdown';
+import Dialog from 'primevue/dialog';
 //import Toast from 'primevue/toast'
 //import ToastService from 'primevue/toastservice'
 
@@ -57,6 +59,8 @@ app.component('Button', Button)
 app.component('FileUpload', FileUpload)
 app.component('Breadcrumb', Breadcrumb)
 app.component('Sidebar', Sidebar)
+app.component('Dropdown', Dropdown)
+app.component('Dialog', Dialog)
 
 // create directives
 app.directive('tooltip', Tooltip)

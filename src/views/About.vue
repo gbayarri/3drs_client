@@ -1,7 +1,10 @@
 <template>
   <div class="main container">
     <h1>{{ header }}</h1> 
-    <Panel :header="welcomePanel.header" class="p-shadow-2 p-mb-3" id="header-welcome">
+    <Panel class="p-shadow-2 p-mb-3" id="header-welcome">
+      <template #header>
+          <i class="fas fa-info-circle"></i> <div class="p-panel-title">{{ welcomePanel.header }}</div>
+      </template>
       <div class="p-grid">
         <div class="p-lg-3 p-md-6 p-sm-12" id="about-logo">
           <p><img alt="Vue logo" class="p-mt-2" src="@/assets/img/logo.png"></p>
@@ -12,7 +15,10 @@
       </div>
     </Panel>
 
-    <Panel :header="aboutPanel.header" class="p-shadow-2 p-mb-3" id="header-about">
+    <Panel class="p-shadow-2 p-mb-3" id="header-about">
+      <template #header>
+          <i class="fas fa-user-friends"></i> <div class="p-panel-title">{{ aboutPanel.header }}</div>
+      </template>
       <div v-html="aboutPanel.description"></div>
     </Panel>
 
@@ -63,14 +69,5 @@ export default {
 
   #about-logo p { text-align: center;}
   #about-logo p img { width: 80%; }
-  /* inject font awesome into panel */
-  #header-welcome .p-panel-header span.p-panel-title::before {
-    font-family: 'Font Awesome 5 Free';
-    content: "\f05a";
-  }
-  #header-about .p-panel-header span.p-panel-title::before {
-    font-family: 'Font Awesome 5 Free';
-    content: "\f500";
-  }
 
 </style>

@@ -2,9 +2,11 @@
   <div class="main container">
     <h1>{{ header }}</h1>
     <Breadcrumb :home="home" :model="breadcrumbs" class="p-mb-3" />  
-    <Panel :header="welcomePanel.header" class="p-shadow-2 p-mb-3" id="header-launch">
-
-      <div v-html="welcomePanel.description"></div>
+    <Panel class="p-shadow-2 p-mb-3" id="header-launch">
+      <template #header>
+          <i class="fas fa-rocket"></i> <div class="p-panel-title">{{ launchPanel.header }}</div>
+      </template>
+      <div v-html="launchPanel.description"></div>
 
       <TabView>
 
@@ -37,7 +39,7 @@ export default {
       selectedStructures: [],
       filteredStructures: null,
       formDisabled: true,
-      welcomePanel: {
+      launchPanel: {
         header: " Launch new 3DRS project",
         description: `<p>Please start uploading one or more structure files from your computer or with a Protein Data Bank ID and the structure will be atomatically uploaded to our server:</p>`
       }
@@ -73,7 +75,7 @@ export default {
           { label: 'Launch', to: { name: 'Launch'}}  
       ]
 
-    const welcomePanel = {
+    const launchPanel = {
       header: " Launch new 3DRS project",
       description: `<p>Please start uploading one or more structure files from your computer or with a Protein Data Bank ID and the structure will be atomatically uploaded to our server:</p>`
     }
@@ -91,17 +93,12 @@ export default {
         }
       }
 
-    return { header, home, breadcrumbs, welcomePanel, tabPanel }
+    return { header, home, breadcrumbs, launchPanel, tabPanel }
   }
 }
 </script>
 
 <style>
 
-/* inject font awesome into panel */
-#header-launch .p-panel-header span.p-panel-title::before {
-  font-family: 'Font Awesome 5 Free';
-  content: "\f135";
-}
 
 </style>
