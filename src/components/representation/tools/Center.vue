@@ -1,13 +1,20 @@
 <template>
-  <Button icon="fas fa-crosshairs" v-tooltip.right="ttp"  />
+  <Button icon="fas fa-crosshairs" v-tooltip.right="ttp" @click="handleClick" />
 </template>
 
 <script>
 export default {
-  setup() {
+  props: ['stage'],
+  setup(props) {
     const ttp = "Center representation"
 
-    return { ttp }
+    let stage = props.stage
+
+    const handleClick = () => {
+      stage.autoView(500);
+    }
+
+    return { ttp, handleClick }
   }
 }
 </script>

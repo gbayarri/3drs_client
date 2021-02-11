@@ -1,8 +1,8 @@
 <template>
 
-    <Tools />
+    <Tools v-if="stageLoaded" />
 
-    <Settings />
+    <Settings v-if="stageLoaded" />
 
     <Viewport />
 
@@ -11,6 +11,7 @@
 </template>
 
 <script>
+import { computed } from 'vue'
 import { useStore } from 'vuex'
 import Tools from '@/components/representation/Tools'
 import Settings from '@/components/representation/Settings'
@@ -22,12 +23,14 @@ export default {
     setup(props) {
 
         const store = useStore()
+        // activate tools, sidebar and so on
+        let stageLoaded = computed(() => store.state.stageLoaded)
         // disable menu
         store.dispatch('menuStatus', false) 
 
         console.log(props.id)
 
-        return { }
+        return { stageLoaded }
     }
 }
 </script>

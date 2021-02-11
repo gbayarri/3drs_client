@@ -15,6 +15,8 @@ import Breadcrumb from 'primevue/breadcrumb';
 import Sidebar from 'primevue/sidebar';
 import Dropdown from 'primevue/dropdown';
 import Dialog from 'primevue/dialog';
+import ColorPicker from 'primevue/colorpicker';
+import ProgressSpinner from 'primevue/progressspinner';
 //import Toast from 'primevue/toast'
 //import ToastService from 'primevue/toastservice'
 
@@ -61,6 +63,8 @@ app.component('Breadcrumb', Breadcrumb)
 app.component('Sidebar', Sidebar)
 app.component('Dropdown', Dropdown)
 app.component('Dialog', Dialog)
+app.component('ColorPicker', ColorPicker)
+app.component('ProgressSpinner', ProgressSpinner)
 
 // create directives
 app.directive('tooltip', Tooltip)

@@ -1,13 +1,27 @@
 <template>
-  <Button icon="fas fa-undo-alt" v-tooltip.right="ttp"  />
+  <Button icon="fas fa-undo-alt" v-tooltip.right="ttp" @click="handleClick" />
 </template>
 
 <script>
 export default {
-  setup() {
-    const ttp = "Start spin rotation"
+  props: ['stage'],
+  setup(props) {
+    const ttp = "Toggle spin rotation"
 
-    return { ttp }
+    let stage = props.stage
+
+    const handleClick = () => {
+      //console.log(stage)
+      stage.toggleSpin();
+      //console.log(stage.getComponentsByName('kk'))
+      /*stageObj.stage.loadFile("https://mmb.irbbarcelona.org/api/pdb/1aki", { defaultRepresentation: false, ext: 'pdb' })
+      .then(function (component) {
+              console.log(stage)
+                component.addRepresentation( "ribbon", {  color: '#000'} )
+      })*/
+    }
+
+    return { ttp, handleClick }
   }
 }
 </script>
