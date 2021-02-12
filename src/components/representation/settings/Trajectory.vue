@@ -1,26 +1,39 @@
 <template>
     <div v-if="!hasTrajectory">
-        <Button label="Add Trajectory" icon="fas fa-film" class="settings-button-trajectory" @click="openModalTrajectory" :disabled="modalTrajectory"  />
+        <Button label="Add Trajectory" icon="fas fa-film" class="settings-button" @click="openModalTrajectory" :disabled="modals.dialog.trajectory"  />
     </div>
     <div v-else>Trajectory</div>
 </template>
 
 <script>
-import { ref, computed } from 'vue'
-import { useStore } from 'vuex'
+//import modals from "@/modules/Modals"
+import { ref, /*computed,*/ inject } from 'vue'
+//import { useStore } from 'vuex'
 export default {
     setup() {
 
-        const store = useStore()
-        let modalTrajectory = computed(() => store.state.modalTrajectory)
+        //const store = useStore()
+        //let modalTrajectory = computed(() => store.state.modalTrajectory)
 
         let hasTrajectory = ref(false)
 
+        let modals = inject('modals')
+
         const openModalTrajectory = () => {
-            store.dispatch('displayModalTrajectory', true)
+            //let mtr1 = modals.getModalTrajectory().modal.trajectory
+            //console.log(mtr1)
+
+            modals.openTrajectory()
+
+            //modals.setModalTrajectory(true)
+            
+            //let mtr2 = modals.getModalTrajectory().modal.trajectory
+            //console.log(mtr2)
+
+            //store.dispatch('displayModalTrajectory', true)
         }
 
-        return { hasTrajectory, modalTrajectory, openModalTrajectory }
+        return { modals, hasTrajectory, /*modalTrajectory, */openModalTrajectory }
     }
 }
 </script>

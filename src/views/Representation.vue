@@ -7,6 +7,7 @@
     <Viewport />
 
     <ModalTrajectory />
+    <ModalStructure />
 
 </template>
 
@@ -17,8 +18,9 @@ import Tools from '@/components/representation/Tools'
 import Settings from '@/components/representation/Settings'
 import Viewport from '@/components/representation/Viewport'
 import ModalTrajectory from '@/components/representation/modals/ModalTrajectory'
+import ModalStructure from '@/components/representation/modals/ModalStructure'
 export default {
-    components: { Tools, Settings, Viewport, ModalTrajectory },
+    components: { Tools, Settings, Viewport, ModalTrajectory, ModalStructure },
     props: ['id'],
     setup(props) {
 

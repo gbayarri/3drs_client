@@ -5,6 +5,7 @@ export default createStore({
     return {
       menuEnabled: true,
       modalTrajectory: false,
+      modalStructure: false,
       stageLoaded: false,
       initialOrientation: null
     }
@@ -15,6 +16,9 @@ export default createStore({
     },
     MODAL_TRAJ(state, status) {
       state.modalTrajectory = status
+    },
+    MODAL_STR(state, status) {
+      state.modalStructure = status
     },
     STAGE_LOADED(state, status) {
       state.stageLoaded = status
@@ -30,15 +34,17 @@ export default createStore({
     displayModalTrajectory(context, status) {
       context.commit('MODAL_TRAJ', status)
     },
+    displayModalStructure(context, status) {
+      context.commit('MODAL_STR', status)
+    },
     stageIsLoaded(context, status) {
       context.commit('STAGE_LOADED', status)
     },
     initOrientation(context, orientation) {
-      
       context.commit('INIT_ORIENTATION', orientation)
     }
   },
   modules: {
   },
-  plugins: [ createLogger() ]
+  //plugins: [ createLogger() ]
 })

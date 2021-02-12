@@ -1,5 +1,5 @@
 <template>
-    <Dialog v-model:visible="modals.dialog.trajectory" 
+    <Dialog v-model:visible="modals.dialog.structure" 
             :closable="true"
             :closeOnEscape="true" 
             :dismissableMask="true" 
@@ -7,67 +7,56 @@
             :baseZIndex="2001"
             :style="{ width: '50vw' }">
         <template #header>
-            <i class="fas fa-film"></i> <h3>{{ header }}</h3>
+            <i class="fas fa-upload"></i> <h3>{{ header }}</h3>
         </template>
 
         Lorem ipsum dolor sit amet consectetur, adipisicing elit. Tempore veniam distinctio reprehenderit facilis corrupti laboriosam voluptate debitis consequuntur delectus perspiciatis! Debitis similique quis deserunt perspiciatis. Doloribus placeat assumenda laborum distinctio est corrupti dolorum, dolores, reiciendis odit nostrum deleniti eum eligendi debitis architecto saepe eius voluptatem, ipsa facilis vitae aut. Molestias assumenda nisi dicta a, reprehenderit cum modi quis? Sint rem dolorem laboriosam, odit eligendi ipsam iste officia aperiam iusto commodi dolore vitae ut! Exercitationem saepe minima officia expedita illo a eius voluptates sapiente iure ullam temporibus necessitatibus sed commodi cum mollitia quasi, nobis eaque maxime quaerat dignissimos laudantium provident cupiditate. Culpa corrupti, atque commodi asperiores facere soluta! Perferendis reiciendis facilis hic blanditiis minus, laudantium laboriosam velit, modi nemo, dolorem vero aut? Laudantium sequi, quis vero numquam sapiente, aspernatur esse sint ipsum maxime omnis eos. Et pariatur est exercitationem explicabo! Quis velit temporibus nobis consequuntur, esse dolor unde suscipit aliquid illum at ex et veritatis illo inventore, soluta fugit omnis perferendis tempore quisquam voluptatem ea quasi necessitatibus natus voluptatibus! Eligendi nam dolores molestiae officia similique atque consequuntur ab quos itaque praesentium qui, placeat distinctio amet exercitationem est non asperiores excepturi ea aut explicabo tenetur ad nulla porro ipsam! Culpa, natus aliquid?
 
         <template #footer>
-            <Button label="Close" icon="pi pi-times" @click="closeBasic" />
+            <Button label="Close" icon="pi pi-times" @click="closeStructure" />
         </template>
     </Dialog>
-    <div style="position:absolute;z-index:100">{{ modals.dialog.trajectory }}</div>
 </template>
 
 <script>
-//import modals from "@/modules/Modals"
-import { /*computed, watch, ref, onMounted, */inject } from 'vue'
-//import { useStore } from 'vuex'
+/*import { computed } from 'vue'
+import { useStore } from 'vuex'*/
+import { inject } from 'vue'
 export default {
     components: {  },
     setup() {
 
-        //TRY TO INTEGRATE BOTH MODALS IN ONE PASSING VARIABLES
-        // INTEGRATE UPLOAD FILE COMPONENT
-
-        const header = "Upload Trajectory"
-
-        //const store = useStore()
-
-        //const modalTrajectory = computed(() => store.state.modalTrajectory)
-
-        //let modalTrajectory = modals.getModalTrajectory().modal.trajectory
+        const header = "Upload Structure"
 
         let modals = inject('modals')
 
-        //let modalTrajectory = ref(false)
+        const closeStructure = () => {
+            //store.dispatch('displayModalTrajectory', false)
+            modals.closeStructure()
+        }
 
-        /*const hideModal = () => {
-            console.log(store.state.modalTrajectory)
+        return { header, modals, /*modalTrajectory, hideModal, showModal, */closeStructure }
+
+        /*const header = "Upload Structure"
+
+        const store = useStore()
+
+        const modalStructure = computed(() => store.state.modalStructure)
+
+        const hideModal = () => {
+            console.log(store.state.modalStructure)
         }
 
         const showModal = () => {
-            console.log(store.state.modalTrajectory)
-        }*/
-
-        const closeBasic = () => {
-            //store.dispatch('displayModalTrajectory', false)
-            modals.closeTrajectory()
+            console.log(store.state.modalStructure)
         }
 
-        /*onMounted(() => {
-            console.log(modalTrajectory)
-        })*/
-
-       /* watch(modals.getModalTrajectory().modal, (mt, pmt) => {
-            //modalTrajectory = modals.getModalTrajectory().modal.trajectory
-            //console.log(mt, pmt)
-            modalTrajectory = ref(mt.trajectory)
-            console.log(modalTrajectory)
-        })*/
+        const closeBasic = () => {
+            store.dispatch('displayModalStructure', false)
+        }
 
 
-        return { header, modals, /*modalTrajectory, hideModal, showModal, */closeBasic }
+        return { header, modalStructure, hideModal, showModal, closeBasic }*/
     }
 }
 </script>

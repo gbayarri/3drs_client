@@ -27,7 +27,7 @@ setup(props) {
         if(cpVisible.value) ttp.value = "Click to close color picker"
         else ttp.value = "Change background color"
 
-        stage.setParameters( { backgroundColor: '#ff0000' } );
+        //stage.setParameters( { backgroundColor: '#ff0000' } );
     }
 
     /*const closePicker = () => {

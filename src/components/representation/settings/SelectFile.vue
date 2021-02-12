@@ -1,5 +1,5 @@
 <template>
-  <Dropdown v-model="selectedFile" :options="files" optionLabel="name" placeholder="Select a File" @change="onChange" />
+    <Dropdown v-model="selectedFile" :options="files" optionLabel="name" placeholder="Select a File" @change="onChange" />
 </template>
 
 <script>
@@ -19,6 +19,8 @@ export default {
         const onChange = (e) => {
             console.log(e.value)
         }
+
+        
 
         return { selectedFile, files, onChange }
     }

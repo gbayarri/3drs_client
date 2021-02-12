@@ -24,23 +24,75 @@ export default {
     const createViewport = () => {
       const stage = ngl.createStage("viewport").stage
 
-      stage.loadFile("https://mmb.irbbarcelona.org/api/pdb/2vgb", { defaultRepresentation: false, ext: 'pdb', name:'2vgb' })
-        .then(function (component) {
+      Promise.all([
 
-            component.addRepresentation( "ribbon", {  color: "sstruc"} )
-            component.addRepresentation( "ball+stick", { sele: "hetero and not(water or ion)",  radius: .4, aspectRatio: 1.5 } )
+        // 2vgb: TODO search structure with chains and models
+        stage.loadFile("https://mmb.irbbarcelona.org/api/pdb/2rgp", { defaultRepresentation: false, ext: 'pdb', name:'2rgp' })
+          .then(function (component) {
 
-            console.log('structure 2vgb loaded')
+              component.addRepresentation( "ribbon", {  color: "sstruc"} )
+              component.addRepresentation( "ball+stick", { sele: "hetero and not(water or ion)",  radius: .4, aspectRatio: 1.5 } )
 
-            stage.autoView()
+              //console.log('structure 2vgb loaded')
 
-            // TODO: FOR EACH FILE
-            //console.log(stage.viewerControls.getOrientation())
-            store.dispatch('initOrientation', stage.viewerControls.getOrientation())
+              
 
-            store.dispatch('stageIsLoaded', true)
+              // TODO: FOR EACH FILE
+              //console.log(stage.viewerControls.getOrientation())
+              /*store.dispatch('initOrientation', stage.viewerControls.getOrientation())
 
-           
+              store.dispatch('stageIsLoaded', true)*/
+
+              return component
+
+          }),
+
+          stage.loadFile("https://mmb.irbbarcelona.org/api/pdb/1aki", { defaultRepresentation: false, ext: 'pdb', name:'1aki' })
+              .then(function (component) {
+                //console.log(stage)
+                  component.addRepresentation( "ribbon", {  color: '#000'} )
+                  component.addRepresentation( "base", { sele: "*", color: "resname" } )
+                  component.addRepresentation( "ball+stick", { sele: "hetero and not(water or ion)",  radius: .4, aspectRatio: 1.5 } )
+                  component.addRepresentation( "ball+stick", { sele: "ion",   radius: .4, aspectRatio: 1.5 })
+
+                  //component.autoView()
+
+                  //stage.autoView()
+
+                  //console.log(stage.viewerControls.getOrientation())
+
+                  return component
+
+          }),
+
+          stage.loadFile("https://mmb.irbbarcelona.org/api/pdb/4i19", { defaultRepresentation: false, ext: 'pdb', name:'4i19' })
+              .then(function (component) {
+                //console.log(stage)
+                  component.addRepresentation( "ribbon", {  color: '#ff0'} )
+                  component.addRepresentation( "base", { sele: "*", color: "resname" } )
+                  component.addRepresentation( "ball+stick", { sele: "hetero and not(water or ion)",  radius: .4, aspectRatio: 1.5 } )
+                  component.addRepresentation( "ball+stick", { sele: "ion",   radius: .4, aspectRatio: 1.5 })
+
+                  //component.autoView()
+
+                  //stage.autoView()
+
+                  //console.log(stage.viewerControls.getOrientation())
+
+                  return component
+
+          })
+
+        ]).then(function (ol) {
+          /*ol[ 0 ].superpose(ol[ 1 ], false)
+          ol[ 0 ].autoView(":A")*/
+
+          //console.log(stage)
+
+          stage.autoView()
+          store.dispatch('initOrientation', stage.viewerControls.getOrientation())
+
+          store.dispatch('stageIsLoaded', true)
 
         })
     }

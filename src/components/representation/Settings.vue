@@ -3,17 +3,24 @@
 
     <Sidebar v-model:visible="visibleRight" :baseZIndex="1000" :dismissable="false" :modal="false" position="right" id="sidebar">
         <div id="sidebar-content">
+            <TitleSettings title="structures" />
             <SelectFile />
+            <MenuFile />
+            <hr class="subsection" />
+            <UploadFile />
             <hr />
+            <TitleSettings title="models / chains" />
             <Models />
             <Chains />
-            <hr />
+            <hr class="subsection" />
+            <TitleSettings title="representations" />
             <MainStructure />
             <Heteroatoms />
             <Metals />
             <Residues />
             <Water />
-            <hr />
+            <hr class="subsection" />
+            <TitleSettings title="trajectory" />
             <Trajectory />
         </div>
     </Sidebar>
@@ -21,7 +28,10 @@
 
 <script>
 import { ref } from 'vue'
+import TitleSettings from '@/components/representation/settings/TitleSettings'
 import SelectFile from '@/components/representation/settings/SelectFile'
+import UploadFile from '@/components/representation/settings/UploadFile'
+import MenuFile from '@/components/representation/settings/MenuFile'
 import Models from '@/components/representation/settings/Models'
 import Chains from '@/components/representation/settings/Chains'
 import MainStructure from '@/components/representation/settings/MainStructure'
@@ -31,7 +41,7 @@ import Residues from '@/components/representation/settings/Residues'
 import Water from '@/components/representation/settings/Water'
 import Trajectory from '@/components/representation/settings/Trajectory'
 export default {
-    components: { SelectFile, Models, Chains, MainStructure, Heteroatoms, Metals, Residues, Water, Trajectory },
+    components: { TitleSettings, SelectFile, UploadFile, MenuFile, Models, Chains, MainStructure, Heteroatoms, Metals, Residues, Water, Trajectory },
     setup() {
 
         let visibleRight = ref(false)
@@ -76,7 +86,7 @@ export default {
         background-position: right bottom;
         width: 100%; 
         height: 100%; 
-        padding: 20px 0; 
+        padding: 10px 0; 
         overflow-y: auto; 
     }
     .p-sidebar .p-sidebar-close {
@@ -98,6 +108,17 @@ export default {
     .p-sidebar .p-sidebar-close .p-sidebar-close-icon::before { content: "\e92e"; }
     .p-sidebar .p-sidebar-close:focus { box-shadow: none!important;}
 
+    h3.settings-title { 
+        margin-left: 2.5%;
+        /*line-height: 0;*/
+        margin-top: 0;
+        padding: 0;
+        font-size: 15px;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: #fff;
+    }
+
     /* panels */
     #sidebar .p-panel.p-component { background: #fff; padding: 0 0 1px 0; width: 95%; margin: 0 2.5% 5px; border-radius: 4px; }
     #sidebar .p-panel.p-panel-toggleable .p-panel-header { position:relative; padding: .7rem 1rem; background: #d0dfef!important; font-size: 14px; }
@@ -105,6 +126,6 @@ export default {
     #sidebar .p-panel.p-panel-toggleable .p-panel-content { font-size: 14px; }
 
     /* buttons */
-    #sidebar .settings-button-trajectory { width: 95%; margin: 0 2.5%; background:#fff; color:#6f96a9; text-align: left; }
-    #sidebar .settings-button-trajectory:hover { background:#546974; color:#fff; }
+    #sidebar .settings-button { width: 95%; margin: 0 2.5%; background:#fff; color:#6f96a9; text-align: left; }
+    #sidebar .settings-button:hover { background:#546974; color:#fff; }
 </style>

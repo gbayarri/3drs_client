@@ -29,6 +29,7 @@ import router from '@/router'
 import store from '@/store'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+import modals from "@/modules/Modals"
 
 // import PrimeVue resources
 import 'primevue/resources/themes/saga-blue/theme.css'      
@@ -74,3 +75,4 @@ app.mount('#app')
 // provide / inject globallly axios & router
 app.provide('$axios', axios)
 app.provide('$router', router)
+app.provide('modals', modals)

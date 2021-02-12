@@ -6,8 +6,8 @@
         <Background :stage="stage" />
         <FullScreen :stage="stage" />
         <Picture :stage="stage" />
-        <Upload :stage="stage" />
         <Align :stage="stage" />
+        <Help />
     </div>
 </template>
 
@@ -20,13 +20,12 @@ import Center from '@/components/representation/tools/Center'
 import Background from '@/components/representation/tools/Background'
 import FullScreen from '@/components/representation/tools/FullScreen'
 import Picture from '@/components/representation/tools/Picture'
-import Upload from '@/components/representation/tools/Upload'
+import Help from '@/components/representation/tools/Help'
 import Align from '@/components/representation/tools/Align'
 export default {
-    components: { Reload, Rotate, Center, Background, FullScreen, Picture, Upload, Align },
+    components: { Reload, Rotate, Center, Background, FullScreen, Picture, Help, Align },
     setup() {
-        let stage = null
-        stage = ngl.getStage().stage
+        let stage = ngl.getStage().stage
         return { stage }
     }
 }
