@@ -36,18 +36,36 @@ export default {
 
     const getHelixes = (structureView) => {
       let helixes = []
-      // TODO!!!!!
+      let prev = null
+      let arraux = []
       structureView.eachResidue(function (rp) {
-        console.log(rp.isHelix())
-        /*console.log(rp.entityIndex)
-          let res = {
-              'id': globals.aminoacids[rp.resname.toLowerCase()].id,
-              'num': rp.resno,
-              'name': rp.resname.toUpperCase(),
-          }
-          sequence.push(res)*/
+        if(rp.isHelix()) {
+          arraux.push(rp.resno)
+        }
+        if(!rp.isHelix() && prev) {
+          helixes.push(arraux)
+          arraux = []
+        }
+        prev = rp.isHelix()
       });
-      //return sequence
+      return helixes
+    }
+
+    const getSheets = (structureView) => {
+      let sheets = []
+      let prev = null
+      let arraux = []
+      structureView.eachResidue(function (rp) {
+        if(rp.isSheet()) {
+          arraux.push(rp.resno)
+        }
+        if(!rp.isSheet() && prev) {
+          sheets.push(arraux)
+          arraux = []
+        }
+        prev = rp.isSheet()
+      });
+      return sheets
     }
 
     const getResidues = (structureView) => {
@@ -56,7 +74,8 @@ export default {
           let res = {
               'id': globals.aminoacids[rp.resname.toLowerCase()].id,
               'num': rp.resno,
-              'name': rp.resname.toUpperCase(),
+              'label': rp.resname.toUpperCase(),
+              'longname': globals.aminoacids[rp.resname.toLowerCase()].name
           }
           sequence.push(res)
       });
@@ -69,13 +88,14 @@ export default {
           let res = {
               'num': rp.resno,
               'name': rp.resname.toUpperCase(),
+              'description': rp.entity.description
           }
           heteros.push(res)
       });
       return heteros
     }
 
-    const getMetals = (structureView) => {
+    const getIons = (structureView) => {
       let ions = []
       structureView.eachResidue(function (rp) {
           let res = {
@@ -105,11 +125,19 @@ export default {
 
       Promise.all([
 
-        // 2vgb: TODO search structure with chains and models
-        stage.loadFile("https://files.rcsb.org/download/1mbs.pdb", { defaultRepresentation: false, ext: 'pdb', name:'first_str' })
+        // 2vgb: pyruvate
+        // 1mbs: web3DMol
+        // 2rgp: water, ions, hetero, helixes and sheets
+        // 2kod: multimodel + multichain
+        // 1pik: multimodel + multichain DNA (no structure)
+        // 4gxy: RNA
+        stage.loadFile("https://files.rcsb.org/download/2rgp.pdb", { defaultRepresentation: false, ext: 'pdb', name:'first_str' })
           .then(function (component) {
 
-            component.addRepresentation( "cartoon", {  sele: "helix", color: "#000000"} )
+              // DON'T REMOVE
+              //component.addRepresentation( "cartoon", {  sele: "helix", color: "#f00", opacity:.4, aspectRatio:10 } )
+              //component.addRepresentation( "cartoon", {  sele: "sheet", color: "#0f0", opacity:.4, aspectRatio:10 } )
+              // DON'T REMOVE
 
               component.addRepresentation( "ribbon", {  color: "sstruc"} )
               component.addRepresentation( "base", { sele: "*", color: "resname" } )
@@ -118,17 +146,18 @@ export default {
 
               //console.log('structure 2vgb loaded')
 
-              
-
               // TODO: FOR EACH FILE
               //console.log(stage.viewerControls.getOrientation())
               /*store.dispatch('initOrientation', stage.viewerControls.getOrientation())
 
               store.dispatch('stageIsLoaded', true)*/
 
+
+
               /* MODELS */
               const selection_models = ngl.createSelection('*') 
               const structureViewModels = component.structure.getView(selection_models)
+              //console.log(structureViewModels)
               const models = getModels(structureViewModels)
               //console.log(models)
 
@@ -142,13 +171,19 @@ export default {
               const selection_helixes = ngl.createSelection('not ( water or ion or hetero )')
               const structureViewHelixes = component.structure.getView(selection_helixes)
               const helixes = getHelixes(structureViewHelixes)
-              console.log(helixes)
+              //console.log(helixes)
+
+              /* SHEETS */
+              const selection_sheets = ngl.createSelection('not ( water or ion or hetero )')
+              const structureViewSheets = component.structure.getView(selection_sheets)
+              const sheets = getSheets(structureViewSheets)
+              //console.log(sheets)
 
               /* RESIDUES */
               const selection_residues = ngl.createSelection('not ( water or ion or hetero )')
               const structureViewResidues = component.structure.getView(selection_residues)
               const residues = getResidues(structureViewResidues)
-              //console.log(residues)
+              console.log(residues)
               
               /* HETEROATOMS */
               const selection_heteroatoms = ngl.createSelection('hetero and not (water or ion)')
@@ -156,11 +191,11 @@ export default {
               const heteroatoms = getHeteroatoms(structureViewHeteroatoms)
               //console.log(heteroatoms)
 
-              /* METALS */
-              const selection_metals = ngl.createSelection('ion')
-              const structureViewMetals = component.structure.getView(selection_metals)
-              const metals = getMetals(structureViewMetals)
-              //console.log(metals)
+              /* IONS */
+              const selection_ions = ngl.createSelection('ion')
+              const structureViewIons = component.structure.getView(selection_ions)
+              const ions = getIons(structureViewIons)
+              //console.log(ions)
 
               /* WATERS */
               const selection_waters = ngl.createSelection('water')

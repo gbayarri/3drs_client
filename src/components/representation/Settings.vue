@@ -1,9 +1,12 @@
 <template>
-    <Button icon="pi pi-angle-double-left" @click="visibleRight = true" class="**p-mr-2" id="settings-handle" />
+    <Button icon="pi pi-angle-double-left" 
+    @click="visibleRight = true" 
+    v-if="!visibleRight"
+    id="settings-handle" />
 
     <Sidebar 
     v-model:visible="visibleRight" 
-    :baseZIndex="1000" 
+    :baseZIndex="1" 
     :dismissable="false" 
     :modal="false" 
     position="right" 
@@ -22,7 +25,7 @@
             <TitleSettings title="representations" />
             <MainStructure class="settings-panel mainstr" />
             <Heteroatoms class="settings-panel hetero" />
-            <Metals class="settings-panel metals" />
+            <Ions class="settings-panel ions" />
             <Residues class="settings-panel residues" />
             <Water class="settings-panel water" />
             <hr class="subsection" />
@@ -42,12 +45,12 @@ import Models from '@/components/representation/settings/Models'
 import Chains from '@/components/representation/settings/Chains'
 import MainStructure from '@/components/representation/settings/MainStructure'
 import Heteroatoms from '@/components/representation/settings/Heteroatoms'
-import Metals from '@/components/representation/settings/Metals'
+import Ions from '@/components/representation/settings/Ions'
 import Residues from '@/components/representation/settings/Residues'
 import Water from '@/components/representation/settings/Water'
 import Trajectory from '@/components/representation/settings/Trajectory'
 export default {
-    components: { TitleSettings, SelectFile, UploadFile, MenuFile, Models, Chains, MainStructure, Heteroatoms, Metals, Residues, Water, Trajectory },
+    components: { TitleSettings, SelectFile, UploadFile, MenuFile, Models, Chains, MainStructure, Heteroatoms, Ions, Residues, Water, Trajectory },
     setup() {
 
         let visibleRight = ref(false)
@@ -83,7 +86,7 @@ export default {
         background-repeat: no-repeat;    */
     }
     .p-sidebar-right { width:25%; }
-    .p-sidebar-content { position: relative; width: 100%; height: 100%; }
+    .p-sidebar-content { position: absolute; width: 100%; height: 100%; z-index:10; }
     #sidebar-content {  
         background-size:175px auto; 
         background-repeat: no-repeat; 
@@ -94,6 +97,7 @@ export default {
         height: 100%; 
         padding: 10px 0; 
         overflow-y: auto; 
+        
     }
     .p-sidebar .p-sidebar-close {
         position: absolute;

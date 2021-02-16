@@ -4,7 +4,7 @@
             <i class="fas fa-dna"></i> <div class="p-panel-title">{{ header }}</div>
         </template>
         <template #icons>
-            <Button icon="fas fa-eye" class="p-button-rounded p-button-text" />
+            <Button icon="fas fa-eye" class="p-button-rounded p-button-text" v-tooltip.top="'ttp'" />
         </template>
 
         <!-- representation -->

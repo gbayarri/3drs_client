@@ -19,7 +19,17 @@ module.exports = {
         thr: { name: 'threonine', id: 'T' },
         trp: { name: 'tryptophan', id: 'W' },
         tyr: { name: 'tyrosine', id: 'Y' },
-        val: { name: 'valine', id: 'V' }
+        val: { name: 'valine', id: 'V' },
+        da: { name: 'deoxyadenosine', id: 'DA' },
+        dc: { name: 'deoxycytidine', id: 'DC' },
+        dg: { name: 'deoxyguanosine', id: 'DG' },
+        dt: { name: 'deoxythymidine', id: 'DT' },
+        di: { name: 'deoxyinosine', id: 'DI' },
+        a: { name: 'adenosine', id: 'A' },
+        c: { name: 'cytidine', id: 'C' },
+        g: { name: 'guanosine', id: 'G' },
+        u: { name: 'uridine', id: 'U' },
+        i: { name: 'inosine', id: 'I' }
     },
     representation_str: [
         { name: 'Backbone', id: 'backbone' },

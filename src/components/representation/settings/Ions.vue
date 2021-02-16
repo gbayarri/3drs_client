@@ -8,8 +8,8 @@
         </template>
         
         <Listbox 
-        v-model="selectedMetals" 
-        :options="metals" 
+        v-model="selectedIons" 
+        :options="ions" 
         :multiple="true" 
         :filter="true" 
         :filterPlaceholder="filterPlaceholder"
@@ -32,12 +32,12 @@ export default {
     setup() {
 
         let isCollapsed = ref(true)
-        const header = "Metals"
+        const header = "Ions"
 
-        const filterPlaceholder = "Search metal"
+        const filterPlaceholder = "Search ion"
 
-        const selectedMetals = ref(null)
-        const metals =  [
+        const selectedIons = ref(null)
+        const ions =  [
             {name: 'K', code: 'K'},
             {name: 'Na', code: 'Na'},
             {name: 'Mn', code: 'Mn'}
@@ -45,10 +45,10 @@ export default {
 
         const onChange = (e) => {
             //console.log(e.value)
-            console.log(selectedMetals.value)
+            console.log(selectedIons.value)
         }
 
-        return { header, isCollapsed, filterPlaceholder, selectedMetals, metals, onChange }
+        return { header, isCollapsed, filterPlaceholder, selectedIons, ions, onChange }
     }
 }
 </script>
