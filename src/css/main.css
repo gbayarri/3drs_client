@@ -29,6 +29,14 @@ h2 { color: #5e738b; font-size: 25px; font-weight: 400; }
 .margin-bottom-20 { margin-bottom:20px!important; }
 .margin-bottom-30 { margin-bottom:30px!important; }
 
+/* scroll - chrome */
+::-webkit-scrollbar { width: 7px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #858f98; }
+::-webkit-scrollbar-thumb:hover { background: #6c757d; }
+/* scroll - firefox */
+body, html { scrollbar-color: #858f98 #f1f1f1; scrollbar-width: thin; }
+
 /* main menu */
 #top { width:100%; border-bottom: 2px solid #dee2e6; height: 60px; background-color: #f5f5f5; }
 #main-logo { width:80px; padding-top: 5px; }
@@ -94,6 +102,20 @@ h2 { color: #5e738b; font-size: 25px; font-weight: 400; }
 .p-dropdown:not(.p-disabled):hover { border-color: #5e738b; }
 .p-dropdown:not(.p-disabled).p-focus { border-color: #5e738b; box-shadow: 0 0 0 0.2rem rgb(94 115 139 / 0.3); }
 .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight { background: #dfe7ef; }
+/* multiselect */
+.p-multiselect:not(.p-disabled):hover { border-color: #5e738b; }
+.p-multiselect:not(.p-disabled).p-focus { border-color: #5e738b; box-shadow: 0 0 0 0.2rem rgb(94 115 139 / 0.3); }
+.p-multiselect-panel .p-multiselect-items .p-multiselect-item.p-highlight { background: #dfe7ef; }
+.p-multiselect-panel .p-multiselect-items .p-multiselect-item:focus { box-shadow: none; }
+/* checkbox */
+.p-checkbox .p-checkbox-box.p-highlight { border-color: #6f96a9; background: #6f96a9; }
+/* listbox */
+.p-listbox .p-listbox-list .p-listbox-item.p-highlight { background: #dfe7ef; }
+.p-listbox .p-listbox-list .p-listbox-item:focus { box-shadow: none;}
+.p-listbox .p-listbox-header { padding: 0.25rem 0 .55rem; }
+.p-listbox .p-listbox-header .p-listbox-filter { padding:.25rem 1.5rem .25rem .5rem ; }
+.p-inputtext:enabled:hover { border-color: #5e738b; }
+.p-inputtext:enabled:focus { border-color: #5e738b; box-shadow: 0 0 0 0.2rem rgb(94 115 139 / 0.3); }
 
 /* breadcrumbs */
 .p-breadcrumb { background:transparent; border:none; padding:0; font-size: 14px; }
@@ -119,6 +141,10 @@ h2 { color: #5e738b; font-size: 25px; font-weight: 400; }
 .p-dialog .p-dialog-header h3 { margin-left: 0.5rem; font-weight: 600;  }
 .p-dialog .p-dialog-header .p-dialog-header-icon { position: absolute; right: 20px; }
 .p-dialog .p-dialog-header .p-dialog-header-icon:focus { box-shadow: none; }
+
+/* file upload */
+.p-fileupload-row > div { width: 33%; word-break: break-word; }
+.p-fileupload-row > div:last-child { padding: 0!important;  width: auto; }
 
 /* progress spinner */
 @keyframes p-progress-spinner-color {

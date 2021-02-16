@@ -3,7 +3,10 @@
         <template #header>
             <i class="fas fa-tint"></i> <div class="p-panel-title">{{ header }}</div>
         </template>
-        Content
+        <template #icons>
+            <Button icon="fas fa-eye" class="p-button-rounded p-button-text" />
+        </template>
+        Content (clone main structure?)
     </Panel>
 </template>
 

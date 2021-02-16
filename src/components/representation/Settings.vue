@@ -1,7 +1,13 @@
 <template>
     <Button icon="pi pi-angle-double-left" @click="visibleRight = true" class="**p-mr-2" id="settings-handle" />
 
-    <Sidebar v-model:visible="visibleRight" :baseZIndex="1000" :dismissable="false" :modal="false" position="right" id="sidebar">
+    <Sidebar 
+    v-model:visible="visibleRight" 
+    :baseZIndex="1000" 
+    :dismissable="false" 
+    :modal="false" 
+    position="right" 
+    id="sidebar">
         <div id="sidebar-content">
             <TitleSettings title="structures" />
             <SelectFile />
@@ -10,15 +16,15 @@
             <UploadFile />
             <hr />
             <TitleSettings title="models / chains" />
-            <Models />
-            <Chains />
+            <Models class="settings-panel models" />
+            <Chains class="settings-panel chains" />
             <hr class="subsection" />
             <TitleSettings title="representations" />
-            <MainStructure />
-            <Heteroatoms />
-            <Metals />
-            <Residues />
-            <Water />
+            <MainStructure class="settings-panel mainstr" />
+            <Heteroatoms class="settings-panel hetero" />
+            <Metals class="settings-panel metals" />
+            <Residues class="settings-panel residues" />
+            <Water class="settings-panel water" />
             <hr class="subsection" />
             <TitleSettings title="trajectory" />
             <Trajectory />
@@ -76,7 +82,7 @@ export default {
         background-position: center; 
         background-repeat: no-repeat;    */
     }
-    .p-sidebar-right { width:20%; }
+    .p-sidebar-right { width:25%; }
     .p-sidebar-content { position: relative; width: 100%; height: 100%; }
     #sidebar-content {  
         background-size:175px auto; 
@@ -121,6 +127,7 @@ export default {
 
     /* panels */
     #sidebar .p-panel.p-component { background: #fff; padding: 0 0 1px 0; width: 95%; margin: 0 2.5% 5px; border-radius: 4px; }
+    #sidebar .p-panel .p-panel-content { padding:0.5rem; }
     #sidebar .p-panel.p-panel-toggleable .p-panel-header { position:relative; padding: .7rem 1rem; background: #d0dfef!important; font-size: 14px; }
     #sidebar .p-panel.p-panel-toggleable .p-panel-header .p-panel-icons { position: absolute; right: 0; }
     #sidebar .p-panel.p-panel-toggleable .p-panel-content { font-size: 14px; }
@@ -128,4 +135,28 @@ export default {
     /* buttons */
     #sidebar .settings-button { width: 95%; margin: 0 2.5%; background:#fff; color:#6f96a9; text-align: left; }
     #sidebar .settings-button:hover { background:#546974; color:#fff; }
+
+    .settings-panel button.p-button-rounded.p-button-text { height: 1.8rem; width: 1.8rem; font-size: 13px; color:#6c757d; }
+    .settings-panel button.p-button-rounded.p-button-text:hover { color:#fff; background:#849096!important; }
+
+    /* dowpdown */ 
+    .settings-panel .p-dropdown { width:100%; margin:0; }
+
+    /* chips */
+    .settings-panel .p-chip { margin-right: 0.2rem; font-size:12px; font-weight: 600; background-color: #6f96a9; color:#fff; }
+    .settings-panel .p-chip .pi { margin-left: 0.2rem; font-size:12px; }
+    
+    /* listbox */
+    .settings-panel .p-listbox { border:none; }
+    .settings-panel .p-listbox .p-listbox-list { padding:0; }
+    .settings-panel .p-listbox .p-listbox-list .p-listbox-item { justify-content:space-between; display:flex; }
+    .settings-panel .p-listbox .p-listbox-list .p-listbox-item i { font-size:14px; color:#88939c; margin-top:3px; }
+
+    /* slider */
+    .settings-panel .p-slider.p-slider-horizontal { width: 95%; margin: 0 2.5%; }
+    .settings-panel .p-slider .p-slider-range { background: #6f96a9; }
+    .settings-panel .p-slider .p-slider-handle { border-color: #6f96a9; }
+    .settings-panel .p-slider:not(.p-disabled) .p-slider-handle:hover { background: #6f96a9;  border-color: #6f96a9; }
+    .settings-panel .slider-value { text-align:right; font-weight: 700;}
+
 </style>

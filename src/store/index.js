@@ -1,10 +1,8 @@
 import { createStore, createLogger } from 'vuex'
-import { ref } from 'vue'
 export default createStore({
   state() {
     return {
       menuEnabled: true,
-      modalTrajectory: false,
       modalStructure: false,
       stageLoaded: false,
       initialOrientation: null
@@ -13,12 +11,6 @@ export default createStore({
   mutations: {
     MENU_STATUS(state, status) {
       state.menuEnabled = status
-    },
-    MODAL_TRAJ(state, status) {
-      state.modalTrajectory = status
-    },
-    MODAL_STR(state, status) {
-      state.modalStructure = status
     },
     STAGE_LOADED(state, status) {
       state.stageLoaded = status
@@ -31,12 +23,6 @@ export default createStore({
     menuStatus(context, status) {
       context.commit('MENU_STATUS', status)
     },
-    displayModalTrajectory(context, status) {
-      context.commit('MODAL_TRAJ', status)
-    },
-    displayModalStructure(context, status) {
-      context.commit('MODAL_STR', status)
-    },
     stageIsLoaded(context, status) {
       context.commit('STAGE_LOADED', status)
     },
@@ -46,5 +32,5 @@ export default createStore({
   },
   modules: {
   },
-  //plugins: [ createLogger() ]
+  plugins: [ /*createLogger()*/ ]
 })

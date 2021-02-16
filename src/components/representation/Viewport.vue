@@ -7,13 +7,9 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue'
+import { inject, computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
-//import globals from '@/globals'
-//console.log(globals.aminoacids)
-
-import ngl from "@/modules/NGLStage"
-
+import globals from '@/globals'
 export default {
   setup() {
 
@@ -21,17 +17,104 @@ export default {
 
     let stageLoaded = computed(() => store.state.stageLoaded)
 
+    const getModels = (structureView) => {
+      let models = []
+      structureView.eachModel(function (rp) {
+        models.push(rp.index)
+      });
+      return models
+    }
+
+    const getChains = (structureView) => {
+      let chains = []
+      structureView.eachChain(function (rp) {
+        chains.push(rp.chainname)
+      });
+      chains = Array.from(new Set(chains))
+      return chains
+    }
+
+    const getHelixes = (structureView) => {
+      let helixes = []
+      // TODO!!!!!
+      structureView.eachResidue(function (rp) {
+        console.log(rp.isHelix())
+        /*console.log(rp.entityIndex)
+          let res = {
+              'id': globals.aminoacids[rp.resname.toLowerCase()].id,
+              'num': rp.resno,
+              'name': rp.resname.toUpperCase(),
+          }
+          sequence.push(res)*/
+      });
+      //return sequence
+    }
+
+    const getResidues = (structureView) => {
+      let sequence = []
+      structureView.eachResidue(function (rp) {
+          let res = {
+              'id': globals.aminoacids[rp.resname.toLowerCase()].id,
+              'num': rp.resno,
+              'name': rp.resname.toUpperCase(),
+          }
+          sequence.push(res)
+      });
+      return sequence
+    }
+
+    const getHeteroatoms = (structureView) => {
+      let heteros = []
+      structureView.eachResidue(function (rp) {
+          let res = {
+              'num': rp.resno,
+              'name': rp.resname.toUpperCase(),
+          }
+          heteros.push(res)
+      });
+      return heteros
+    }
+
+    const getMetals = (structureView) => {
+      let ions = []
+      structureView.eachResidue(function (rp) {
+          let res = {
+              'num': rp.resno,
+              'name': rp.resname.toUpperCase(),
+          }
+          ions.push(res)
+      });
+      return ions
+    }
+
+    const getWaters = (structureView) => {
+      let waters = []
+      structureView.eachResidue(function (rp) {
+          let res = {
+              'num': rp.resno,
+              'name': rp.resname.toUpperCase(),
+          }
+          waters.push(res)
+      });
+      return waters
+    }
+
     const createViewport = () => {
-      const stage = ngl.createStage("viewport").stage
+      let ngl = inject('ngl')
+      const stage = ngl.createStage("viewport")
 
       Promise.all([
 
         // 2vgb: TODO search structure with chains and models
-        stage.loadFile("https://mmb.irbbarcelona.org/api/pdb/2rgp", { defaultRepresentation: false, ext: 'pdb', name:'2rgp' })
+        stage.loadFile("https://files.rcsb.org/download/1mbs.pdb", { defaultRepresentation: false, ext: 'pdb', name:'first_str' })
           .then(function (component) {
 
+            component.addRepresentation( "cartoon", {  sele: "helix", color: "#000000"} )
+
               component.addRepresentation( "ribbon", {  color: "sstruc"} )
-              component.addRepresentation( "ball+stick", { sele: "hetero and not(water or ion)",  radius: .4, aspectRatio: 1.5 } )
+              component.addRepresentation( "base", { sele: "*", color: "resname" } )
+              //component.addRepresentation( "ball+stick", { sele: "hetero and not(water or ion)",  radius: .4, aspectRatio: 1.5 } )
+              component.addRepresentation( "ball+stick", { sele: "hetero",  radius: .4, aspectRatio: 1.5 } )
 
               //console.log('structure 2vgb loaded')
 
@@ -43,11 +126,53 @@ export default {
 
               store.dispatch('stageIsLoaded', true)*/
 
+              /* MODELS */
+              const selection_models = ngl.createSelection('*') 
+              const structureViewModels = component.structure.getView(selection_models)
+              const models = getModels(structureViewModels)
+              //console.log(models)
+
+              /* CHAINS */
+              const selection_chains = ngl.createSelection('/0') // change by model
+              const structureViewChains = component.structure.getView(selection_chains)
+              const chains = getChains(structureViewChains)
+              //console.log(chains)
+
+              /* HELIXES */
+              const selection_helixes = ngl.createSelection('not ( water or ion or hetero )')
+              const structureViewHelixes = component.structure.getView(selection_helixes)
+              const helixes = getHelixes(structureViewHelixes)
+              console.log(helixes)
+
+              /* RESIDUES */
+              const selection_residues = ngl.createSelection('not ( water or ion or hetero )')
+              const structureViewResidues = component.structure.getView(selection_residues)
+              const residues = getResidues(structureViewResidues)
+              //console.log(residues)
+              
+              /* HETEROATOMS */
+              const selection_heteroatoms = ngl.createSelection('hetero and not (water or ion)')
+              const structureViewHeteroatoms = component.structure.getView(selection_heteroatoms)
+              const heteroatoms = getHeteroatoms(structureViewHeteroatoms)
+              //console.log(heteroatoms)
+
+              /* METALS */
+              const selection_metals = ngl.createSelection('ion')
+              const structureViewMetals = component.structure.getView(selection_metals)
+              const metals = getMetals(structureViewMetals)
+              //console.log(metals)
+
+              /* WATERS */
+              const selection_waters = ngl.createSelection('water')
+              const structureViewWaters = component.structure.getView(selection_waters)
+              const waters = getWaters(structureViewWaters)
+              //console.log(waters)
+
               return component
 
           }),
 
-          stage.loadFile("https://mmb.irbbarcelona.org/api/pdb/1aki", { defaultRepresentation: false, ext: 'pdb', name:'1aki' })
+          /*stage.loadFile("https://files.rcsb.org/download/1aki.pdb", { defaultRepresentation: false, ext: 'pdb', name:'1aki' })
               .then(function (component) {
                 //console.log(stage)
                   component.addRepresentation( "ribbon", {  color: '#000'} )
@@ -65,7 +190,7 @@ export default {
 
           }),
 
-          stage.loadFile("https://mmb.irbbarcelona.org/api/pdb/4i19", { defaultRepresentation: false, ext: 'pdb', name:'4i19' })
+          stage.loadFile("https://files.rcsb.org/download/4i19.pdb", { defaultRepresentation: false, ext: 'pdb', name:'4i19' })
               .then(function (component) {
                 //console.log(stage)
                   component.addRepresentation( "ribbon", {  color: '#ff0'} )
@@ -81,7 +206,7 @@ export default {
 
                   return component
 
-          })
+          })*/
 
         ]).then(function (ol) {
           /*ol[ 0 ].superpose(ol[ 1 ], false)

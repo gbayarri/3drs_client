@@ -3,7 +3,10 @@
         <template #header>
             <i class="fas fa-share-alt"></i> <div class="p-panel-title">{{ header }}</div>
         </template>
-        Content
+        <template #icons>
+            <Button icon="fas fa-eye" class="p-button-rounded p-button-text" />
+        </template>
+        Content (list of all residues consecutive -like old site- allowing multiple selection via alt+click, for example)
     </Panel>
 </template>
 

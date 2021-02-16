@@ -5,73 +5,97 @@
             :dismissableMask="true" 
             :modal="true" 
             :baseZIndex="2001"
-            :style="{ width: '50vw' }">
+            :style="{ width: '60vw' }">
         <template #header>
             <i class="fas fa-film"></i> <h3>{{ header }}</h3>
         </template>
 
-        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Tempore veniam distinctio reprehenderit facilis corrupti laboriosam voluptate debitis consequuntur delectus perspiciatis! Debitis similique quis deserunt perspiciatis. Doloribus placeat assumenda laborum distinctio est corrupti dolorum, dolores, reiciendis odit nostrum deleniti eum eligendi debitis architecto saepe eius voluptatem, ipsa facilis vitae aut. Molestias assumenda nisi dicta a, reprehenderit cum modi quis? Sint rem dolorem laboriosam, odit eligendi ipsam iste officia aperiam iusto commodi dolore vitae ut! Exercitationem saepe minima officia expedita illo a eius voluptates sapiente iure ullam temporibus necessitatibus sed commodi cum mollitia quasi, nobis eaque maxime quaerat dignissimos laudantium provident cupiditate. Culpa corrupti, atque commodi asperiores facere soluta! Perferendis reiciendis facilis hic blanditiis minus, laudantium laboriosam velit, modi nemo, dolorem vero aut? Laudantium sequi, quis vero numquam sapiente, aspernatur esse sint ipsum maxime omnis eos. Et pariatur est exercitationem explicabo! Quis velit temporibus nobis consequuntur, esse dolor unde suscipit aliquid illum at ex et veritatis illo inventore, soluta fugit omnis perferendis tempore quisquam voluptatem ea quasi necessitatibus natus voluptatibus! Eligendi nam dolores molestiae officia similique atque consequuntur ab quos itaque praesentium qui, placeat distinctio amet exercitationem est non asperiores excepturi ea aut explicabo tenetur ad nulla porro ipsam! Culpa, natus aliquid?
+        <FileUpload 
+        @uploader="uploader"
+        @select="selector"
+        accept=".xtc, .dcd" 
+        :customUpload="true"
+        :multiple="false" 
+        :maxFileSize="52428800"
+        :disabled="disableFileUpload"
+        chooseLabel="Select">
+            <template #empty>
+                <p v-html="descr"></p>
+            </template>
+        </FileUpload>
 
         <template #footer>
-            <Button label="Close" icon="pi pi-times" @click="closeBasic" />
+            <Button label="Close" icon="pi pi-times" @click="closeModal" />
         </template>
     </Dialog>
-    <div style="position:absolute;z-index:100">{{ modals.dialog.trajectory }}</div>
 </template>
 
 <script>
-//import modals from "@/modules/Modals"
-import { /*computed, watch, ref, onMounted, */inject } from 'vue'
-//import { useStore } from 'vuex'
+import { ref, inject } from 'vue'
 export default {
     components: {  },
     setup() {
 
-        //TRY TO INTEGRATE BOTH MODALS IN ONE PASSING VARIABLES
-        // INTEGRATE UPLOAD FILE COMPONENT
-
+        /* MODAL */
         const header = "Upload Trajectory"
+        const modals = inject('modals')
 
-        //const store = useStore()
-
-        //const modalTrajectory = computed(() => store.state.modalTrajectory)
-
-        //let modalTrajectory = modals.getModalTrajectory().modal.trajectory
-
-        let modals = inject('modals')
-
-        //let modalTrajectory = ref(false)
-
-        /*const hideModal = () => {
-            console.log(store.state.modalTrajectory)
+        const closeModal = () => {
+            modals.closeModal('trajectory')
         }
 
-        const showModal = () => {
-            console.log(store.state.modalTrajectory)
-        }*/
+        /* FILE UPLOAD */
+        const $axios = inject('$axios');
+        let disableFileUpload = ref(false)
+        const descr = "Click <strong>Select button</strong> above or drag and drop files to here to upload."
+        
+        const selector = (e) => {
+            setTimeout(function(){
+                let ext = 'dcd'
+                if(e.originalEvent.path[3].innerText.indexOf('.xtc') != -1) ext = 'xtc'
 
-        const closeBasic = () => {
-            //store.dispatch('displayModalTrajectory', false)
-            modals.closeTrajectory()
+                const rows = document.getElementsByClassName("p-fileupload-row")
+                for(var item of rows){
+                    item.getElementsByTagName("div")[0].innerHTML = '<span class="fu-ext-traj">' + ext + '</span><br><span class="fu-traj">trajectory</span>'
+                    item.getElementsByTagName("div")[0].style.lineHeight = '15px'
+                }
+            }, 20);
         }
 
-        /*onMounted(() => {
-            console.log(modalTrajectory)
-        })*/
+        const uploader = (e) => {
+            disableFileUpload.value = true
+            let filesList =  Object.assign([], e.files)
+            let formData = new FormData();
+            let resp = null
 
-       /* watch(modals.getModalTrajectory().modal, (mt, pmt) => {
-            //modalTrajectory = modals.getModalTrajectory().modal.trajectory
-            //console.log(mt, pmt)
-            modalTrajectory = ref(mt.trajectory)
-            console.log(modalTrajectory)
-        })*/
+            for (const [key, value] of filesList.entries()) {
+                formData.append('file' + key, value)
+            }
 
+            console.log('Uploading trajectory file!!!')
 
-        return { header, modals, /*modalTrajectory, hideModal, showModal, */closeBasic }
+            /*$axios
+                .post(process.env.VUE_APP_API_LOCATION + 'upload/file/', formData)
+                .then(function (response) {
+                    //console.log(response);
+                    resp = response.data
+                })
+                .catch(err => console.error(err.message))
+                .finally( () => {
+                    // CONTROL ERRORS WHEN EMPTY FILE, FOR EXAMPLE
+                    //router.push({ name: 'Contact', params: { id } }) 
+                    //$router.push({ path: `/representation/${id}` }) 
+                    console.log(resp)
+                })*/
+        }
+
+        return { header, modals, closeModal, 
+                 descr, selector, uploader, disableFileUpload }
     }
 }
 </script>
 
 <style>
-
+    .fu-ext-traj { color:#6f96a9; font-weight: 700; }
+    .fu-traj { text-transform: uppercase; color: #8c8c8c; font-size: 14px; font-weight: 600; }
 </style>

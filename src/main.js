@@ -2,21 +2,25 @@ import { createApp } from 'vue'
 
 // import PrimeVue and components
 import PrimeVue from 'primevue/config'
-import TabMenu from 'primevue/tabmenu';
+import TabMenu from 'primevue/tabmenu'
 import Tooltip from 'primevue/tooltip'
-import Panel from 'primevue/panel';
-import Card from 'primevue/card';
-import TabView from 'primevue/tabview';
-import TabPanel from 'primevue/tabpanel';
-import AutoComplete from 'primevue/autocomplete';
-import Button from 'primevue/button';
-import FileUpload from 'primevue/fileupload';
-import Breadcrumb from 'primevue/breadcrumb';
-import Sidebar from 'primevue/sidebar';
-import Dropdown from 'primevue/dropdown';
-import Dialog from 'primevue/dialog';
-import ColorPicker from 'primevue/colorpicker';
-import ProgressSpinner from 'primevue/progressspinner';
+import Panel from 'primevue/panel'
+import Card from 'primevue/card'
+import TabView from 'primevue/tabview'
+import TabPanel from 'primevue/tabpanel'
+import AutoComplete from 'primevue/autocomplete'
+import Button from 'primevue/button'
+import FileUpload from 'primevue/fileupload'
+import Breadcrumb from 'primevue/breadcrumb'
+import Sidebar from 'primevue/sidebar'
+import Dropdown from 'primevue/dropdown'
+import Dialog from 'primevue/dialog'
+import ColorPicker from 'primevue/colorpicker'
+import ProgressSpinner from 'primevue/progressspinner'
+import MultiSelect from 'primevue/multiselect'
+import Slider from 'primevue/slider'
+import Chip from 'primevue/chip'
+import Listbox from 'primevue/listbox'
 //import Toast from 'primevue/toast'
 //import ToastService from 'primevue/toastservice'
 
@@ -29,6 +33,7 @@ import router from '@/router'
 import store from '@/store'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+import ngl from "@/modules/NGL"
 import modals from "@/modules/Modals"
 
 // import PrimeVue resources
@@ -66,6 +71,10 @@ app.component('Dropdown', Dropdown)
 app.component('Dialog', Dialog)
 app.component('ColorPicker', ColorPicker)
 app.component('ProgressSpinner', ProgressSpinner)
+app.component('MultiSelect', MultiSelect)
+app.component('Slider', Slider)
+app.component('Chip', Chip)
+app.component('Listbox', Listbox)
 
 // create directives
 app.directive('tooltip', Tooltip)
@@ -75,4 +84,5 @@ app.mount('#app')
 // provide / inject globallly axios & router
 app.provide('$axios', axios)
 app.provide('$router', router)
+app.provide('ngl', ngl)
 app.provide('modals', modals)

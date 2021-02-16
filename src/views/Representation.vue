@@ -2,6 +2,8 @@
 
     <Tools v-if="stageLoaded" />
 
+    <MiniSettings v-if="stageLoaded" />
+
     <Settings v-if="stageLoaded" />
 
     <Viewport />
@@ -15,12 +17,13 @@
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 import Tools from '@/components/representation/Tools'
+import MiniSettings from '@/components/representation/MiniSettings'
 import Settings from '@/components/representation/Settings'
 import Viewport from '@/components/representation/Viewport'
 import ModalTrajectory from '@/components/representation/modals/ModalTrajectory'
 import ModalStructure from '@/components/representation/modals/ModalStructure'
 export default {
-    components: { Tools, Settings, Viewport, ModalTrajectory, ModalStructure },
+    components: { Tools, MiniSettings, Settings, Viewport, ModalTrajectory, ModalStructure },
     props: ['id'],
     setup(props) {
 
