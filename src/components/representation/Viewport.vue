@@ -131,6 +131,9 @@ export default {
         // 2kod: multimodel + multichain
         // 1pik: multimodel + multichain DNA (no structure)
         // 4gxy: RNA
+
+        // to create array with pdb addresses and load them programmatically in this Promise
+        // move all component function (getModels and so on) to the NGL module
         stage.loadFile("https://files.rcsb.org/download/2rgp.pdb", { defaultRepresentation: false, ext: 'pdb', name:'first_str' })
           .then(function (component) {
 

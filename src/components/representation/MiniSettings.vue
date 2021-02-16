@@ -1,6 +1,7 @@
 <template>
     <div id="minisettings">
         minisettings (all content of MainStructure here)
+        TODO BOTTOM LEGEND ON THE RIGH BOTTOM CORNER (MOVE IF SIDEBAR OPENED)
     </div>
 </template>
 
