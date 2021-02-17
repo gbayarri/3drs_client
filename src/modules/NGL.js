@@ -5,7 +5,7 @@ let stage = reactive({});
 let selection = reactive({});
 
 const createStage = function (layer) {
-    stage = new Stage(layer, { tooltip:true })
+    stage = new Stage(layer, { tooltip:false })
     //console.log('stage created')
     return stage 
 }

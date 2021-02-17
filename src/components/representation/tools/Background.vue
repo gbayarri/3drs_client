@@ -7,12 +7,12 @@
 
 <script>
 import { ref, watch } from 'vue'
-import { useStore } from 'vuex'
+//import { useStore } from 'vuex'
 export default {
 props: ['stage'],
 setup(props) {
 
-    const store = useStore()
+    //const store = useStore()
 
     const ttp = ref("Change background color")
     let color = ref('#f1f1f1')

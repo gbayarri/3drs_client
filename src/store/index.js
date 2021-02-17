@@ -5,6 +5,7 @@ export default createStore({
       menuEnabled: true,
       modalStructure: false,
       stageLoaded: false,
+      sidebarEnabled: false,
       initialOrientation: null
     }
   },
@@ -17,6 +18,9 @@ export default createStore({
     },
     INIT_ORIENTATION(state, orientation) {
       state.initialOrientation = orientation
+    },
+    SIDEBAR_STATUS(state, status) {
+      state.sidebarEnabled = status
     }
   },
   actions: {
@@ -28,6 +32,9 @@ export default createStore({
     },
     initOrientation(context, orientation) {
       context.commit('INIT_ORIENTATION', orientation)
+    },
+    sidebarStatus(context, status) {
+      context.commit('SIDEBAR_STATUS', status)
     }
   },
   modules: {

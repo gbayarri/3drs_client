@@ -2,7 +2,8 @@ import { reactive } from "vue";
 
 let dialog = reactive({
   trajectory: false,
-  structure: false
+  structure: false,
+  share: false
 });
 
 const openModal = function (label) {

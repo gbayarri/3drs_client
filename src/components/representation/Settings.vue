@@ -10,6 +10,8 @@
     :dismissable="false" 
     :modal="false" 
     position="right" 
+    @show="onSidebarShown"
+    @hide="onSidebarHidden"
     id="sidebar">
         <div id="sidebar-content">
             <TitleSettings title="structures" />
@@ -22,12 +24,14 @@
             <Models class="settings-panel models" />
             <Chains class="settings-panel chains" />
             <hr class="subsection" />
-            <TitleSettings title="representations" />
-            <MainStructure class="settings-panel mainstr" />
+            <TitleSettings title="molecules" />
+            <!-- <MainStructure class="settings-panel mainstr" />-->
             <Heteroatoms class="settings-panel hetero" />
             <Ions class="settings-panel ions" />
             <Residues class="settings-panel residues" />
             <Water class="settings-panel water" />
+            <CustomSelection class="settings-panel custom" />
+            <!-- ADD CUSTOM SELECTION -->
             <hr class="subsection" />
             <TitleSettings title="trajectory" />
             <Trajectory />
@@ -37,25 +41,37 @@
 
 <script>
 import { ref } from 'vue'
+import { useStore } from 'vuex'
 import TitleSettings from '@/components/representation/settings/TitleSettings'
 import SelectFile from '@/components/representation/settings/SelectFile'
 import UploadFile from '@/components/representation/settings/UploadFile'
 import MenuFile from '@/components/representation/settings/MenuFile'
 import Models from '@/components/representation/settings/Models'
 import Chains from '@/components/representation/settings/Chains'
-import MainStructure from '@/components/representation/settings/MainStructure'
+//import MainStructure from '@/components/representation/settings/MainStructure'
 import Heteroatoms from '@/components/representation/settings/Heteroatoms'
 import Ions from '@/components/representation/settings/Ions'
 import Residues from '@/components/representation/settings/Residues'
 import Water from '@/components/representation/settings/Water'
+import CustomSelection from '@/components/representation/settings/CustomSelection'
 import Trajectory from '@/components/representation/settings/Trajectory'
 export default {
-    components: { TitleSettings, SelectFile, UploadFile, MenuFile, Models, Chains, MainStructure, Heteroatoms, Ions, Residues, Water, Trajectory },
+    components: { TitleSettings, SelectFile, UploadFile, MenuFile, Models, Chains, /*MainStructure,*/ Heteroatoms, Ions, Residues, Water, CustomSelection, Trajectory },
     setup() {
+
+        const store = useStore()
 
         let visibleRight = ref(false)
 
-        return { visibleRight }
+        const onSidebarShown = () => {
+            store.dispatch('sidebarStatus', true)
+        }
+
+        const onSidebarHidden = () => {
+            store.dispatch('sidebarStatus', false)
+        }
+
+        return { visibleRight, onSidebarShown, onSidebarHidden }
     }
 }
 </script>

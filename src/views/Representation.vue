@@ -6,10 +6,15 @@
 
     <Settings v-if="stageLoaded" />
 
+    <Share v-if="stageLoaded" />
+
+    <Legend v-if="stageLoaded" />
+
     <Viewport />
 
     <ModalTrajectory />
     <ModalStructure />
+    <ModalShare />
 
 </template>
 
@@ -19,11 +24,14 @@ import { useStore } from 'vuex'
 import Tools from '@/components/representation/Tools'
 import MiniSettings from '@/components/representation/MiniSettings'
 import Settings from '@/components/representation/Settings'
+import Share from '@/components/representation/Share'
+import Legend from '@/components/representation/Legend'
 import Viewport from '@/components/representation/Viewport'
 import ModalTrajectory from '@/components/representation/modals/ModalTrajectory'
 import ModalStructure from '@/components/representation/modals/ModalStructure'
+import ModalShare from '@/components/representation/modals/ModalShare'
 export default {
-    components: { Tools, MiniSettings, Settings, Viewport, ModalTrajectory, ModalStructure },
+    components: { Tools, MiniSettings, Settings, Share, Legend, Viewport, ModalTrajectory, ModalStructure, ModalShare },
     props: ['id'],
     setup(props) {
 

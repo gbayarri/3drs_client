@@ -10,15 +10,15 @@
             <span class="sequence-number">702&nbsp;&nbsp;</span>
             <span class="sequence-item" data-chain="A" data-resnum="702" data-resname="ALA" v-tooltip.top="'Alanine (ALA)<br>Residue: 702'">A</span>
             <span class="sequence-item" data-chain="A" data-resnum="703" data-resname="ALA" data-sheet="1">A</span>
-            <span class="sheet" v-tooltip.bottom="'β-sheet<br>ALA703~ALA707'">&nbsp;&nbsp;</span>
+            <span class="sheet" @mouseover="sheetOver(1)" @mouseleave="sheetLeave(1)" data-sheet="1" v-tooltip.bottom="'β-sheet<br>ALA703~ALA707'">&nbsp;&nbsp;</span>
             <span class="sequence-item" data-chain="A" data-resnum="704" data-resname="ALA" data-sheet="1">A</span>
-            <span class="sheet">&nbsp;&nbsp;</span>
+            <span class="sheet" @mouseover="sheetOver(1)" @mouseleave="sheetLeave(1)" data-sheet="1" v-tooltip.bottom="'β-sheet<br>ALA703~ALA707'">&nbsp;&nbsp;</span>
             <span class="sequence-item" data-chain="A" data-resnum="705" data-resname="ALA" data-sheet="1">A</span>
-            <span class="sheet">&nbsp;&nbsp;</span>
+            <span class="sheet" @mouseover="sheetOver(1)" @mouseleave="sheetLeave(1)" data-sheet="1" >&nbsp;&nbsp;</span>
             <span class="sequence-item" data-chain="A" data-resnum="706" data-resname="ALA" data-sheet="1">A</span>
-            <span class="sheet">&nbsp;&nbsp;</span>
+            <span class="sheet" @mouseover="sheetOver(1)" @mouseleave="sheetLeave(1)" data-sheet="1" >&nbsp;&nbsp;</span>
             <span class="sequence-item" data-chain="A" data-resnum="707" data-resname="ALA" data-sheet="1">A</span>
-            <span class="sheet-arrow">&#9654;&nbsp;</span>
+            <span class="sheet-arrow" @mouseover="sheetOver(1)" @mouseleave="sheetLeave(1)" data-sheet="1">&#9654;&nbsp;</span>
             <span class="sequence-item disabled">&nbsp;</span>
             <span class="sequence-item disabled">&nbsp;</span>
             <span class="sequence-item disabled">&nbsp;</span>
@@ -27,15 +27,15 @@
             <span class="sequence-item" data-chain="A" data-resnum="712" data-resname="ALA">A</span>
             <span class="sequence-item" data-chain="A" data-resnum="713" data-resname="ALA">A</span>
             <span class="sequence-item" data-chain="A" data-resnum="714" data-resname="ALA" data-helix="1">A</span>
-            <span class="helix" v-tooltip.bottom="'α-helix<br>ALA714~ALA718'">&nbsp;&nbsp;</span>
+            <span class="helix" @mouseover="helixOver(1)" @mouseleave="helixLeave(1)" data-helix="1" v-tooltip.bottom="'α-helix<br>ALA714~ALA718'">&nbsp;&nbsp;</span>
             <span class="sequence-item" data-chain="A" data-resnum="715" data-resname="ALA" data-helix="1">A</span>
-            <span class="helix">&nbsp;&nbsp;</span>
+            <span class="helix" @mouseover="helixOver(1)" @mouseleave="helixLeave(1)" data-helix="1">&nbsp;&nbsp;</span>
             <span class="sequence-item" data-chain="A" data-resnum="716" data-resname="ALA" data-helix="1">A</span>
-            <span class="helix">&nbsp;&nbsp;</span>
+            <span class="helix" @mouseover="helixOver(1)" @mouseleave="helixLeave(1)" data-helix="1">&nbsp;&nbsp;</span>
             <span class="sequence-item" data-chain="A" data-resnum="717" data-resname="ALA" data-helix="1">A</span>
-            <span class="helix">&nbsp;&nbsp;</span>
+            <span class="helix" @mouseover="helixOver(1)" @mouseleave="helixLeave(1)" data-helix="1">&nbsp;&nbsp;</span>
             <span class="sequence-item" data-chain="A" data-resnum="718" data-resname="ALA" data-helix="1">A</span>
-            <span class="helix-bullet">&#9679;&nbsp;</span>
+            <span class="helix" @mouseover="helixOver(1)" @mouseleave="helixLeave(1)" data-helix="1">&nbsp;&nbsp;</span>
             <span class="sequence-item" data-chain="A" data-resnum="719" data-resname="ALA">A</span>
             <span class="sequence-item" data-chain="A" data-resnum="720" data-resname="ALA">A</span>
             <span class="helix">&nbsp;&nbsp;</span>
@@ -45,7 +45,7 @@
             <span class="sequence-item" data-chain="A" data-resnum="722" data-resname="ALA">A</span>
             <span class="helix">&nbsp;&nbsp;</span>
             <span class="sequence-item" data-chain="A" data-resnum="723" data-resname="ALA">A</span>
-            <span class="helix-bullet">&#9679;&nbsp;</span>
+            <span class="helix">&nbsp;&nbsp;</span>
             <span class="sequence-item" data-chain="A" data-resnum="724" data-resname="ALA">A</span>
             <span class="sequence-item" data-chain="A" data-resnum="725" data-resname="ALA">A</span>
             <span class="sequence-item" data-chain="A" data-resnum="726" data-resname="ALA">A</span>
@@ -94,7 +94,41 @@ export default {
         let isCollapsed = ref(true)
         const header = "Residues"
 
-        return { header, isCollapsed }
+        const sheetOver = (sheet) => {
+            const sheets = document.querySelectorAll('[data-sheet="' + sheet + '"]')
+            for(const s of sheets) {
+                if(s.className == 'sheet') s.style.backgroundColor = 'rgb(46, 199, 150)'
+                if(s.className == 'sheet-arrow') s.style.color = 'rgb(46, 199, 150)'
+                if(s.className == 'sequence-item')  s.classList.add('sequence-item-hover')
+            }
+        }
+
+        const sheetLeave = (sheet) => {
+            const sheets = document.querySelectorAll('[data-sheet="' + sheet + '"]')
+            for(const s of sheets) {
+                if(s.className == 'sheet') s.style.backgroundColor = 'rgb(104, 158, 153)'
+                if(s.className == 'sheet-arrow') s.style.color = 'rgb(104, 158, 153)'
+                if(s.className == 'sequence-item sequence-item-hover')  s.classList.remove('sequence-item-hover')
+            }
+        }
+
+        const helixOver = (sheet) => {
+            const helixes = document.querySelectorAll('[data-helix="' + sheet + '"]')
+            for(const s of helixes) {
+                if(s.className == 'helix') s.style.backgroundPosition = 'center top'
+                if(s.className == 'sequence-item')  s.classList.add('sequence-item-hover')
+            }
+        }
+
+        const helixLeave = (sheet) => {
+            const helixes = document.querySelectorAll('[data-helix="' + sheet + '"]')
+            for(const s of helixes) {
+                if(s.className == 'helix') s.style.backgroundPosition = 'center bottom'
+                if(s.className == 'sequence-item sequence-item-hover')  s.classList.remove('sequence-item-hover')
+            }
+        }
+
+        return { header, isCollapsed, sheetOver, sheetLeave, helixOver, helixLeave }
     }
 }
 </script>
@@ -108,7 +142,8 @@ export default {
     }
     #sequence-text .sequence-item { position:relative; z-index:1; padding:0 0.5px; cursor:default; }
     #sequence-text .sequence-item:not(.disabled) { cursor: pointer; }    
-    #sequence-text .sequence-item:not(.disabled):hover {
+    #sequence-text .sequence-item:not(.disabled):hover,
+    .sequence-item-hover {
         color: #fff;
         background: #5E738B;
     }
@@ -146,7 +181,9 @@ export default {
         font-size: 22px;
     }
     #sequence-text .helix {
-        background: rgb(183, 120, 120);
+        background-repeat: no-repeat; 
+        background-image: url("~@/assets/img/bg_helix.png"); 
+        background-position: center bottom;
         word-break: keep-all;
         cursor: pointer;
         position: relative;
@@ -155,16 +192,5 @@ export default {
         padding: 0px;
         margin-left: -1.2em;
         font-size: 10px;
-    }
-    #sequence-text .helix-bullet {
-        color: rgb(183, 120, 120);
-        word-break: keep-all;
-        cursor: pointer;
-        position: relative;
-        top: 0.67em;
-        left: 0.6em;
-        padding: 0px;
-        margin-left: -1.2em;
-        font-size: 18px;
     }
 </style>

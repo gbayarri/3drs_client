@@ -186,7 +186,7 @@ export default {
               const selection_residues = ngl.createSelection('not ( water or ion or hetero )')
               const structureViewResidues = component.structure.getView(selection_residues)
               const residues = getResidues(structureViewResidues)
-              console.log(residues)
+              //console.log(residues)
               
               /* HETEROATOMS */
               const selection_heteroatoms = ngl.createSelection('hetero and not (water or ion)')

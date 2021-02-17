@@ -8,7 +8,7 @@ export default {
     const ttp = "Open help documentation"
 
     const handleClick = () => {
-      window.open('https://github.com/gbayarri/3drs', '_blank')
+      window.open(process.env.VUE_APP_HELP_URL, '_blank')
     }
 
     return { ttp, handleClick }

@@ -21,6 +21,7 @@ import MultiSelect from 'primevue/multiselect'
 import Slider from 'primevue/slider'
 import Chip from 'primevue/chip'
 import Listbox from 'primevue/listbox'
+import InputText from 'primevue/inputtext'
 //import Toast from 'primevue/toast'
 //import ToastService from 'primevue/toastservice'
 
@@ -75,6 +76,7 @@ app.component('MultiSelect', MultiSelect)
 app.component('Slider', Slider)
 app.component('Chip', Chip)
 app.component('Listbox', Listbox)
+app.component('InputText', InputText)
 
 // create directives
 app.directive('tooltip', Tooltip)
