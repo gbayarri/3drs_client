@@ -4,7 +4,17 @@
             <i class="fas fa-share-alt"></i> <div class="p-panel-title">{{ header }}</div>
         </template>
         <template #icons>
-            <Button icon="fas fa-eye" class="p-button-rounded p-button-text" />
+            <Button 
+            :icon="allSelected ? 'fas fa-times' : 'fas fa-check-double'" 
+            class="p-button-rounded p-button-text" 
+            @click="selectAll" 
+            v-tooltip.top="ttpsa" />
+            <Button 
+            :icon="allVisible ? 'fas fa-eye-slash' : 'fas fa-eye'" 
+            @click="hideAll" 
+            class="p-button-rounded p-button-text" 
+            v-tooltip.top="ttph" 
+            />
         </template>
         <div id="sequence-text">
             <span class="sequence-number">702&nbsp;&nbsp;</span>
@@ -89,10 +99,30 @@ import { ref } from 'vue'
 export default {
     setup() {
 
-        // TODO ROLLOVER SHEET / HELIX ALL RESIDUES
-
         let isCollapsed = ref(true)
         const header = "Residues"
+        let ttph = ref("Hide all residues")
+        let allSelected = ref(false)
+        let allVisible = ref(false)
+        let ttpsa = ref("Select all the residues")
+
+        const selectAll = () => {
+            ttpsa.value = allSelected.value ? 'Select all the residues' : 'Unselect all the residues'
+            const items = document.getElementsByClassName("sequence-item")
+            for(const it of items) {
+                if(!allSelected.value) {
+                    if(it.className.indexOf('disabled') === -1) it.classList.add('sequence-item-hover')
+                } else {
+                    if(it.className.indexOf('disabled') === -1) it.classList.remove('sequence-item-hover')
+                }
+            }
+            allSelected.value = !allSelected.value
+        }
+
+        const hideAll = () => {
+            ttph.value = allVisible.value ? 'Hide all residues' : 'Show all residues'
+            allVisible.value = !allVisible.value
+        }
 
         const sheetOver = (sheet) => {
             const sheets = document.querySelectorAll('[data-sheet="' + sheet + '"]')
@@ -128,7 +158,9 @@ export default {
             }
         }
 
-        return { header, isCollapsed, sheetOver, sheetLeave, helixOver, helixLeave }
+        return { header, isCollapsed, ttph,
+        ttpsa, allSelected, selectAll, hideAll, allVisible,
+        sheetOver, sheetLeave, helixOver, helixLeave }
     }
 }
 </script>

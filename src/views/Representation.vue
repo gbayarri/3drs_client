@@ -2,7 +2,7 @@
 
     <Tools v-if="stageLoaded" />
 
-    <MiniSettings v-if="stageLoaded" />
+    <RepresentationSettings v-if="stageLoaded" />
 
     <Settings v-if="stageLoaded" />
 
@@ -22,7 +22,7 @@
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 import Tools from '@/components/representation/Tools'
-import MiniSettings from '@/components/representation/MiniSettings'
+import RepresentationSettings from '@/components/representation/RepresentationSettings'
 import Settings from '@/components/representation/Settings'
 import Share from '@/components/representation/Share'
 import Legend from '@/components/representation/Legend'
@@ -31,7 +31,7 @@ import ModalTrajectory from '@/components/representation/modals/ModalTrajectory'
 import ModalStructure from '@/components/representation/modals/ModalStructure'
 import ModalShare from '@/components/representation/modals/ModalShare'
 export default {
-    components: { Tools, MiniSettings, Settings, Share, Legend, Viewport, ModalTrajectory, ModalStructure, ModalShare },
+    components: { Tools, RepresentationSettings, Settings, Share, Legend, Viewport, ModalTrajectory, ModalStructure, ModalShare },
     props: ['id'],
     setup(props) {
 

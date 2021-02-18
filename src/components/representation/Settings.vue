@@ -26,9 +26,9 @@
             <hr class="subsection" />
             <TitleSettings title="molecules" />
             <!-- <MainStructure class="settings-panel mainstr" />-->
+            <Residues class="settings-panel residues" />
             <Heteroatoms class="settings-panel hetero" />
             <Ions class="settings-panel ions" />
-            <Residues class="settings-panel residues" />
             <Water class="settings-panel water" />
             <CustomSelection class="settings-panel custom" />
             <!-- ADD CUSTOM SELECTION -->

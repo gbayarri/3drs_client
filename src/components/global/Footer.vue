@@ -1,5 +1,4 @@
 <template>
-    <!-- Sticky footer (TODO: simplify structure to http://mmb.irbbarcelona.org/webdev/bootstrap/home.html) -->
     <footer class="footer">
       <div class="container">
         <span class="text-muted">{{ new Date().getFullYear() }} &copy; <a target="_blank" class="white-link" href="https://mmb.irbbarcelona.org">Molecular Modeling and Bioinformatics Group</a></span>

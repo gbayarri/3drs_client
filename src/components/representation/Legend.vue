@@ -1,7 +1,6 @@
 <template>
-  <div id="legend" :class="{ 'legend-moved-left': sidebarEnabled }">
-      <!--str.name + ' | model 1 | <strong>' + chain + '</strong> | <strong>' + name + ' ' + num + '</strong>'-->
-      file.pdb | model 1 | <strong>A</strong> | <strong>ALA 702</strong>
+  <div id="legend" :class="{ 'legend-moved-left': sidebarEnabled }" v-if="legendEnabled">
+      <span>{{ legendContent.name }}</span>  | Model <span>1</span> | Chain <span>{{ legendContent.chainname }}</span> | <span>{{ legendContent.resname }} {{ legendContent.resno }}</span>  {{ legendContent.atomname }}
   </div>
 </template>
 
@@ -13,8 +12,10 @@ export default {
         const store = useStore()
         
         let sidebarEnabled = computed(() => store.state.sidebarEnabled)
-
-        return { sidebarEnabled }
+        let legendEnabled = computed(() => store.state.legendEnabled)
+        let legendContent = computed(() => store.state.legendContent)
+        
+        return { sidebarEnabled, legendEnabled, legendContent }
     }
 }
 </script>
@@ -30,25 +31,25 @@ export default {
     text-align: right;
     color: #fff;
     padding: 10px 15px;
-    /* display: none; */
-    /*-moz-transition-duration: 0.4s;
+    -moz-transition-duration: 0.4s;
     -webkit-transition-duration: 0.4s;
     -o-transition-duration: 0.4s;
     transition-duration: 0.4s;
     -moz-transition-timing-function: ease;
     -webkit-transition-timing-function: ease;
     -o-transition-timing-function: ease;
-    transition-timing-function: ease;*/
+    transition-timing-function: ease;
 }
 #legend.legend-moved-left { 
     right: 26%;
-    /*-moz-transition-duration: 0.3s;
+    -moz-transition-duration: 0.3s;
     -webkit-transition-duration: 0.3s;
     -o-transition-duration: 0.3s;
     transition-duration: 0.3s;
     -moz-transition-timing-function: ease-in;
     -webkit-transition-timing-function: ease-in;
     -o-transition-timing-function: ease-in;
-    transition-timing-function: ease-in;*/
+    transition-timing-function: ease-in;
 }
+#legend span { text-transform: uppercase; font-weight: 600;}
 </style>

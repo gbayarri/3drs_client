@@ -6,6 +6,9 @@ export default createStore({
       modalStructure: false,
       stageLoaded: false,
       sidebarEnabled: false,
+      legendEnabled: false, 
+      legendContent: {},
+
       initialOrientation: null
     }
   },
@@ -21,6 +24,12 @@ export default createStore({
     },
     SIDEBAR_STATUS(state, status) {
       state.sidebarEnabled = status
+    },
+    LEGEND_STATUS(state, status) {
+      state.legendEnabled = status
+    },
+    LEGEND_UPDATE(state, legend) {
+      state.legendContent = legend
     }
   },
   actions: {
@@ -35,6 +44,12 @@ export default createStore({
     },
     sidebarStatus(context, status) {
       context.commit('SIDEBAR_STATUS', status)
+    },
+    legendStatus(context, status) {
+      context.commit('LEGEND_STATUS', status)
+    },
+    updateLegend(context, legend) {
+      context.commit('LEGEND_UPDATE', legend)
     }
   },
   modules: {

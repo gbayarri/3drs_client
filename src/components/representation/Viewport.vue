@@ -14,7 +14,6 @@ export default {
   setup() {
 
     const store = useStore()
-
     let stageLoaded = computed(() => store.state.stageLoaded)
 
     const getModels = (structureView) => {
@@ -142,7 +141,7 @@ export default {
               //component.addRepresentation( "cartoon", {  sele: "sheet", color: "#0f0", opacity:.4, aspectRatio:10 } )
               // DON'T REMOVE
 
-              component.addRepresentation( "ribbon", {  color: "sstruc"} )
+              component.addRepresentation( "ribbon", {  sele: "*", color: "sstruc"} )
               component.addRepresentation( "base", { sele: "*", color: "resname" } )
               //component.addRepresentation( "ball+stick", { sele: "hetero and not(water or ion)",  radius: .4, aspectRatio: 1.5 } )
               component.addRepresentation( "ball+stick", { sele: "hetero",  radius: .4, aspectRatio: 1.5 } )
@@ -257,7 +256,66 @@ export default {
 
           store.dispatch('stageIsLoaded', true)
 
+          checkSignals(stage)
+
         })
+    }
+
+    const checkSignals = (stage) => {
+
+      stage.signals.hovered.add( function(pickingProxy){ 
+        // update / show legend
+        if (pickingProxy && pickingProxy.atom) {
+          store.dispatch('updateLegend', {
+            name: pickingProxy.atom.structure.name,
+            chainname: pickingProxy.atom.chainname,
+            resname: pickingProxy.atom.resname,
+            resno: pickingProxy.atom.resno,
+            atomname: pickingProxy.atom.atomname
+          })
+          store.dispatch('legendStatus', true)
+        }
+        // hide legend
+        if (!pickingProxy) {
+          store.dispatch('legendStatus', false)
+        }
+      })
+
+      /*stage.signals.hovered.add( function(pickingProxy){ 
+    		if (pickingProxy && pickingProxy.atom) {
+    			if(typeof repr_res !== 'undefined') component.removeRepresentation(repr_res);
+    			chain = pickingProxy.atom.chainname;
+	        	num = pickingProxy.atom.resno;
+	        	name = pickingProxy.atom.resname;
+	        	Widgets.showLegend(str, chain, name, num);
+	        	repr_res = component.addRepresentation( "backbone", { sele: '(' + num + ':' + chain + ')', aspectRatio: 10, opacity:.5, color:'#5E738B' });
+
+                //var s = sequence.find(e => e.num === num);
+                if(chain == current_chain) {
+                    cleanSequence();
+                    var seq_item = $('.sequence-item[data-chain="' + current_chain + '"][data-resnum="' + num + '"]');
+                    seq_item.css('background', '#5E738B');
+                    seq_item.css('color', '#fff');
+                }
+    		}
+    		if (!pickingProxy) {
+    			Widgets.hideLegend();
+    			if(typeof repr_res !== 'undefined') component.removeRepresentation(repr_res);
+                cleanSequence();
+    		}
+    	});
+
+    	stage.signals.clicked.add( function(pickingProxy){ 
+    		if (pickingProxy && pickingProxy.atom) {
+    			if(typeof repr_res !== 'undefined') component.removeRepresentation(repr_res);
+        		if(typeof repr_res_detail !== 'undefined') component.removeRepresentation(repr_res_detail);
+        		chain = pickingProxy.atom.chainname;
+	        	num = pickingProxy.atom.resno;
+	        	name = pickingProxy.atom.resname;
+	        	Widgets.showLegend(str, chain, name, num);
+        		repr_res_detail = component.addRepresentation( "ball+stick", { sele: '(' + num + ':' + chain + ')', aspectRatio: 1 });
+        		component.autoView('(' + num + ':' + chain + ')', 500);
+        	*/
     }
 
     onMounted(() => {
