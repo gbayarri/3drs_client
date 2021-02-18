@@ -137,7 +137,7 @@ export default {
 
         // TODO: SPECIAL MENU FOR REPRESENTATION 1 => NO MOL REPR / RADIUS AND 
         // ALLOW MOL REPR SEPARATELY???
-        // SHOW / HIDE STRUCTURE, BASES (CHECK IF NA), HETERO, IONS & WATERS.
+        // SHOW / HIDE STRUCTURE, BASES (CHECK IF NA in getResidues()), HETERO, IONS & WATERS.
         // ALLOW TO MODIFY OPACITY BUT NO COLORSCHEME
 
         // fold / unfold
@@ -163,12 +163,17 @@ export default {
             hasRadius.value = !(e.value.id == 'line' || e.value.id == 'surface')
         }
 
+        // REMOVE REPRESENTATION 
+        /* stage.getComponentsByName('first_str').list[0].dispose() */
         const ttprr = "Remove representation (double click)"
         const removeRepresentation = () => {
             console.log("double click!!")
         }
 
         let ttphr = ref("Hide representation")
+
+        // SET VISIBILITY
+        /*stage.getComponentsByName('first_str').list[0].setVisibility( false )*/
 
         let modelNewSel = ref('')
         let nrbDisabled = computed(() => !modelNewSel.value.length)
@@ -207,6 +212,9 @@ export default {
         })
 
         // opacity
+        /*stage.getComponentsByName('first_str').list[0].reprList.forEach( function( repre ){
+              //repre.setParameters( { opacity: 0.5} )
+            } )*/
         const label_opacity = "Select opacity"
         let opacity = ref(100)
 

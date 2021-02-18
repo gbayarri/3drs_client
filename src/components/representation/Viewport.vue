@@ -70,6 +70,8 @@ export default {
     const getResidues = (structureView) => {
       let sequence = []
       structureView.eachResidue(function (rp) {
+        //console.log(rp.isNucleic(), rp.isProtein())
+        console.log(rp.isDna())
           let res = {
               'id': globals.aminoacids[rp.resname.toLowerCase()].id,
               'num': rp.resno,
@@ -141,10 +143,11 @@ export default {
               //component.addRepresentation( "cartoon", {  sele: "sheet", color: "#0f0", opacity:.4, aspectRatio:10 } )
               // DON'T REMOVE
 
-              component.addRepresentation( "ribbon", {  sele: "*", color: "sstruc"} )
-              component.addRepresentation( "base", { sele: "*", color: "resname" } )
-              //component.addRepresentation( "ball+stick", { sele: "hetero and not(water or ion)",  radius: .4, aspectRatio: 1.5 } )
-              component.addRepresentation( "ball+stick", { sele: "hetero",  radius: .4, aspectRatio: 1.5 } )
+              component.addRepresentation( "cartoon", { name: "struc_1", sele: "*", color: "sstruc"} )
+              component.addRepresentation( "base", { name: "base_1", sele: "*", color: "resname" } )
+              component.addRepresentation( "ball+stick", { name: "ligand_1", sele: "hetero and not(water or ion)",  radius: .4, aspectRatio: 1.5 } )
+              component.addRepresentation( "ball+stick", { name: "water_1", sele: "water",  radius: .4, aspectRatio: 1.5 } )
+              component.addRepresentation( "ball+stick", { name: "ion_1", sele: "ion",  radius: .4, aspectRatio: 1.5 } )
 
               //console.log('structure 2vgb loaded')
 
@@ -257,6 +260,36 @@ export default {
           store.dispatch('stageIsLoaded', true)
 
           checkSignals(stage)
+
+          //stage.getRepresentationsByName('ligand_1').setVisibility(false)
+
+          //stage.getComponentsByName('first_str')[0].setVisibility(false)
+
+          //console.log(stage.getComponentsByName('first_str').list[0].structureView.getStructure())
+
+          /*stage.getComponentsByName('first_str').list[0].structure.eachResidue(function (rp) {
+            console.log(rp)
+          });*/
+
+          /*setTimeout( () => {
+            stage.getComponentsByName('first_str').list[0].reprList.forEach( function( repre ){
+              //repre.setVisibility( false );
+              repre.setParameters( { color: '#ff0000'} );
+              repre.setParameters( { opacity: 0.6} );
+              //console.log(repre)
+              //repre.dispose()
+              
+            } )
+            //stage.getComponentsByName('first_str').list[0].dispose()
+            //console.log(stage.getComponentsByName('first_str'))
+            //stage.getComponentsByName('first_str').list[0].setVisibility( false )
+          }, 2000)*/
+
+          /*stage.getRepresentationsByName( "licorice" ).list.forEach( function( repre ){
+            repre.setVisibility( !repre.visible );
+          } );*/
+
+          //console.log(stage)
 
         })
     }
