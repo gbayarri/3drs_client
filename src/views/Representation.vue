@@ -20,7 +20,8 @@
 
 <script>
 import { computed } from 'vue'
-import { useStore } from 'vuex'
+//import { useStore } from 'vuex'
+import useFlags from '@/modules/common/useFlags'
 import Tools from '@/components/representation/Tools'
 import RepresentationSettings from '@/components/representation/RepresentationSettings'
 import Settings from '@/components/representation/Settings'
@@ -35,11 +36,15 @@ export default {
     props: ['id'],
     setup(props) {
 
-        const store = useStore()
+        //const store = useStore()
+        const { flags, setFlagStatus } = useFlags()
+
         // activate tools, sidebar and so on
-        let stageLoaded = computed(() => store.state.stageLoaded)
+        //let stageLoaded = computed(() => store.state.stageLoaded)
+        const stageLoaded = computed(() => flags.stageLoaded)
         // disable menu
-        store.dispatch('menuStatus', false) 
+        
+        setFlagStatus('menuEnabled', false)
 
         console.log(props.id)
 

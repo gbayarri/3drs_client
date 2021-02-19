@@ -7,16 +7,30 @@
 </template>
 
 <script>
-import { inject, computed, onMounted } from 'vue'
-import { useStore } from 'vuex'
+import { /*inject, */computed, onMounted } from 'vue'
+import useFlags from '@/modules/common/useFlags'
+import useStage from '@/modules/ngl/useStage'
+import useLegend from '@/modules/ngl/useLegend'
+import useTools from '@/modules/ngl/useTools'
+import processStructure from '@/modules/ngl/processStructure'
+//import { useStore } from 'vuex'
 import globals from '@/globals'
 export default {
   setup() {
 
-    const store = useStore()
-    let stageLoaded = computed(() => store.state.stageLoaded)
+    //const store = useStore()
+    //let stageLoaded = computed(() => store.state.stageLoaded)
 
-    const getModels = (structureView) => {
+    const { flags, setFlagStatus } = useFlags()
+    const stageLoaded = computed(() => flags.stageLoaded)
+
+    const { updateLegend } = useLegend()
+
+    const { updateOrientation } = useTools()
+
+    const { getModels, getChains } = processStructure()
+
+    /*const getModels = (structureView) => {
       let models = []
       structureView.eachModel(function (rp) {
         models.push(rp.index)
@@ -31,7 +45,7 @@ export default {
       });
       chains = Array.from(new Set(chains))
       return chains
-    }
+    }*/
 
     const getHelixes = (structureView) => {
       let helixes = []
@@ -71,11 +85,13 @@ export default {
       let sequence = []
       structureView.eachResidue(function (rp) {
         //console.log(rp.isNucleic(), rp.isProtein())
-        console.log(rp.isDna())
+        //console.log(rp.isDna())
+        //console.log(rp)
           let res = {
               'id': globals.aminoacids[rp.resname.toLowerCase()].id,
               'num': rp.resno,
               'label': rp.resname.toUpperCase(),
+              'chain': rp.chainname,
               'longname': globals.aminoacids[rp.resname.toLowerCase()].name
           }
           sequence.push(res)
@@ -121,8 +137,11 @@ export default {
     }
 
     const createViewport = () => {
-      let ngl = inject('ngl')
-      const stage = ngl.createStage("viewport")
+      //const ngl = inject('ngl')
+      //const stage = ngl.createStage("viewport")
+
+      const { createStage, createSelection } = useStage()
+      const stage = createStage("viewport")
 
       Promise.all([
 
@@ -135,7 +154,8 @@ export default {
 
         // to create array with pdb addresses and load them programmatically in this Promise
         // move all component function (getModels and so on) to the NGL module
-        stage.loadFile("https://files.rcsb.org/download/2rgp.pdb", { defaultRepresentation: false, ext: 'pdb', name:'first_str' })
+        // see https://youtu.be/KsNXsxKoXlY (async fetch composable function)
+        stage.loadFile("https://files.rcsb.org/download/2kod.pdb", { defaultRepresentation: false, ext: 'pdb', name:'first_str' })
           .then(function (component) {
 
               // DON'T REMOVE
@@ -160,50 +180,59 @@ export default {
 
 
               /* MODELS */
-              const selection_models = ngl.createSelection('*') 
+              /*const selection_models = createSelection('*') 
               const structureViewModels = component.structure.getView(selection_models)
-              //console.log(structureViewModels)
-              const models = getModels(structureViewModels)
-              //console.log(models)
+              const models = getModels(structureViewChains)
+              */
+              const models = getModels(component)
+              console.log(models)
 
               /* CHAINS */
-              const selection_chains = ngl.createSelection('/0') // change by model
+              /*const selection_chains = createSelection('/0') // change by model
               const structureViewChains = component.structure.getView(selection_chains)
-              const chains = getChains(structureViewChains)
+              const chains = getChains(structureViewChains)*/
               //console.log(chains)
+              const chains = getChains(component, 0)
+              console.log(chains)
 
               /* HELIXES */
-              const selection_helixes = ngl.createSelection('not ( water or ion or hetero )')
+              /* ADD MODEL */
+              const selection_helixes = createSelection('/0 and not ( water or ion or hetero )')
               const structureViewHelixes = component.structure.getView(selection_helixes)
               const helixes = getHelixes(structureViewHelixes)
               //console.log(helixes)
 
               /* SHEETS */
-              const selection_sheets = ngl.createSelection('not ( water or ion or hetero )')
+              /* ADD MODEL */
+              const selection_sheets = createSelection('not ( water or ion or hetero )')
               const structureViewSheets = component.structure.getView(selection_sheets)
               const sheets = getSheets(structureViewSheets)
               //console.log(sheets)
 
               /* RESIDUES */
-              const selection_residues = ngl.createSelection('not ( water or ion or hetero )')
+              /* ADD MODEL */
+              const selection_residues = createSelection('/0 and not ( water or ion or hetero )')
               const structureViewResidues = component.structure.getView(selection_residues)
               const residues = getResidues(structureViewResidues)
-              //console.log(residues)
+              console.log(residues)
               
               /* HETEROATOMS */
-              const selection_heteroatoms = ngl.createSelection('hetero and not (water or ion)')
+              /* ADD MODEL */
+              const selection_heteroatoms = createSelection('hetero and not (water or ion)')
               const structureViewHeteroatoms = component.structure.getView(selection_heteroatoms)
               const heteroatoms = getHeteroatoms(structureViewHeteroatoms)
               //console.log(heteroatoms)
 
               /* IONS */
-              const selection_ions = ngl.createSelection('ion')
+              /* ADD MODEL */
+              const selection_ions = createSelection('ion')
               const structureViewIons = component.structure.getView(selection_ions)
               const ions = getIons(structureViewIons)
               //console.log(ions)
 
               /* WATERS */
-              const selection_waters = ngl.createSelection('water')
+              /* ADD MODEL */
+              const selection_waters = createSelection('water')
               const structureViewWaters = component.structure.getView(selection_waters)
               const waters = getWaters(structureViewWaters)
               //console.log(waters)
@@ -255,9 +284,11 @@ export default {
           //console.log(stage)
 
           stage.autoView()
-          store.dispatch('initOrientation', stage.viewerControls.getOrientation())
+          //store.dispatch('initOrientation', stage.viewerControls.getOrientation())
+          updateOrientation(stage.viewerControls.getOrientation())
 
-          store.dispatch('stageIsLoaded', true)
+          setFlagStatus('stageLoaded', true)
+          //store.dispatch('stageIsLoaded', true)
 
           checkSignals(stage)
 
@@ -274,8 +305,8 @@ export default {
           /*setTimeout( () => {
             stage.getComponentsByName('first_str').list[0].reprList.forEach( function( repre ){
               //repre.setVisibility( false );
-              repre.setParameters( { color: '#ff0000'} );
-              repre.setParameters( { opacity: 0.6} );
+              //repre.setParameters( { color: '#555'} );
+              //repre.setParameters( { opacity: 0.6} );
               //console.log(repre)
               //repre.dispose()
               
@@ -299,18 +330,18 @@ export default {
       stage.signals.hovered.add( function(pickingProxy){ 
         // update / show legend
         if (pickingProxy && pickingProxy.atom) {
-          store.dispatch('updateLegend', {
+          updateLegend({
             name: pickingProxy.atom.structure.name,
             chainname: pickingProxy.atom.chainname,
             resname: pickingProxy.atom.resname,
             resno: pickingProxy.atom.resno,
             atomname: pickingProxy.atom.atomname
           })
-          store.dispatch('legendStatus', true)
+          setFlagStatus('legendEnabled', true)
         }
         // hide legend
         if (!pickingProxy) {
-          store.dispatch('legendStatus', false)
+          setFlagStatus('legendEnabled', false)
         }
       })
 

@@ -17,7 +17,7 @@
         <div class="p-grid">
             <div class="p-col-9" style="padding-right:0">
                 <Dropdown 
-                v-model="representationsList" 
+                v-model="representationSelected" 
                 :options="reprType" 
                 optionLabel="name" 
                 @change="onChangeRepresentation"
@@ -28,7 +28,7 @@
                 icon="far fa-trash-alt" 
                 class="p-button-rounded repr-button" 
                 v-on:dblclick="removeRepresentation"
-                v-tooltip.top="ttprr" />
+                v-tooltip.top="ttprr" v-if="representationSelected.id != 1" />
                 <Button 
                 icon="far fa-eye" 
                 class="p-button-rounded repr-button" 
@@ -58,54 +58,58 @@
 
             <hr />
             
-            <!-- molecular representation -->
-            <div class="p-grid">
-                <div class="p-col">
-                    <label>{{ label_mol_repr }}</label>
+            <div v-if="representationSelected.id != 1">
+            
+                <!-- molecular representation -->
+                <div class="p-grid">
+                    <div class="p-col">
+                        <label>{{ label_mol_repr }}</label>
+                    </div>
                 </div>
-            </div>
-            <div class="p-grid">
-                <div class="p-col">
-                    <Dropdown 
-                    v-model="molRepresentation" 
-                    :options="molReprType" 
-                    optionLabel="name" 
-                    @change="onChangeMolRepresentation"/>
+                <div class="p-grid">
+                    <div class="p-col">
+                        <Dropdown 
+                        v-model="molRepresentation" 
+                        :options="molReprType" 
+                        optionLabel="name" 
+                        @change="onChangeMolRepresentation"/>
+                    </div>
                 </div>
-            </div>
 
-            <!-- radius -->
-            <div class="p-grid double-col" v-if="hasRadius" >
-                <div class="p-col">
-                    <label>{{ label_radius }}</label>
+                <!-- radius -->
+                <div class="p-grid double-col" v-if="hasRadius" >
+                    <div class="p-col">
+                        <label>{{ label_radius }}</label>
+                    </div>
+                    <div class="p-col slider-value">
+                        <label>{{ radius }}</label>
+                    </div>
                 </div>
-                <div class="p-col slider-value">
-                    <label>{{ radius }}</label>
+                <div class="p-grid" v-if="hasRadius" >
+                    <div class="p-col">
+                        <Slider v-model="radius" :min="0" :max="500" :step="5" />
+                    </div>
                 </div>
-            </div>
-            <div class="p-grid" v-if="hasRadius" >
-                <div class="p-col">
-                    <Slider v-model="radius" :min="0" :max="500" :step="5" />
-                </div>
-            </div>
 
-            <!-- color -->
-            <div class="p-grid">
-                <div class="p-col">
-                    <label>{{ label_color }}</label>
+                <!-- color -->
+                <div class="p-grid">
+                    <div class="p-col">
+                        <label>{{ label_color }}</label>
+                    </div>
                 </div>
-            </div>
-            <div class="p-grid">
-                <div class="p-col">
-                    <Dropdown
-                    v-model="mainStructureColor" 
-                    :options="colorScheme" 
-                    optionLabel="name" 
-                    @change="onChangeColorScheme"/>
+                <div class="p-grid">
+                    <div class="p-col">
+                        <Dropdown
+                        v-model="mainStructureColor" 
+                        :options="colorScheme" 
+                        optionLabel="name" 
+                        @change="onChangeColorScheme"/>
+                    </div>
+                    <div class="p-col-fixed" v-if="colorUniform" style="width:3rem; ">
+                        <ColorPicker v-model="color" style="margin-left:-.5rem;margin-top:2px;" />
+                    </div>
                 </div>
-                <div class="p-col-fixed" v-if="colorUniform" style="width:3rem; ">
-                    <ColorPicker v-model="color" style="margin-left:-.5rem;margin-top:2px;" />
-                </div>
+                
             </div>
 
             <!-- opacity -->
@@ -152,12 +156,12 @@ export default {
         const label_repr = "Select representation"
         const label_new_repr = "Create new representation"
         const reprType =  [
-            { name: 'Representation 1', id: '1' },
-            { name: 'Representation 2', id: '2' },
-            { name: 'Representation 3', id: '3' },
-            { name: 'Representation 4', id: '4' }
+            { name: 'Representation 1', id: 1 },
+            { name: 'Representation 2', id: 2 },
+            { name: 'Representation 3', id: 3 },
+            { name: 'Representation 4', id: 4 }
         ]
-        let representationsList = ref({ name: 'Representation 1', id: '1' })
+        let representationSelected = ref({ name: 'Representation 1', id: 1 })
 
         const onChangeRepresentation = (e) => {
             hasRadius.value = !(e.value.id == 'line' || e.value.id == 'surface')
@@ -220,7 +224,7 @@ export default {
 
         return { isCollapsed, 
         ttpu, unfoldRepresentations,
-        label_repr, label_new_repr, reprType, representationsList, onChangeRepresentation, 
+        label_repr, label_new_repr, reprType, representationSelected, onChangeRepresentation, 
         ttprr, removeRepresentation, ttphr,
         nrbDisabled, modelNewSel, placeholderNewSel, newRepresentation,
         label_mol_repr, molReprType, molRepresentation, onChangeMolRepresentation,
@@ -256,6 +260,7 @@ export default {
         color:#6f96a9;  
         padding: .35rem 0; 
         width: 2.2rem; 
+        z-index:2;
     }
     #minisettings .p-button-nr:hover { background: #6f96a9; color:#fff; }
     /* label */

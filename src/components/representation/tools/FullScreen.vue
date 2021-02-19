@@ -11,7 +11,7 @@ export default {
     const ttp = ref("View in full screen mode")
 
     const isFullScreen = ref(false)
-    let stage = props.stage
+    const stage = props.stage
 
     const exitHandler = () => {
         //isFullScreen = (!isFullScreen ? true : false)

@@ -1,5 +1,5 @@
 <template>
-    <Dialog v-model:visible="modals.dialog.structure" 
+    <Dialog v-model:visible="dialog.structure" 
             :closable="true"
             :closeOnEscape="true" 
             :dismissableMask="true" 
@@ -25,28 +25,31 @@
         </FileUpload>
 
         <template #footer>
-            <Button label="Close" icon="pi pi-times" @click="closeModal" />
+            <Button label="Close" icon="pi pi-times" @click="closeThisModal" />
         </template>
     </Dialog>
 </template>
 
 <script>
 import { ref, inject } from 'vue'
+import useModals from '@/modules/common/useModals'
 export default {
     components: {  },
     setup() {
 
         /* MODAL */
         const header = "Upload Structure"
-        const modals = inject('modals')
+        //const modals = inject('modals')
+        const { dialog, closeModal } = useModals()
 
-        const closeModal = () => {
-            modals.closeModal('structure')
+        const closeThisModal = () => {
+            //modals.closeModal('structure')
+            closeModal('structure')
         }
 
         /* FILE UPLOAD */
         const $axios = inject('$axios');
-        let disableFileUpload = ref(false)
+        const disableFileUpload = ref(false)
         const descr = "Click <strong>Select button</strong> above or drag and drop files to here to upload."
         
         const selector = () => {
@@ -85,7 +88,7 @@ export default {
                 })*/
         }
 
-        return { header, modals, closeModal,
+        return { header, dialog, closeThisModal,
                  descr, selector, uploader, disableFileUpload }
     }
 }

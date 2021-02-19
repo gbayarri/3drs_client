@@ -9,7 +9,7 @@ export default {
 
     const ttp = "Take a picture of the representation"
 
-    let stage = props.stage
+    const stage = props.stage
 
     const handleClick = () => {
       stage.makeImage( {

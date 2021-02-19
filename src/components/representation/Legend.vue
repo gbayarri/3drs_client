@@ -5,15 +5,18 @@
 </template>
 
 <script>
-import { useStore } from 'vuex'
+//import { useStore } from 'vuex'
+import useFlags from '@/modules/common/useFlags'
+import useLegend from '@/modules/ngl/useLegend'
 import { computed } from 'vue'
 export default {
     setup() {
-        const store = useStore()
-        
-        let sidebarEnabled = computed(() => store.state.sidebarEnabled)
-        let legendEnabled = computed(() => store.state.legendEnabled)
-        let legendContent = computed(() => store.state.legendContent)
+        const { flags } = useFlags()
+        const { legend } = useLegend()
+
+        const sidebarEnabled = computed(() => flags.sidebarEnabled)
+        const legendEnabled = computed(() => flags.legendEnabled)
+        const legendContent = computed(() => legend.value )
         
         return { sidebarEnabled, legendEnabled, legendContent }
     }

@@ -22,6 +22,7 @@ import Slider from 'primevue/slider'
 import Chip from 'primevue/chip'
 import Listbox from 'primevue/listbox'
 import InputText from 'primevue/inputtext'
+import Message from 'primevue/message'
 //import Toast from 'primevue/toast'
 //import ToastService from 'primevue/toastservice'
 
@@ -31,11 +32,11 @@ import Footer from '@/components/global/Footer'
 // import App, router and Vuex store
 import App from '@/App.vue'
 import router from '@/router'
-import store from '@/store'
+//import store from '@/store'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
-import ngl from "@/modules/NGL"
-import modals from "@/modules/Modals"
+/*import ngl from "@/modules/useNGL"
+import useModals from "@/modules/useModals"*/
 
 // import PrimeVue resources
 import 'primevue/resources/themes/saga-blue/theme.css'      
@@ -50,7 +51,7 @@ import '@/css/main.css'
 
 // create app
 const app = createApp(App)
-app.use(store)
+//app.use(store)
 app.use(router)
 app.use(VueAxios, axios)
 app.use(PrimeVue, {ripple: true})
@@ -77,14 +78,15 @@ app.component('Slider', Slider)
 app.component('Chip', Chip)
 app.component('Listbox', Listbox)
 app.component('InputText', InputText)
+app.component('Message', Message)
 
 // create directives
 app.directive('tooltip', Tooltip)
 
 //mount app
 app.mount('#app')
-// provide / inject globallly axios & router
+// provide / inject globallly modules
 app.provide('$axios', axios)
 app.provide('$router', router)
-app.provide('ngl', ngl)
-app.provide('modals', modals)
+/*app.provide('ngl', ngl)
+app.provide('$modals', useModals)*/

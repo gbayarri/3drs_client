@@ -12,7 +12,7 @@ export default {
 
     //stage.getComponentsByName('kk')
 
-    let stage = props.stage
+    const stage = props.stage
 
     const handleClick = () => {
       // TODO: PUT IN A FOR!!!! TEST WITH MORE THAN 2!!!!!

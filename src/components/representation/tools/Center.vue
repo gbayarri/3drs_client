@@ -7,8 +7,7 @@ export default {
   props: ['stage'],
   setup(props) {
     const ttp = "Center representation"
-
-    let stage = props.stage
+    const stage = props.stage
 
     const handleClick = () => {
       stage.autoView(500);

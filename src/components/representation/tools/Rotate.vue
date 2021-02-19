@@ -7,8 +7,7 @@ export default {
   props: ['stage'],
   setup(props) {
     const ttp = "Toggle spin rotation"
-
-    let stage = props.stage
+    const stage = props.stage
 
     const handleClick = () => {
       //console.log(stage)

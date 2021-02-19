@@ -31,7 +31,7 @@ import { ref } from 'vue'
 export default {
     setup() {
 
-        let isCollapsed = ref(true)
+        const isCollapsed = ref(true)
         const header = "Ions"
 
         const filterPlaceholder = "Search ion"

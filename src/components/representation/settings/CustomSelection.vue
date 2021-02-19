@@ -26,8 +26,8 @@ import { ref } from 'vue'
 export default {
     setup() {
 
-        let isCollapsed = ref(true)
-        let customSelection = ref(null)
+        const isCollapsed = ref(true)
+        const customSelection = ref(null)
         const header = "Custom selection"
         const label = "Add custom selection"
         const ttp = 'Need help with NGL viewer Selection Language? Click here.'

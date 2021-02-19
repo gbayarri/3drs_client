@@ -20,15 +20,20 @@
 </template>
 
 <script>
-import { useStore } from 'vuex'
+//import { useStore } from 'vuex'
 import { computed } from 'vue'
+import useFlags from '@/modules/common/useFlags'
 export default {
   components: {  },
   setup() {
     
-    const store = useStore()
+    /*const store = useStore()
     
-    let menuEnabled = computed(() => store.state.menuEnabled)
+    let menuEnabled = computed(() => store.state.menuEnabled)*/
+
+    const { flags } = useFlags()
+
+    const menuEnabled = computed(() => flags.menuEnabled)
 
     const items = [
         { label: 'About', icon: 'pi pi-fw pi-info-circle', to: '/' },

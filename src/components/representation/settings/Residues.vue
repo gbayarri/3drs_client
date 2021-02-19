@@ -8,12 +8,12 @@
             :icon="allSelected ? 'fas fa-times' : 'fas fa-check-double'" 
             class="p-button-rounded p-button-text" 
             @click="selectAll" 
-            v-tooltip.top="ttpsa" />
+            v-tooltip.left="ttpsa" />
             <Button 
             :icon="allVisible ? 'fas fa-eye-slash' : 'fas fa-eye'" 
             @click="hideAll" 
             class="p-button-rounded p-button-text" 
-            v-tooltip.top="ttph" 
+            v-tooltip.left="ttph" 
             />
         </template>
         <div id="sequence-text">
@@ -99,12 +99,12 @@ import { ref } from 'vue'
 export default {
     setup() {
 
-        let isCollapsed = ref(true)
+        const isCollapsed = ref(true)
         const header = "Residues"
-        let ttph = ref("Hide all residues")
-        let allSelected = ref(false)
-        let allVisible = ref(false)
-        let ttpsa = ref("Select all the residues")
+        const ttph = ref("Hide all residues")
+        const allSelected = ref(false)
+        const allVisible = ref(false)
+        const ttpsa = ref("Select all the residues")
 
         const selectAll = () => {
             ttpsa.value = allSelected.value ? 'Select all the residues' : 'Unselect all the residues'

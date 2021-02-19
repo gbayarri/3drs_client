@@ -1,20 +1,25 @@
 <template>
-  <Button :label="label" icon="fas fa-upload" class="settings-button margin-top-5" @click="openModalStructure" :disabled="modals.dialog.structure"  />
+  <Button 
+  :label="label" 
+  icon="fas fa-upload" 
+  class="settings-button margin-top-5" 
+  @click="openModalStructure" 
+  :disabled="dialog.structure"  />
 </template>
 
 <script>
-import { inject } from 'vue'
+import useModals from '@/modules/common/useModals'
 export default {
     setup() {
 
         const label = "Upload new structure(s)"
-        const modals = inject('modals')
+        const { dialog, openModal } = useModals()
 
         const openModalStructure = () => {
-            modals.openModal('structure')
+            openModal('structure')
         }
 
-        return { label, modals, openModalStructure }
+        return { label, dialog, openModalStructure }
     }
 }
 </script>

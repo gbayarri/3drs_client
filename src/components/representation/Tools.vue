@@ -12,7 +12,8 @@
 </template>
 
 <script>
-import { inject } from 'vue'
+//import { inject } from 'vue'
+import useStage from "@/modules/ngl/useStage"
 import Reload from '@/components/representation/tools/Reload'
 import Rotate from '@/components/representation/tools/Rotate'
 import Center from '@/components/representation/tools/Center'
@@ -24,8 +25,9 @@ import Align from '@/components/representation/tools/Align'
 export default {
     components: { Reload, Rotate, Center, Background, FullScreen, Picture, Help, Align },
     setup() {
-        let ngl = inject('ngl')
-        let stage = ngl.getStage()
+        //const ngl = inject('ngl')
+        //const stage = ngl.getStage()
+        const { stage } = useStage()
         return { stage }
     }
 }

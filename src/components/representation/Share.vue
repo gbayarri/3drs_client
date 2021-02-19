@@ -5,21 +5,25 @@
 </template>
 
 <script>
-import { inject, computed } from 'vue'
-import { useStore } from 'vuex'
+import { computed } from 'vue'
+//import { useStore } from 'vuex'
+import useFlags from '@/modules/common/useFlags'
+import useModals from '@/modules/common/useModals'
 export default {
 
     setup() {
 
-        const store = useStore()
+        //const store = useStore()
 
         const ttp = 'Ready to share?<br>Click here!'
-        const modals = inject('modals')
+        const { openModal } = useModals()
 
-        let sidebarEnabled = computed(() => store.state.sidebarEnabled)
+        //let sidebarEnabled = computed(() => store.state.sidebarEnabled)
+        const { flags } = useFlags()
+        const sidebarEnabled = computed(() => flags.sidebarEnabled)
 
         const openShareModal = () => {
-             modals.openModal('share')
+             openModal('share')
         }
 
         return { ttp, sidebarEnabled, openShareModal }

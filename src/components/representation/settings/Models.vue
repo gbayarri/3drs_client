@@ -19,11 +19,11 @@ import { ref } from 'vue'
 export default {
     setup() {
 
-        let isCollapsed = ref(true)
+        const isCollapsed = ref(true)
         const header = "Models"
         const placeholder = "Select Models"
 
-        let selectedModel = ref({name: 'Model 1', code: '1'})
+        const selectedModel = ref({name: 'Model 1', code: '1'})
 
         const models = [
             {name: 'Model 1', code: '1'},

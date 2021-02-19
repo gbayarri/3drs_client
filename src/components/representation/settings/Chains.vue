@@ -37,12 +37,12 @@ import { ref } from 'vue'
 export default {
     setup() {
 
-        let isCollapsed = ref(true)
+        const isCollapsed = ref(true)
         const header = "Chains"
 
         const placeholder = "Select Chains"
 
-        let selectedChains = ref([
+        const selectedChains = ref([
             {name: 'Chain A', code: 'A'},
             {name: 'Chain B', code: 'B'},
             {name: 'Chain C', code: 'C'},

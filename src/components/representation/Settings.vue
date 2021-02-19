@@ -41,7 +41,8 @@
 
 <script>
 import { ref } from 'vue'
-import { useStore } from 'vuex'
+//import { useStore } from 'vuex'
+import useFlags from '@/modules/common/useFlags'
 import TitleSettings from '@/components/representation/settings/TitleSettings'
 import SelectFile from '@/components/representation/settings/SelectFile'
 import UploadFile from '@/components/representation/settings/UploadFile'
@@ -59,16 +60,19 @@ export default {
     components: { TitleSettings, SelectFile, UploadFile, MenuFile, Models, Chains, /*MainStructure,*/ Heteroatoms, Ions, Residues, Water, CustomSelection, Trajectory },
     setup() {
 
-        const store = useStore()
+        //const store = useStore()
 
-        let visibleRight = ref(false)
+        const visibleRight = ref(false)
+        const { setFlagStatus } = useFlags()
 
         const onSidebarShown = () => {
-            store.dispatch('sidebarStatus', true)
+            setFlagStatus('sidebarEnabled', true)
+            //store.dispatch('sidebarStatus', true)
         }
 
         const onSidebarHidden = () => {
-            store.dispatch('sidebarStatus', false)
+            setFlagStatus('sidebarEnabled', false)
+            //store.dispatch('sidebarStatus', false)
         }
 
         return { visibleRight, onSidebarShown, onSidebarHidden }

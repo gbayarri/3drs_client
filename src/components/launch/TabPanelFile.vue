@@ -1,5 +1,6 @@
 <template>
     <p>{{ texts.desc }}</p>
+    <Message :severity="msg.severity" :key="msg.content" v-if="msg.show">{{msg.content}}</Message>
     <FileUpload 
     @uploader="uploader"
     @select="selector"
@@ -25,6 +26,12 @@ export default {
         const $router = inject('$router');
 
         let disableFileUpload = ref(false)
+
+        let msg = ref({
+            severity: null,
+            content: null,
+            show: false
+        })
 
         const selector = () => {
             setTimeout(function(){
@@ -53,14 +60,21 @@ export default {
                 })
                 .catch(err => console.error(err.message))
                 .finally( () => {
-                    // CONTROL ERRORS WHEN EMPTY FILE, FOR EXAMPLE
                     //router.push({ name: 'Contact', params: { id } }) 
                     //$router.push({ path: `/representation/${id}` }) 
                     console.log(resp)
+                    if(resp.status === 'error') {
+                        msg.value = {
+                            severity: 'error',
+                            content: resp.message,
+                            show: true
+                        }
+                        disableFileUpload.value = false
+                    }
                 })
         }
 
-        return { disableFileUpload, selector, uploader }
+        return { disableFileUpload, msg, selector, uploader }
     }
 }
 </script>

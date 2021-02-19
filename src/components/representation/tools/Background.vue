@@ -7,19 +7,14 @@
 
 <script>
 import { ref, watch } from 'vue'
-//import { useStore } from 'vuex'
 export default {
 props: ['stage'],
 setup(props) {
-
-    //const store = useStore()
-
     const ttp = ref("Change background color")
-    let color = ref('#f1f1f1')
-
+    const color = ref('#f1f1f1')
     const cpVisible = ref(false)
 
-    let stage = props.stage
+    const stage = props.stage
 
     const handleClick = () => {
         cpVisible.value = !cpVisible.value;

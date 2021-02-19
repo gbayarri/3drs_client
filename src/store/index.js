@@ -3,10 +3,12 @@ export default createStore({
   state() {
     return {
       menuEnabled: true,
-      modalStructure: false,
+      //modalStructure: false,
       stageLoaded: false,
       sidebarEnabled: false,
       legendEnabled: false, 
+
+      
       legendContent: {},
 
       initialOrientation: null

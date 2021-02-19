@@ -27,9 +27,9 @@ export default {
 
         const $axios = inject('$axios');
 
-        let selectedStructures = ref([])
-        let filteredStructures = ref([])
-        let formDisabled = ref(true)
+        const selectedStructures = ref([])
+        const filteredStructures = ref([])
+        const formDisabled = ref(true)
 
         // call API to get PDB's with given query
         const searchStructure = (event) => {

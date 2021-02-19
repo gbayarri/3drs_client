@@ -81,13 +81,13 @@ import globals from '@/globals'
 export default {
     setup() {
 
-        let isCollapsed = ref(true)
+        const isCollapsed = ref(true)
         const header = "Main Structure"
 
         // representation
         const label_repr = "Select representation"
         const reprType =  globals.representation_str
-        let mainStructureRepresentation = ref({ name: 'Ribbon', id: 'ribbon' })
+        const mainStructureRepresentation = ref({ name: 'Ribbon', id: 'ribbon' })
 
         const onChangeRepresentation = (e) => {
             hasRadius.value = !(e.value.id == 'line' || e.value.id == 'surface')
@@ -95,15 +95,15 @@ export default {
 
         // radius
         const label_radius = "Select radius"
-        let hasRadius = ref(true)
-        let radius = ref(100)
+        const hasRadius = ref(true)
+        const radius = ref(100)
 
         // color
         const label_color = "Select color scheme"
         const colorScheme =  globals.colorScheme
-        let colorUniform = ref(false)
-        let color = ref('#6f96a9')
-        let mainStructureColor = ref({ name: 'Secondary structure', id: 'sstruc' })
+        const colorUniform = ref(false)
+        const color = ref('#6f96a9')
+        const mainStructureColor = ref({ name: 'Secondary structure', id: 'sstruc' })
 
         const onChangeColorScheme = (e) => {
             colorUniform.value = (e.value.id == 'uniform')
@@ -115,7 +115,7 @@ export default {
 
         // opacity
         const label_opacity = "Select opacity"
-        let opacity = ref(100)
+        const opacity = ref(100)
 
         return { header, isCollapsed, 
         label_repr, reprType, mainStructureRepresentation, onChangeRepresentation,

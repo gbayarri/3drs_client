@@ -3,21 +3,25 @@
 </template>
 
 <script>
-import { useStore } from 'vuex'
+//import { useStore } from 'vuex'
+import useTools from '@/modules/ngl/useTools'
 export default {
   props: ['stage'],
   setup(props) {
     
-    const store = useStore()
+    //const store = useStore()
 
-    const initialOrientation = store.state.initialOrientation.elements
+    // TO MODIFY WITH COMPOSITION API?
+    //const initialOrientation = store.state.initialOrientation.elements
+    //const { initialOrientation } = useTools()
+    const initialOrientation = useTools().initialOrientation.value
 
     const ttp = "Reload representation"
 
-    let stage = props.stage
+    const stage = props.stage
 
     const handleClick = () => {
-      stage.animationControls.orient(initialOrientation, 500);
+      stage.animationControls.orient(initialOrientation.elements, 500);
     }
 
     return { ttp, handleClick }
