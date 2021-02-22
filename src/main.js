@@ -29,14 +29,11 @@ import Message from 'primevue/message'
 // generic components
 import Footer from '@/components/global/Footer'
 
-// import App, router and Vuex store
+// import App, router 
 import App from '@/App.vue'
 import router from '@/router'
-//import store from '@/store'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
-/*import ngl from "@/modules/useNGL"
-import useModals from "@/modules/useModals"*/
 
 // import PrimeVue resources
 import 'primevue/resources/themes/saga-blue/theme.css'      
@@ -51,7 +48,6 @@ import '@/css/main.css'
 
 // create app
 const app = createApp(App)
-//app.use(store)
 app.use(router)
 app.use(VueAxios, axios)
 app.use(PrimeVue, {ripple: true})
@@ -85,8 +81,6 @@ app.directive('tooltip', Tooltip)
 
 //mount app
 app.mount('#app')
-// provide / inject globallly modules
+// provide / inject globally modules
 app.provide('$axios', axios)
 app.provide('$router', router)
-/*app.provide('ngl', ngl)
-app.provide('$modals', useModals)*/

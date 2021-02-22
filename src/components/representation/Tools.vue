@@ -27,7 +27,8 @@ export default {
     setup() {
         //const ngl = inject('ngl')
         //const stage = ngl.getStage()
-        const { stage } = useStage()
+        const { getStage } = useStage()
+        const stage = getStage()
         return { stage }
     }
 }

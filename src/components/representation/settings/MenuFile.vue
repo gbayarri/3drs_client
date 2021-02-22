@@ -1,14 +1,46 @@
 <template>
     <div id="file-buttons" class="margin-top-5">
-        <!-- SEE REPRESENTATIONSETTINGS FOR BUTTONS' ACTIONS -->
-        <Button icon="far fa-trash-alt" class="p-button-rounded p-button-text" />
-        <Button icon="fas fa-eye" class="p-button-rounded p-button-text" />
+        <Button 
+        icon="far fa-trash-alt" 
+        class="p-button-rounded p-button-text" 
+        v-on:dblclick="removeFile"
+        v-tooltip.top="ttprf" 
+        v-if="numStructures > 1" />
+        <Button 
+        icon="fas fa-eye" 
+        class="p-button-rounded p-button-text" 
+        v-tooltip.top="ttphf"
+        @click="hideFile"  />
     </div>
 </template>
 
 <script>
+import { ref } from 'vue'
+import structureStorage from '@/modules/structure/structureStorage'
 export default {
+    setup() {
+        
+        const { currentStructure, getNumStructures } = structureStorage()
 
+        // REMOVE STRUCTURE 
+        const ttprf = "Remove structure (double click)"
+        const numStructures = getNumStructures()
+
+        const removeFile = () => {
+            console.log("removing file " + currentStructure.value)
+        }
+
+        // HIDE STRUCTURE
+        let ttphf = ref("Hide structure")
+        const hideFile = () => {
+            console.log("hiding file " + currentStructure.value)
+        }
+
+        return { 
+            ttprf, numStructures, removeFile,
+            ttphf, hideFile
+        }
+    }
 }
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-    <Panel :toggleable="true" v-model:collapsed="isCollapsed">
+    <Panel :toggleable="true" v-model:collapsed="isCollapsed" v-if="chains.length > 1">
         <template #header>
             <i class="fas fa-link"></i> <div class="p-panel-title">{{ header }}</div>
         </template>
@@ -13,11 +13,11 @@
         class="multiselect-custom">
             <template #value="slotProps">
                 <Chip 
-                :label="option.code" 
+                :label="option.id" 
                 @remove="removeChip" 
                 removable 
                 v-for="option of slotProps.value" 
-                :key="option.code" />
+                :key="option.id" />
                 <template v-if="!slotProps.value || slotProps.value.length === 0">
                     {{ placeholder }}
                 </template>
@@ -33,37 +33,34 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import structureStorage from '@/modules/structure/structureStorage'
+import structureNavigation from '@/modules/structure/structureNavigation'
 export default {
     setup() {
+
+        const { getChains } = structureStorage()
+        const { updateNavigation, getCurrentChains } = structureNavigation()
 
         const isCollapsed = ref(true)
         const header = "Chains"
 
         const placeholder = "Select Chains"
 
-        const selectedChains = ref([
-            {name: 'Chain A', code: 'A'},
-            {name: 'Chain B', code: 'B'},
-            {name: 'Chain C', code: 'C'},
-            {name: 'Chain D', code: 'D'}
-        ])
-
-        const chains = [
-            {name: 'Chain A', code: 'A'},
-            {name: 'Chain B', code: 'B'},
-            {name: 'Chain C', code: 'C'},
-            {name: 'Chain D', code: 'D'}
-        ]
+        const selectedChains = ref(getCurrentChains())
+        const chains = computed(() => getChains())
 
         const onChange = (e) => {
-            //console.log(e.value)
-            console.log(selectedChains.value)
+            const chs = []
+            for(const chain of selectedChains.value){
+                chs.push(chain)
+            }
+            updateNavigation('chain', chs )
         }
 
         const removeChip = (e) => {
             selectedChains.value = selectedChains.value.filter(item => item.code !== e.path[1].innerText)
-            console.log(selectedChains.value)
+            //console.log(selectedChains.value)
         }
 
         return { header, placeholder, isCollapsed, selectedChains, chains, onChange, removeChip }

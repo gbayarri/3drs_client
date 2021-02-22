@@ -1,5 +1,5 @@
 <template>
-    <Panel :toggleable="true" v-model:collapsed="isCollapsed">
+    <Panel :toggleable="true" v-model:collapsed="isCollapsed" v-if="models.length > 1">
         <template #header>
             <i class="fas fa-layer-group"></i> <div class="p-panel-title">{{ header }}</div>
         </template>
@@ -15,27 +15,24 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import structureStorage from '@/modules/structure/structureStorage'
+import structureNavigation from '@/modules/structure/structureNavigation'
 export default {
     setup() {
+
+        const { getModels } = structureStorage()
+        const { updateNavigation, getCurrentModel } = structureNavigation()
 
         const isCollapsed = ref(true)
         const header = "Models"
         const placeholder = "Select Models"
 
-        const selectedModel = ref({name: 'Model 1', code: '1'})
-
-        const models = [
-            {name: 'Model 1', code: '1'},
-            {name: 'Model 2', code: '2'},
-            {name: 'Model 3', code: '3'},
-            {name: 'Model 4', code: '4'},
-            {name: 'Model 5', code: '5'}
-        ]
+        const selectedModel = ref(getCurrentModel())
+        const models = computed(() => getModels())
 
         const onChange = (e) => {
-            console.log(e.value)
-            console.log(selectedModel.value)
+            updateNavigation('model', { name: selectedModel.value.name, id: selectedModel.value.id } )
         }
 
         return { header, placeholder, isCollapsed, selectedModel, models, onChange }

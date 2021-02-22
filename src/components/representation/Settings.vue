@@ -20,10 +20,10 @@
             <hr class="subsection" />
             <UploadFile />
             <hr />
-            <TitleSettings title="models / chains" />
-            <Models class="settings-panel models" />
-            <Chains class="settings-panel chains" />
-            <hr class="subsection" />
+            <TitleSettings :title="tit_mod_chs" v-if="!noModelsChains" />
+            <Models class="settings-panel models" v-if="!noModelsChains" />
+            <Chains class="settings-panel chains" v-if="!noModelsChains" />
+            <hr class="subsection" v-if="!noModelsChains" />
             <TitleSettings title="molecules" />
             <!-- <MainStructure class="settings-panel mainstr" />-->
             <Residues class="settings-panel residues" />
@@ -40,8 +40,8 @@
 </template>
 
 <script>
-import { ref } from 'vue'
-//import { useStore } from 'vuex'
+import { ref, computed } from 'vue'
+import structureStorage from '@/modules/structure/structureStorage'
 import useFlags from '@/modules/common/useFlags'
 import TitleSettings from '@/components/representation/settings/TitleSettings'
 import SelectFile from '@/components/representation/settings/SelectFile'
@@ -59,23 +59,30 @@ import Trajectory from '@/components/representation/settings/Trajectory'
 export default {
     components: { TitleSettings, SelectFile, UploadFile, MenuFile, Models, Chains, /*MainStructure,*/ Heteroatoms, Ions, Residues, Water, CustomSelection, Trajectory },
     setup() {
-
-        //const store = useStore()
-
         const visibleRight = ref(false)
         const { setFlagStatus } = useFlags()
 
+        const { getChains, getModels } = structureStorage()
+
+        const tit_mod_chs = computed(() => {
+            if(getChains().length > 1 && getModels().length > 1) return "models / chains"
+            if(getChains().length <= 1 && getModels().length > 1) return "models"
+            if(getChains().length > 1 && getModels().length <= 1) return "chains"
+        })
+
+        const noModelsChains = computed(() => getChains().length <= 1 && getModels().length <= 1 )
+
         const onSidebarShown = () => {
             setFlagStatus('sidebarEnabled', true)
-            //store.dispatch('sidebarStatus', true)
         }
 
         const onSidebarHidden = () => {
             setFlagStatus('sidebarEnabled', false)
-            //store.dispatch('sidebarStatus', false)
         }
 
-        return { visibleRight, onSidebarShown, onSidebarHidden }
+        return { 
+            visibleRight, onSidebarShown, onSidebarHidden, tit_mod_chs, noModelsChains
+        }
     }
 }
 </script>

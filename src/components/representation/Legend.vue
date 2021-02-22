@@ -5,9 +5,8 @@
 </template>
 
 <script>
-//import { useStore } from 'vuex'
 import useFlags from '@/modules/common/useFlags'
-import useLegend from '@/modules/ngl/useLegend'
+import useLegend from '@/modules/viewport/useLegend'
 import { computed } from 'vue'
 export default {
     setup() {

@@ -28,7 +28,8 @@
                 icon="far fa-trash-alt" 
                 class="p-button-rounded repr-button" 
                 v-on:dblclick="removeRepresentation"
-                v-tooltip.top="ttprr" v-if="representationSelected.id != 1" />
+                v-tooltip.top="ttprr" 
+                v-if="representationSelected.id != 1" />
                 <Button 
                 icon="far fa-eye" 
                 class="p-button-rounded repr-button" 

@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 
-const initialOrientation = ref({ })
+const initialOrientation = ref({})
 
 export default function useTools() {
 
