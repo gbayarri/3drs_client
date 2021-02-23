@@ -10,24 +10,38 @@ export default function structureNavigation() {
         //console.log(currentStructure.value)
     }
 
-    const updateNavigation = function (label, value) {
-        navigation.value.filter(item => item.id === currentStructure.value)[0][label] = value
-        //console.log(navigation)
+    const updateCurrentModel = function (value) {
+        navigation.value.filter(item => item.id === currentStructure.value)[0].curr_model = value
+    }
+
+    const updateCurrentChains= function (value) {
+        //navigation.value.filter(item => item.id === currentStructure.value)[0].curr_model = value
+        const cm = getCurrentModel()
+        let models = navigation.value.filter(item => item.id === currentStructure.value)[0].models
+        models.filter(item => item.id === cm)[0].chains = value
+        navigation.value.filter(item => item.id === currentStructure.value)[0].models = models
+        console.log(navigation.value)
     }
 
     const getCurrentModel = function () {
-        return navigation.value.filter(item => item.id === currentStructure.value)[0].model
+        //console.log(navigation.value)
+        return navigation.value.filter(item => item.id === currentStructure.value)[0].curr_model
     }
 
     const getCurrentChains = function () {
-        return navigation.value.filter(item => item.id === currentStructure.value)[0].chain
+        const cm = getCurrentModel()
+        //console.log(cm)
+        const models = navigation.value.filter(item => item.id === currentStructure.value)[0].models
+        //console.log(models.filter(item => item.id === cm)[0].chains)
+        return models.filter(item => item.id === cm)[0].chains
     }
 
     return { 
         navigation,
         currentStructure,
         setCurrentStructure,
-        updateNavigation,
+        updateCurrentModel,
+        updateCurrentChains,
         getCurrentModel,
         getCurrentChains
     }

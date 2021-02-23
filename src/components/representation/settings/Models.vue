@@ -1,41 +1,66 @@
 <template>
-    <Panel :toggleable="true" v-model:collapsed="isCollapsed" v-if="models.length > 1">
+    <Panel :toggleable="models.length > 1" v-model:collapsed="isCollapsed">
         <template #header>
             <i class="fas fa-layer-group"></i> <div class="p-panel-title">{{ header }}</div>
         </template>
 
-        <Dropdown 
-        v-model="selectedModel" 
-        :options="models" 
-        optionLabel="name" 
-        :placeholder="placeholder" 
-        @change="onChange" />
+        <div class="p-grid double-col">
+            <div class="p-col">
+                <label>{{ label_models }}</label>
+            </div>
+            <div class="p-col slider-value">
+                <label>{{ selectedModel }}</label>
+            </div>
+        </div>
+        <div class="p-grid margin-top-5">
+            <div class="p-col">
+                <Slider v-model="selectedModel" :min="1" :max="models.length" :step="1" @change="onChange" />
+            </div>
+        </div>
+
 
     </Panel>
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import structureStorage from '@/modules/structure/structureStorage'
 import structureNavigation from '@/modules/structure/structureNavigation'
 export default {
     setup() {
 
         const { getModels } = structureStorage()
-        const { updateNavigation, getCurrentModel } = structureNavigation()
+        const { updateCurrentModel, getCurrentModel } = structureNavigation()
 
-        const isCollapsed = ref(true)
         const header = "Models"
         const placeholder = "Select Models"
+        const label_models = "Model index"
 
-        const selectedModel = ref(getCurrentModel())
+        // TODO: put in a watcher and make this number reactive!!!
+        // CHECK getCurrentModel() FUNCTION WHEN CHANGE FILE
+        const selectedModel = ref(getCurrentModel() + 1)
         const models = computed(() => getModels())
+        const isCollapsed = ref(true)
+        /*const isCollapsed = computed({ 
+            get: () => {
+                //if(getModels().length <= 1) return true
+                console.log(getModels().length)
+                return true
+                //if(getModels().length > 1) return false
+            },
+            set: (value) => value
+        }) */
 
         const onChange = (e) => {
-            updateNavigation('model', { name: selectedModel.value.name, id: selectedModel.value.id } )
+            updateCurrentModel( selectedModel.value - 1 )
         }
 
-        return { header, placeholder, isCollapsed, selectedModel, models, onChange }
+        // modifying isCollapsed v-model property without computed()
+        watch(models, (mods, prevmods) => {
+            if(mods.length <= 1) isCollapsed.value = true
+        })
+
+        return { header, placeholder, label_models, isCollapsed, selectedModel, models, onChange }
     }
 }
 </script>

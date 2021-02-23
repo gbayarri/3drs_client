@@ -40,7 +40,7 @@ export default {
 
       // see https://youtu.be/KsNXsxKoXlY (async fetch composable function)
 
-      const structures = [ { name:"2rgp", id: "1" }, /*{ name:"1mbs", id: "2" }, { name:"1pik", id: "3" },*/ { name:"2kod", id: "4" }, { name:"2vgb", id: "5" },  ]
+      const structures = [{ name:"1pik", id: "1" }, { name:"2kod", id: "4" }/*{ name:"6ACC", id: "4" }, { name:"2rgp", id: "1" }, /*{ name:"1mbs", id: "2" }, { name:"1pik", id: "3" }, { name:"2kod", id: "4" }, { name:"2vgb", id: "5" },*/  ]
       const array_promises = []
       for(const str of structures) {
         array_promises

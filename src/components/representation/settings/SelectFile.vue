@@ -4,6 +4,7 @@
     :options="filesList" 
     optionLabel="name" 
     :placeholder="placeholder"
+    :disabled="filesList.length <= 1"
     @change="onChange" />
 </template>
 

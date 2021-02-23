@@ -20,28 +20,25 @@
             <hr class="subsection" />
             <UploadFile />
             <hr />
-            <TitleSettings :title="tit_mod_chs" v-if="!noModelsChains" />
-            <Models class="settings-panel models" v-if="!noModelsChains" />
-            <Chains class="settings-panel chains" v-if="!noModelsChains" />
-            <hr class="subsection" v-if="!noModelsChains" />
-            <TitleSettings title="molecules" />
-            <!-- <MainStructure class="settings-panel mainstr" />-->
+            <TitleSettings :title="tit_mod_chs" />
+            <Models class="settings-panel models" />
+            <Chains class="settings-panel chains" />
+            <hr class="subsection" />
+            <TitleSettings :title="tit_mols" />
             <Residues class="settings-panel residues" />
             <Heteroatoms class="settings-panel hetero" />
             <Ions class="settings-panel ions" />
             <Water class="settings-panel water" />
             <CustomSelection class="settings-panel custom" />
-            <!-- ADD CUSTOM SELECTION -->
             <hr class="subsection" />
-            <TitleSettings title="trajectory" />
+            <TitleSettings :title="tit_traj" />
             <Trajectory />
         </div>
     </Sidebar>
 </template>
 
 <script>
-import { ref, computed } from 'vue'
-import structureStorage from '@/modules/structure/structureStorage'
+import { ref } from 'vue'
 import useFlags from '@/modules/common/useFlags'
 import TitleSettings from '@/components/representation/settings/TitleSettings'
 import SelectFile from '@/components/representation/settings/SelectFile'
@@ -49,7 +46,6 @@ import UploadFile from '@/components/representation/settings/UploadFile'
 import MenuFile from '@/components/representation/settings/MenuFile'
 import Models from '@/components/representation/settings/Models'
 import Chains from '@/components/representation/settings/Chains'
-//import MainStructure from '@/components/representation/settings/MainStructure'
 import Heteroatoms from '@/components/representation/settings/Heteroatoms'
 import Ions from '@/components/representation/settings/Ions'
 import Residues from '@/components/representation/settings/Residues'
@@ -57,20 +53,14 @@ import Water from '@/components/representation/settings/Water'
 import CustomSelection from '@/components/representation/settings/CustomSelection'
 import Trajectory from '@/components/representation/settings/Trajectory'
 export default {
-    components: { TitleSettings, SelectFile, UploadFile, MenuFile, Models, Chains, /*MainStructure,*/ Heteroatoms, Ions, Residues, Water, CustomSelection, Trajectory },
+    components: { TitleSettings, SelectFile, UploadFile, MenuFile, Models, Chains, Heteroatoms, Ions, Residues, Water, CustomSelection, Trajectory },
     setup() {
         const visibleRight = ref(false)
         const { setFlagStatus } = useFlags()
 
-        const { getChains, getModels } = structureStorage()
-
-        const tit_mod_chs = computed(() => {
-            if(getChains().length > 1 && getModels().length > 1) return "models / chains"
-            if(getChains().length <= 1 && getModels().length > 1) return "models"
-            if(getChains().length > 1 && getModels().length <= 1) return "chains"
-        })
-
-        const noModelsChains = computed(() => getChains().length <= 1 && getModels().length <= 1 )
+        const tit_mod_chs = "models / chains"
+        const tit_mols = "molecules"
+        const tit_traj = "trajectory"
 
         const onSidebarShown = () => {
             setFlagStatus('sidebarEnabled', true)
@@ -81,7 +71,7 @@ export default {
         }
 
         return { 
-            visibleRight, onSidebarShown, onSidebarHidden, tit_mod_chs, noModelsChains
+            visibleRight, onSidebarShown, onSidebarHidden, tit_mod_chs, tit_mols, tit_traj
         }
     }
 }
@@ -159,9 +149,10 @@ export default {
     /* panels */
     #sidebar .p-panel.p-component { background: #fff; padding: 0 0 1px 0; width: 95%; margin: 0 2.5% 5px; border-radius: 4px; }
     #sidebar .p-panel .p-panel-content { padding:0.5rem; }
-    #sidebar .p-panel.p-panel-toggleable .p-panel-header { position:relative; padding: .7rem 1rem; background: #d0dfef!important; font-size: 14px; }
-    #sidebar .p-panel.p-panel-toggleable .p-panel-header .p-panel-icons { position: absolute; right: 0; }
-    #sidebar .p-panel.p-panel-toggleable .p-panel-content { font-size: 14px; }
+    #sidebar .p-panel .p-panel-header { position:relative; padding: .7rem 1rem; background: #d0dfef!important; font-size: 14px; }
+    #sidebar .p-panel:not(.p-panel-toggleable) .p-panel-header { background: #f5faff!important; color:#b4c6d6!important; cursor: not-allowed; }
+    #sidebar .p-panel .p-panel-header .p-panel-icons { position: absolute; right: 0; }
+    #sidebar .p-panel .p-panel-content { font-size: 14px; }
 
     /* buttons */
     #sidebar .settings-button { width: 95%; margin: 0 2.5%; background:#fff; color:#6f96a9; text-align: left; }

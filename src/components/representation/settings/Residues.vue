@@ -5,6 +5,12 @@
         </template>
         <template #icons>
             <Button 
+            icon="far fa-clone fa-flip-horizontal" 
+            class="p-button-rounded p-button-text" 
+            @click="openOut" 
+            v-tooltip.left="ttpoo"
+            />
+            <Button 
             :icon="allSelected ? 'fas fa-times' : 'fas fa-check-double'" 
             class="p-button-rounded p-button-text" 
             @click="selectAll" 
@@ -13,11 +19,11 @@
             :icon="allVisible ? 'fas fa-eye-slash' : 'fas fa-eye'" 
             @click="hideAll" 
             class="p-button-rounded p-button-text" 
-            v-tooltip.left="ttph" 
+            v-tooltip.left="ttpha" 
             />
         </template>
         <div id="sequence-text">
-            <span class="sequence-number">702&nbsp;&nbsp;</span>
+            <!--<span class="sequence-number">702&nbsp;&nbsp;</span>
             <span class="sequence-item" data-chain="A" data-resnum="702" data-resname="ALA" v-tooltip.top="'Alanine (ALA)<br>Residue: 702'">A</span>
             <span class="sequence-item" data-chain="A" data-resnum="703" data-resname="ALA" data-sheet="1">A</span>
             <span class="sheet" @mouseover="sheetOver(1)" @mouseleave="sheetLeave(1)" data-sheet="1" v-tooltip.bottom="'β-sheet<br>ALA703~ALA707'">&nbsp;&nbsp;</span>
@@ -88,7 +94,7 @@
             <span class="sheet">&nbsp;&nbsp;</span>
             <span class="sequence-item" data-chain="A" data-resnum="749" data-resname="ALA">A</span>
             <span class="sheet-arrow">&#9654;&nbsp;</span>
-            <span class="sequence-item" data-chain="A" data-resnum="750" data-resname="ALA">A</span>
+            <span class="sequence-item" data-chain="A" data-resnum="750" data-resname="ALA">A</span>-->
         </div>
         
     </Panel>
@@ -101,10 +107,15 @@ export default {
 
         const isCollapsed = ref(true)
         const header = "Residues"
-        const ttph = ref("Hide all residues")
+        const ttpha = ref("Hide all residues")
         const allSelected = ref(false)
         const allVisible = ref(false)
-        const ttpsa = ref("Select all the residues")
+        const ttpsa = ref("Select all residues")
+        const ttpoo = ref("View in external window")
+
+        const openOut = () => {
+
+        }
 
         const selectAll = () => {
             ttpsa.value = allSelected.value ? 'Select all the residues' : 'Unselect all the residues'
@@ -120,7 +131,7 @@ export default {
         }
 
         const hideAll = () => {
-            ttph.value = allVisible.value ? 'Hide all residues' : 'Show all residues'
+            ttpha.value = allVisible.value ? 'Hide all residues' : 'Show all residues'
             allVisible.value = !allVisible.value
         }
 
@@ -158,7 +169,8 @@ export default {
             }
         }
 
-        return { header, isCollapsed, ttph,
+        return { header, isCollapsed, ttpha,
+        ttpoo, openOut,
         ttpsa, allSelected, selectAll, hideAll, allVisible,
         sheetOver, sheetLeave, helixOver, helixLeave }
     }
