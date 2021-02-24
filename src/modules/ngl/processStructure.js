@@ -79,6 +79,7 @@ export default function processStructure() {
         structureView.eachResidue(function (rp) {
           if(rp.isSheet()) {
             arraux.push({
+                'label': rp.resname.toUpperCase(),
                 'num': rp.resno,
                 'chain': rp.chainname
             })
@@ -89,6 +90,7 @@ export default function processStructure() {
           }
           prev = rp.isSheet()
         })
+        //console.log(sheets)
         return sheets
     }
 
@@ -98,19 +100,51 @@ export default function processStructure() {
         const structureView = component.structure.getView(selection_residues)
 
         let sequence = []
+        let prev_res = structureView.structure.residueStore.resno[0]
+        let prev_hx = null
+        let curr_helix = 0
+        let helix = null
+        let prev_sh = null
+        let curr_sheet = 0
+        let sheet = null
         structureView.eachResidue(function (rp) {
-          //console.log(rp.isNucleic(), rp.isProtein())
-          //console.log(rp.isDna())
-          //console.log(rp.resname.toLowerCase())
+            // check sequence "holes"
+            if(rp.resno > (prev_res + 1)) {
+                for (var i = (prev_res + 1); i < rp.resno; i ++) {
+                    sequence.push({ 'id': null, 'num': i, sheet: null, helix: null })
+                }
+            }
+            // helixes
+            if(rp.isHelix()) helix = curr_helix
+            if(!rp.isHelix() && prev_hx) {
+                helix = null
+                curr_helix ++
+            }
+            prev_hx = rp.isHelix()
+            // sheets
+            if(rp.isSheet()) sheet = curr_sheet
+            if(!rp.isSheet() && prev_sh) {
+                // update last to "arrow" sheet
+                sequence.filter(item => item.num === prev_res)[0].last_sheet = true
+                sheet = null
+                curr_sheet ++
+            }
+            prev_sh = rp.isSheet()
+            // push residue
             let res = {
-                'id': globals.aminoacids[rp.resname.toLowerCase()].id,
-                'num': rp.resno,
-                'label': rp.resname.toUpperCase(),
-                'chain': rp.chainname,
-                'longname': globals.aminoacids[rp.resname.toLowerCase()].name
+                id: globals.aminoacids[rp.resname.toLowerCase()].id,
+                num: rp.resno,
+                label: rp.resname.toUpperCase(),
+                chain: rp.chainname,
+                last_sheet: false,
+                sheet: sheet,
+                helix: helix,
+                longname: globals.aminoacids[rp.resname.toLowerCase()].name
             }
             sequence.push(res)
+            prev_res = rp.resno
         })
+        //console.log(sequence)
         return sequence
     }
 

@@ -1,21 +1,14 @@
 <template>
     <Panel :toggleable="chains.length > 1" v-model:collapsed="isCollapsed">
         <template #header>
-            <i class="fas fa-link"></i> <div class="p-panel-title">{{ header }}</div>
+            <i class="fas fa-link"></i> <div class="p-panel-title">{{ page.header }}</div>
         </template>
-
-        <!--<MultiSelect 
-        v-model="selectedChains" 
-        :options="chains" 
-        optionLabel="name" 
-        :placeholder="placeholder"
-        @change="onChange" />-->
 
         <MultiSelect 
         v-model="selectedChains" 
         :options="chains" 
         optionLabel="name" 
-        :placeholder="placeholder" 
+        :placeholder="page.placeholder" 
         @change="onChange"
         class="multiselect-custom">
             <template #value="slotProps">
@@ -26,7 +19,7 @@
                 v-for="option of slotProps.value" 
                 :key="option.id" />
                 <template v-if="!slotProps.value || slotProps.value.length === 0">
-                    {{ placeholder }}
+                    {{ page.placeholder }}
                 </template>
             </template>
             <template #option="slotProps">
@@ -40,50 +33,27 @@
 </template>
 
 <script>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import structureStorage from '@/modules/structure/structureStorage'
 import structureNavigation from '@/modules/structure/structureNavigation'
 export default {
     setup() {
 
         const { getChains } = structureStorage()
-        const { updateCurrentChains, getCurrentChains, getCurrentModel } = structureNavigation()
+        const { updateCurrentChains, getCurrentChains } = structureNavigation()
 
         const isCollapsed = ref(true)
-        const header = "Chains"
 
-        const placeholder = "Select Chains"
+        const page = {
+            header: "Chains",
+            placeholder: "Select Chains"
+        }
 
         // trick for creating reactivity with computed property
         const watchedChains = computed(() => getCurrentChains())
         const selectedChains = ref(getCurrentChains())
-        watch(watchedChains, (chs) => {
-            selectedChains.value = chs
-        })
-
-
-        //let selectedChains = ref(getCurrentChains())
-        //const watchedChains = computed(() => getCurrentChains())
-        //let selectedChains = null
-        //const watchedChains = computed(() => getCurrentChains())
-        /*const selectedChains = computed({ 
-            get: () => getCurrentChains(),
-            set: (value) => {
-                for(var item of value) {
-                    console.log(item.id, item.name)
-                }
-                return [
-                    { name: 'Chain A', id: 'A' },
-                    { name: 'Chain B', id: 'B' }
-                ]
-            }
-        })*/
-
-        //console.log(selectedChains.value[0])
-
 
         const chains = computed(() => getChains())
-        //console.log(chains.value)
 
         const updateNav = () => {
             const chs = []
@@ -94,7 +64,6 @@ export default {
         }
 
         const onChange = () => {
-            //console.log('curr model: ', getCurrentModel())
             updateNav()
         }
 
@@ -103,24 +72,15 @@ export default {
             updateNav()
         }
 
-        // modifying isCollapsed v-model property without computed()
-        watch(chains, (chs, prevchs) => {
+        // modifying isCollapsed & selectedChains v-model properties without computed()
+        watch([watchedChains, chains], (newValues, prevValues) => {
+            const wch = newValues[0]
+            const chs = newValues[1]
+            selectedChains.value = wch
             if(chs.length <= 1) isCollapsed.value = true
         })
 
-        // watching chains according to its model
-       /* watch(watchedChains, (chs, prevchs) => {
-            //console.log(chs, prevchs)
-            selectedChains = chs
-            console.log(chs)
-        })*/
-
-        /*watch(() => [...selectedChains.value], (chs, prevchs) => {
-            console.log(chs, prevchs);
-        })*/
-
-
-        return { header, placeholder, isCollapsed, selectedChains, chains, onChange, removeChip }
+        return { page, isCollapsed, selectedChains, chains, onChange, removeChip }
     }
 }
 </script>

@@ -1,12 +1,12 @@
 <template>
     <Panel :toggleable="models.length > 1" v-model:collapsed="isCollapsed">
         <template #header>
-            <i class="fas fa-layer-group"></i> <div class="p-panel-title">{{ header }}</div>
+            <i class="fas fa-layer-group"></i> <div class="p-panel-title">{{ page.header }}</div>
         </template>
 
         <div class="p-grid double-col">
             <div class="p-col">
-                <label>{{ label_models }}</label>
+                <label>{{ page.label_models }}</label>
             </div>
             <div class="p-col slider-value">
                 <label>{{ selectedModel }}</label>
@@ -32,35 +32,32 @@ export default {
         const { getModels } = structureStorage()
         const { updateCurrentModel, getCurrentModel } = structureNavigation()
 
-        const header = "Models"
-        const placeholder = "Select Models"
-        const label_models = "Model index"
-
-        // TODO: put in a watcher and make this number reactive!!!
-        // CHECK getCurrentModel() FUNCTION WHEN CHANGE FILE
-        const selectedModel = ref(getCurrentModel() + 1)
-        const models = computed(() => getModels())
         const isCollapsed = ref(true)
-        /*const isCollapsed = computed({ 
-            get: () => {
-                //if(getModels().length <= 1) return true
-                console.log(getModels().length)
-                return true
-                //if(getModels().length > 1) return false
-            },
-            set: (value) => value
-        }) */
+
+        const page = {
+            header: "Models",
+            label_models: "Model index"
+        }
+
+        // trick for creating reactivity with computed property
+        const watchedModel = computed(() => (getCurrentModel() + 1))
+        const selectedModel = ref(getCurrentModel() + 1)
+
+        const models = computed(() => getModels())
 
         const onChange = (e) => {
             updateCurrentModel( selectedModel.value - 1 )
         }
 
-        // modifying isCollapsed v-model property without computed()
-        watch(models, (mods, prevmods) => {
+        // modifying isCollapsed & selectedModel v-model properties without computed()
+        watch([watchedModel, models], (newValues, prevValues) => {
+            const wmd = newValues[0]
+            const mods = newValues[1]
+            selectedModel.value = wmd
             if(mods.length <= 1) isCollapsed.value = true
         })
 
-        return { header, placeholder, label_models, isCollapsed, selectedModel, models, onChange }
+        return { page, isCollapsed, selectedModel, models, onChange }
     }
 }
 </script>

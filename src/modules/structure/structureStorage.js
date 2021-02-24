@@ -5,7 +5,7 @@ const project = ref([])
 
 export default function structureStorage() {
 
-    const { navigation, currentStructure } = structureNavigation()
+    const { navigation, currentStructure/*, getCurrentChains*/ } = structureNavigation()
 
     const resetStructure = function (str) {
         // reset project & navigation
@@ -26,10 +26,14 @@ export default function structureStorage() {
             models: []
         })
         // init each model of each structure
-        for(const model of str.models){
+        for(const model of str.models) {
+            const chains = []
+            for(const chs of model.chains) {
+                chains.push({ name: 'Chain ' + chs.id, id: chs.id  })
+            }
             navigation.value.filter(item => item.id === id)[0].models.push({
                 id: model.id,
-                chains: [{ name: 'Chain A', id: 'A' }],
+                chains: chains,
                 residues: [],
                 ions: [],
                 waters: []
@@ -78,16 +82,18 @@ export default function structureStorage() {
         return chains
     }
 
-    const getResidues = function () {
+    const getChainContent = function (content) {
         const currStr = project.value.filter(item => item.id === currentStructure.value)[0].structure
-        const currMod = navigation.value.filter(item => item.id === currentStructure.value)[0].model.id
+        const currMod = navigation.value.filter(item => item.id === currentStructure.value)[0].curr_model
         const allChains = currStr.models.filter(item => item.id === currMod)[0].chains
         const chains = []
 
+        //console.log(getCurrentChains())
+
         for(const chain of allChains) {
             chains.push({
-                name: "Chain " + chain.id,
-                id: chain.id
+                id: chain.id,
+                [content]: chain[content]
             })
         }
         return chains
@@ -100,7 +106,8 @@ export default function structureStorage() {
         getFileNames,
         getNumStructures,
         getModels,
-        getChains
+        getChains,
+        getChainContent
     }
 
 }

@@ -95,13 +95,7 @@ export default {
         border-radius: 5px 0 0 5px;
         box-shadow: -3px 0 3px -2px rgba(0,0,0,0.3);
     }
-    .p-sidebar { padding:0!important; background: transparent!important;
-        /*background-image: url("~@/assets/img/logo_gray.png"); 
-        background-color: #cccccc; 
-        height: 500px; 
-        background-position: center; 
-        background-repeat: no-repeat;    */
-    }
+    .p-sidebar { padding:0!important; background: transparent!important; }
     .p-sidebar-right { width:25%; }
     .p-sidebar-content { position: absolute; width: 100%; height: 100%; z-index:10; }
     #sidebar-content {  
@@ -114,7 +108,7 @@ export default {
         height: 100%; 
         padding: 10px 0; 
         overflow-y: auto; 
-        
+        overflow-x: hidden;
     }
     .p-sidebar .p-sidebar-close {
         position: absolute;

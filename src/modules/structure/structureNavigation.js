@@ -20,11 +20,11 @@ export default function structureNavigation() {
         let models = navigation.value.filter(item => item.id === currentStructure.value)[0].models
         models.filter(item => item.id === cm)[0].chains = value
         navigation.value.filter(item => item.id === currentStructure.value)[0].models = models
-        console.log(navigation.value)
+        //console.log(navigation.value)
     }
 
     const getCurrentModel = function () {
-        //console.log(navigation.value)
+        //console.log(navigation.value.filter(item => item.id === currentStructure.value)[0].curr_model)
         return navigation.value.filter(item => item.id === currentStructure.value)[0].curr_model
     }
 
