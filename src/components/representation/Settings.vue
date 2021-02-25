@@ -28,7 +28,7 @@
             <Residues class="settings-panel residues" />
             <Heteroatoms class="settings-panel hetero" />
             <Ions class="settings-panel ions" />
-            <Water class="settings-panel water" />
+            <Waters class="settings-panel water" />
             <CustomSelection class="settings-panel custom" />
             <hr class="subsection" />
             <TitleSettings :title="tit_traj" />
@@ -49,11 +49,11 @@ import Chains from '@/components/representation/settings/Chains'
 import Heteroatoms from '@/components/representation/settings/Heteroatoms'
 import Ions from '@/components/representation/settings/Ions'
 import Residues from '@/components/representation/settings/Residues'
-import Water from '@/components/representation/settings/Water'
+import Waters from '@/components/representation/settings/Waters'
 import CustomSelection from '@/components/representation/settings/CustomSelection'
 import Trajectory from '@/components/representation/settings/Trajectory'
 export default {
-    components: { TitleSettings, SelectFile, UploadFile, MenuFile, Models, Chains, Heteroatoms, Ions, Residues, Water, CustomSelection, Trajectory },
+    components: { TitleSettings, SelectFile, UploadFile, MenuFile, Models, Chains, Heteroatoms, Ions, Residues, Waters, CustomSelection, Trajectory },
     setup() {
         const visibleRight = ref(false)
         const { setFlagStatus } = useFlags()

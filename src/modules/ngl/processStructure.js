@@ -55,6 +55,7 @@ export default function processStructure() {
         structureView.eachResidue(function (rp) {
           if(rp.isHelix()) {
             arraux.push({
+                'label': rp.resname.toUpperCase(),
                 'num': rp.resno,
                 'chain': rp.chainname
             })
@@ -139,6 +140,8 @@ export default function processStructure() {
                 last_sheet: false,
                 sheet: sheet,
                 helix: helix,
+                fsheet: Math.random(),
+                lsheet: Math.random(),
                 longname: globals.aminoacids[rp.resname.toLowerCase()].name
             }
             sequence.push(res)

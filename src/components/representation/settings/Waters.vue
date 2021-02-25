@@ -4,7 +4,21 @@
             <i class="fas fa-tint"></i> <div class="p-panel-title">{{ header }}</div>
         </template>
         <template #icons>
-            <Button icon="fas fa-eye" class="p-button-rounded p-button-text" />
+            <Button 
+            :icon="externalWindow ? 'fab fa-red-river fa-rotate-180' : 'fab fa-red-river'" 
+            class="p-button-rounded p-button-text"
+            style="font-size:16px;" 
+            @click="openOut" 
+            v-tooltip.left="ttpoo"
+            :disabled="modelWater.length == 0"
+            />
+            <Button 
+            :icon="allSelected ? 'fas fa-times' : 'fas fa-check-double'" 
+            class="p-button-rounded p-button-text" 
+            @click="selectAll" 
+            v-tooltip.left="ttpsa"
+            :disabled="modelWater.length == 0" />
+            <!--<Button icon="fas fa-eye" class="p-button-rounded p-button-text" />-->
         </template>
         <div id="water-text">
             <span class="water-number">702&nbsp;&nbsp;</span>
@@ -66,14 +80,57 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, reactive, computed, watch, toRefs } from 'vue'
+import useFlags from '@/modules/common/useFlags'
+import useZoomWindow from '@/modules/representations/useZoomWindow'
 export default {
     setup() {
 
-        const isCollapsed = ref(true)
-        const header = "Water"
+        const { flags, setFlagStatus } = useFlags()
+        const { setWindowType } = useZoomWindow()
 
-        return { header, isCollapsed }
+        const isCollapsed = ref(true)
+        const allSelected = ref(false)
+        // TODO RESIDUES AND WATERS "DIFFERENT" WINDOWS
+        const externalWindow = computed(() => flags.zoomWindowEnabled)
+        
+        const page = reactive({
+            header: "Water",
+            //ttpha: "Hide all waters",
+            ttpsa: "Select all waters",
+            ttpoo: computed(() => flags.zoomWindowEnabled ? 'Close external window' : 'View in external window')
+        })
+
+        let modelWater = [0]
+
+        const openOut = () => {
+            if(!externalWindow.value) {
+                setWindowType('water')
+                setFlagStatus('zoomWindowEnabled', true)
+            } else {
+                setFlagStatus('zoomWindowEnabled', false)
+            }
+        }
+
+        const selectAll = () => {
+            page.ttpsa = allSelected.value ? 'Select all the residues' : 'Unselect all the residues'
+            const items = document.getElementsByClassName("water-item")
+            for(const it of items) {
+                if(!allSelected.value) {
+                    if(it.className.indexOf('disabled') === -1) it.classList.add('water-item-hover')
+                } else {
+                    if(it.className.indexOf('disabled') === -1) it.classList.remove('water-item-hover')
+                }
+            }
+            allSelected.value = !allSelected.value
+        }
+
+        return { 
+            ...toRefs(page), isCollapsed,
+            modelWater,
+            openOut, externalWindow,
+            allSelected, selectAll, 
+        }
     }
 }
 </script>
@@ -87,7 +144,8 @@ export default {
     }
     #water-text .water-item { position:relative; z-index:1; padding:0 1px; cursor:default; }
     #water-text .water-item:not(.disabled) { cursor: pointer; }    
-    #water-text .water-item:not(.disabled):hover {
+    #water-text .water-item:not(.disabled):hover, 
+    .water-item-hover {
         color: #fff;
         background: #5E738B;
     }

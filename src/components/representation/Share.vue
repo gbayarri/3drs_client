@@ -1,5 +1,5 @@
 <template>
-    <div id="share-box" @click="openShareModal" v-tooltip.left="ttp" class="p-shadow-2" :class="{ 'legend-moved-left': sidebarEnabled }">
+    <div id="share-box" @click="openShareModal" v-tooltip.left="ttp" class="p-shadow-2" :class="{ 'open-settings': sidebarEnabled }">
         <img src="@/assets/img/logo_legend.png" />
     </div>
 </template>
@@ -47,7 +47,7 @@ export default {
     -o-transition-timing-function: ease;
     transition-timing-function: ease;
 }
-#share-box.legend-moved-left { 
+#share-box.open-settings { 
     right: 26%;
     -moz-transition-duration: 0.3s;
     -webkit-transition-duration: 0.3s;

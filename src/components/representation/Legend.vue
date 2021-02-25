@@ -1,5 +1,5 @@
 <template>
-  <div id="legend" :class="{ 'legend-moved-left': sidebarEnabled }" v-if="legendEnabled">
+  <div id="legend" :class="{ 'open-settings': sidebarEnabled }" v-if="legendEnabled">
       <span>{{ legendContent.name }}</span>  | Model <span>1</span> | Chain <span>{{ legendContent.chainname }}</span> | <span>{{ legendContent.resname }} {{ legendContent.resno }}</span>  {{ legendContent.atomname }}
   </div>
 </template>
@@ -42,7 +42,7 @@ export default {
     -o-transition-timing-function: ease;
     transition-timing-function: ease;
 }
-#legend.legend-moved-left { 
+#legend.open-settings { 
     right: 26%;
     -moz-transition-duration: 0.3s;
     -webkit-transition-duration: 0.3s;

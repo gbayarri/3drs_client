@@ -1,31 +1,42 @@
 <template>
-    <Panel :toggleable="true" v-model:collapsed="isCollapsed">
+    <Panel :toggleable="modelResidues.length >= 1" v-model:collapsed="isCollapsed">
         <template #header>
             <i class="fas fa-share-alt"></i> <div class="p-panel-title">{{ header }}</div>
         </template>
         <template #icons>
             <Button 
-            icon="far fa-clone fa-flip-horizontal" 
-            class="p-button-rounded p-button-text" 
+            :icon="externalWindow ? 'fab fa-red-river fa-rotate-180' : 'fab fa-red-river'" 
+            class="p-button-rounded p-button-text"
+            style="font-size:16px;" 
             @click="openOut" 
             v-tooltip.left="ttpoo"
+            :disabled="modelResidues.length == 0"
             />
             <Button 
             :icon="allSelected ? 'fas fa-times' : 'fas fa-check-double'" 
             class="p-button-rounded p-button-text" 
             @click="selectAll" 
-            v-tooltip.left="ttpsa" />
-            <Button 
+            v-tooltip.left="ttpsa"
+            :disabled="modelResidues.length == 0" />
+            <!--<Button 
             :icon="allVisible ? 'fas fa-eye-slash' : 'fas fa-eye'" 
             @click="hideAll" 
             class="p-button-rounded p-button-text" 
             v-tooltip.left="ttpha" 
-            />
+            />-->
         </template>
         <div id="sequence-text">
-            <div class="chain-sequence" v-for="(chain, index) in modelResidues" :key="index">
-                <div class="chain-title" v-if="chain.residues.length > 0">Chain {{ chain.id }}</div>
-                <Residue v-for="(item, index) in chain.residues" :key="index" :residue="item" :index="index" />
+            <div class="chain-sequence margin-bottom-10" v-for="(chain, index) in modelResidues" :key="index">
+                <div class="chain-title margin-bottom-10" v-if="chain.residues.length > 0">Chain {{ chain.id }}</div>
+                <Residue 
+                v-for="(item, index) in chain.residues" 
+                :key="index" 
+                :residue="item" 
+                :index="index" 
+                :sheets="modelSheets" 
+                :helixes="modelHelixes" 
+                :window="false"
+                />
             </div>
         </div>
         
@@ -34,62 +45,63 @@
 
 <script>
 import { ref, reactive, computed, watch, toRefs } from 'vue'
+import useFlags from '@/modules/common/useFlags'
+import useZoomWindow from '@/modules/representations/useZoomWindow'
 import structureStorage from '@/modules/structure/structureStorage'
 import structureNavigation from '@/modules/structure/structureNavigation'
-import Residue from '@/components/representation/settings/residues/Residue'
+import Residue from '@/components/representation/settings/addons/Residue'
 export default {
     components: { Residue },
     setup() {
 
+        const { flags, setFlagStatus } = useFlags()
+        const { windowType, setWindowType } = useZoomWindow()
         const { getChainContent } = structureStorage()
         const { getCurrentChains } = structureNavigation()
 
         const isCollapsed = ref(true)
         const allSelected = ref(false)
-        const allVisible = ref(false)
+        const externalWindow = computed(() => {
+            // TODO RESIDUES AND WATERS "DIFFERENT" WINDOWS
+            if(flags.zoomWindowEnabled/* && windowType !== 'residues'*/)  return true
+        })
+        //const allVisible = ref(false)
 
         const page = reactive({
             header: "Residues",
-            label_models: "Model index",
-            ttpha: "Hide all residues",
+            //ttpha: "Hide all residues",
             ttpsa: "Select all residues",
-            ttpoo: "View in external window"
+            ttpoo: computed(() => flags.zoomWindowEnabled ? 'Close external window' : 'View in external window')
         })
         
         // trick for creating reactivity with computed property
         const watchedChains = computed(() => getCurrentChains())
-        //const selectedChains = ref(getCurrentChains())
 
-        const getModelResidues = (wch) => {
+        const getModelContent = (wch, label) => {
             const chains = []
             for(const c of wch) chains.push(c.id)
-            const allResidues = getChainContent('residues')
-            const allSheets = getChainContent('sheets')
-            const allHelixes = getChainContent('helixes')
-            /*return [ 
-                allResidues.filter(item => chains.includes(item.id)),  
-                allSheets.filter(item => chains.includes(item.id)),
-                allHelixes.filter(item => chains.includes(item.id))                
-                ]*/
-            return allResidues.filter(item => chains.includes(item.id))
+            const allContent = getChainContent(label)
+            return allContent.filter(item => chains.includes(item.id))
         }
 
-        const modelSheets = []
-        const modelHelixes = []
-
-        let modelResidues = computed(() => getModelResidues(watchedChains.value))
-        console.log(modelResidues.value)
-
-        // TODO!!!!
-        const residues = []
-        //const shownResidues = ref(getCurrentResidues())
+        let modelResidues = computed(() => getModelContent(watchedChains.value, 'residues'))
+        let modelSheets = computed(() => getModelContent(watchedChains.value, 'sheets'))
+        let modelHelixes = computed(() => getModelContent(watchedChains.value, 'helixes'))
+        /*console.log(modelResidues.value)
+        console.log(modelSheets.value)
+        console.log(modelHelixes.value)*/
 
         const openOut = () => {
-
+            if(!externalWindow.value) {
+                setWindowType('residues')
+                setFlagStatus('zoomWindowEnabled', true)
+            } else {
+                setFlagStatus('zoomWindowEnabled', false)
+            }
         }
 
         const selectAll = () => {
-            page.ttpsa = allSelected.value ? 'Select all the residues' : 'Unselect all the residues'
+            page.ttpsa = allSelected.value ? 'Select all residues' : 'Unselect all residues'
             const items = document.getElementsByClassName("sequence-item")
             for(const it of items) {
                 if(!allSelected.value) {
@@ -101,33 +113,52 @@ export default {
             allSelected.value = !allSelected.value
         }
 
-        const hideAll = () => {
+        // TODO!!!! ADD TO NAVIGATION
+        // FUNCTION onClick OR SIMILAR
+
+        /*const hideAll = () => {
             page.ttpha = allVisible.value ? 'Hide all residues' : 'Show all residues'
             allVisible.value = !allVisible.value
-        }
+        }*/
 
         // modifying isCollapsed & selectedChains v-model properties without computed()
-        watch([watchedChains/*, residues*/], (newValues, prevValues) => {
+        watch([watchedChains], (newValues, prevValues) => {
             const wch = newValues[0]
-            let modelResidues  =  computed(() => getModelResidues(wch))
-            console.log(modelResidues)
+            modelResidues  =  computed(() => getModelContent(wch, 'residues'))
+            modelSheets = computed(() => getModelContent(wch, 'sheets'))
+            modelHelixes = computed(() => getModelContent(wch, 'helixes'))
+            //console.log(modelResidues.value)
+            /*console.log(modelSheets.value)
+            console.log(modelHelixes.value)*/
+            if(modelResidues.value.length < 1) isCollapsed.value = true
         })
 
-        return { ...toRefs(page), isCollapsed,
-        modelResidues, modelSheets, modelHelixes,
-        openOut,
-        allSelected, selectAll, hideAll, allVisible 
+        return { 
+            ...toRefs(page), isCollapsed,
+            modelResidues, modelSheets, modelHelixes,
+            openOut, externalWindow,
+            allSelected, selectAll, 
+            /*hideAll, allVisible */
         }
     }
 }
 </script>
 
 <style>
-   #sequence-text {
+    #sequence-text {
         font-family: monospace;
         font-size: 14px !important;
         line-height: 35px;
         word-break: break-all;
+        overflow-y: auto; 
+        overflow-x: hidden; 
+        max-height:15rem;
+    }
+    #sequence-text .chain-title {
+        font-family: 'Open Sans';
+        background: #e1ebf7;
+        padding-left: .5rem;
+        line-height: 25px;
     }
     #sequence-text .sequence-item { position:relative; z-index:1; padding:0 0.5px; cursor:default; }
     #sequence-text .sequence-item:not(.disabled) { cursor: pointer; }    

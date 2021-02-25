@@ -240,7 +240,6 @@ export default {
     #minisettings { 
         position: absolute; 
         z-index: 2; 
-        /*left: calc(2% + 50px); */
         left: 1%;
         bottom: 0;
         width: 20%;
