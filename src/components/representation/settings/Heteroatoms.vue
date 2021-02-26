@@ -5,8 +5,9 @@
         </template>
         <template #icons>
             <Button 
-            :icon="allSelected ? 'fas fa-times' : 'fas fa-check-double'" 
+            :icon="allSelected ? 'fas fa-times-circle' : 'fas fa-check-circle'" 
             class="p-button-rounded p-button-text" 
+            style="font-size:16px;" 
             @click="selectAll" 
             v-tooltip.left="ttpsa"
             :disabled="modelHeteroatoms.length == 0" />
@@ -93,6 +94,7 @@ export default {
             //console.log(modelHeteroatoms.value)
             if(modelHeteroatoms.value.length < 1) isCollapsed.value = true
             if(!shts || shts.length === 0) allSelected.value = false
+            if(shts && (shts.length === modelHeteroatoms.value.length)) allSelected.value = true
         })
 
         const onChange = (e) => {

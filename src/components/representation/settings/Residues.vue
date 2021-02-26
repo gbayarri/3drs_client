@@ -5,7 +5,7 @@
         </template>
         <template #icons>
             <Button 
-            :icon="externalWindow ? 'fab fa-red-river fa-rotate-180' : 'fab fa-red-river'" 
+            :icon="externalWindow ? 'fas fa-external-link-square-alt fa-flip-vertical' : 'fas fa-external-link-square-alt fa-flip-horizontal'" 
             class="p-button-rounded p-button-text"
             style="font-size:16px;" 
             @click="openOut" 
@@ -13,8 +13,9 @@
             :disabled="modelResidues.length == 0"
             />
             <Button 
-            :icon="allSelected ? 'fas fa-times' : 'fas fa-check-double'" 
+            :icon="checkAllSelected ? 'fas fa-times-circle' : 'fas fa-check-circle'" 
             class="p-button-rounded p-button-text" 
+            style="font-size:16px;"
             @click="selectAll" 
             v-tooltip.left="ttpsa"
             :disabled="modelResidues.length == 0" />
@@ -55,24 +56,23 @@ export default {
     setup() {
 
         const { flags, setFlagStatus } = useFlags()
-        const { windowType, setWindowType } = useZoomWindow()
+        const { windowType, allSelected, setWindowType } = useZoomWindow()
         const { getChainContent } = structureStorage()
         const { getCurrentChains } = structureNavigation()
 
         const isCollapsed = ref(true)
-        const allSelected = ref(false)
-        const externalWindow = computed(() => {
-            // TODO RESIDUES AND WATERS "DIFFERENT" WINDOWS
-            if(flags.zoomWindowEnabled/* && windowType !== 'residues'*/)  return true
-        })
+        //const allSelected = ref(false)
+        const externalWindow = computed(() => (flags.zoomWindowEnabled && windowType.value === 'residues'))
         //const allVisible = ref(false)
 
         const page = reactive({
             header: "Residues",
             //ttpha: "Hide all residues",
             ttpsa: "Select all residues",
-            ttpoo: computed(() => flags.zoomWindowEnabled ? 'Close external window' : 'View in external window')
+            ttpoo: computed(() => (flags.zoomWindowEnabled && windowType.value === 'residues') ? 'Close external window' : 'View in external window')
         })
+
+        const checkAllSelected = computed(() => allSelected['residues'] )
         
         // trick for creating reactivity with computed property
         const watchedChains = computed(() => getCurrentChains())
@@ -96,21 +96,26 @@ export default {
                 setWindowType('residues')
                 setFlagStatus('zoomWindowEnabled', true)
             } else {
+                setWindowType('')
                 setFlagStatus('zoomWindowEnabled', false)
             }
         }
 
         const selectAll = () => {
-            page.ttpsa = allSelected.value ? 'Select all residues' : 'Unselect all residues'
+            /*page.ttpsa = allSelected.value ? 'Select all residues' : 'Unselect all residues'
             const items = document.getElementsByClassName("sequence-item")
             for(const it of items) {
                 if(!allSelected.value) {
-                    if(it.className.indexOf('disabled') === -1) it.classList.add('sequence-item-hover')
+                    if(it.className.indexOf('disabled') === -1) it.classList.add('sequence-item-selected')
                 } else {
-                    if(it.className.indexOf('disabled') === -1) it.classList.remove('sequence-item-hover')
+                    if(it.className.indexOf('disabled') === -1) it.classList.remove('sequence-item-selected')
                 }
             }
-            allSelected.value = !allSelected.value
+            allSelected.value = !allSelected.value*/
+
+            // TODO!!!! ADD TO NAVIGATION
+
+            allSelected['residues'] = !allSelected['residues']
         }
 
         // TODO!!!! ADD TO NAVIGATION
@@ -137,7 +142,7 @@ export default {
             ...toRefs(page), isCollapsed,
             modelResidues, modelSheets, modelHelixes,
             openOut, externalWindow,
-            allSelected, selectAll, 
+            allSelected, selectAll, checkAllSelected
             /*hideAll, allVisible */
         }
     }
@@ -164,6 +169,10 @@ export default {
     #sequence-text .sequence-item:not(.disabled) { cursor: pointer; }    
     #sequence-text .sequence-item:not(.disabled):hover,
     .sequence-item-hover {
+        color: #fff;
+        background: #99a8b9;
+    }
+    .sequence-item-selected {
         color: #fff;
         background: #5E738B;
     }

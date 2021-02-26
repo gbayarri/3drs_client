@@ -1,6 +1,10 @@
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 
 const windowType = ref('')
+const allSelected = reactive({
+  residues: false,
+  waters: false
+})
 
 export default function useZoomWindow() {
 
@@ -8,6 +12,15 @@ export default function useZoomWindow() {
     windowType.value = type
   }
 
-  return { windowType, setWindowType }
+  const toggleAllSelected = function (type) {
+    allSelected[type] = !allSelected[type]
+  }
+
+  return { 
+    windowType, 
+    allSelected,
+    setWindowType, 
+    toggleAllSelected 
+  }
 
 }

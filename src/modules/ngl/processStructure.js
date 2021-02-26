@@ -100,8 +100,14 @@ export default function processStructure() {
         const selection_residues = createSelection('/' + model + ' and :' + chain + ' and not ( water or ion or hetero )')
         const structureView = component.structure.getView(selection_residues)
 
+        const res_numbers = []
+        structureView.eachResidue(function (rp) {
+            res_numbers.push(rp.resno)
+        })
+
         let sequence = []
-        let prev_res = structureView.structure.residueStore.resno[0]
+        //let prev_res = structureView.structure.residueStore.resno[0]
+        let prev_res = res_numbers[0]
         let prev_hx = null
         let curr_helix = 0
         let helix = null
@@ -191,14 +197,28 @@ export default function processStructure() {
         const selection_waters = createSelection('/' + model + ' and :' + chain + ' and water')
         const structureView = component.structure.getView(selection_waters)
 
-        let waters = []
+        const wat_numbers = []
         structureView.eachResidue(function (rp) {
+            wat_numbers.push(rp.resno)
+        })
+
+        let waters = []
+        let prev_wat = wat_numbers[0]
+        structureView.eachResidue(function (rp) {
+            // check sequence "holes"
+            if(rp.resno > (prev_wat + 1)) {
+                for (var i = (prev_wat + 1); i < rp.resno; i ++) {
+                    waters.push({ 'name': null, 'num': i })
+                }
+            }
+            // push water
             let res = {
                 'num': rp.resno,
                 'name': rp.resname.toUpperCase(),
                 'chain': rp.chainname
             }
             waters.push(res)
+            prev_wat = rp.resno
         })
         return waters
     }

@@ -5,8 +5,9 @@
         </template>
         <template #icons>
             <Button 
-            :icon="allSelected ? 'fas fa-times' : 'fas fa-check-double'" 
+            :icon="allSelected ? 'fas fa-times-circle' : 'fas fa-check-circle'" 
             class="p-button-rounded p-button-text" 
+            style="font-size:16px;" 
             @click="selectAll" 
             v-tooltip.left="ttpsa"
             :disabled="modelIons.length == 0" />
@@ -105,7 +106,7 @@ export default {
             //console.log(modelIons.value)
             if(modelIons.value.length < 1) isCollapsed.value = true
             if(!sins || sins.length === 0) allSelected.value = false
-            //if(sins.length === modelIons.value.length) allSelected.value = true
+            if(sins && (sins.length === modelIons.value.length)) allSelected.value = true
             //if(sins.length < modelIons.value.length) allSelected.value = false
         })
 

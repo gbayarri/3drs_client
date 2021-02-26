@@ -88,13 +88,13 @@ export default function structureStorage() {
         const allChains = currStr.models.filter(item => item.id === currMod)[0].chains
         const chains = []
 
-        //console.log(getCurrentChains())
-
         for(const chain of allChains) {
-            chains.push({
-                id: chain.id,
-                [content]: chain[content]
-            })
+            if(chain[content].length > 0) {
+                chains.push({
+                    id: chain.id,
+                    [content]: chain[content]
+                })
+            }
         }
         return chains
     }

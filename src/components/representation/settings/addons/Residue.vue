@@ -9,7 +9,12 @@
     :data-chain="residue.chain" 
     :data-resnum="residue.num" 
     :data-resname="residue.label" 
-    v-tooltip.left="residue.longname + ' (' +  residue.label + ')<br>Residue: ' + residue.id + ' ' + residue.num">
+    :data-sheet="(residue.sheet !== null) ? residue.chain + ':' + residue.sheet : null" 
+    :data-helix="(residue.helix !== null) ? residue.chain + ':' + residue.helix : null" 
+    v-tooltip.left="residue.longname[0].toUpperCase() + residue.longname.substring(1) + ' (' +  residue.label + ')<br>' + residue.chain + ': ' + residue.id + ' ' + residue.num"
+    @mouseover="onMouseOver"
+    @mouseleave="onMouseLeave"
+    @click="onClick">
         {{ residue.id }}
     </span>
     <span v-else class="sequence-item disabled">&nbsp;</span>
@@ -18,6 +23,7 @@
     v-if="(residue.sheet !== null) && window" 
     @mouseover="sheetOver(residue.sheet, residue.chain)" 
     @mouseleave="sheetLeave(residue.sheet, residue.chain)" 
+    @click="sheetClick(residue.sheet, residue.chain)"
     :data-sheet="residue.chain + ':' + residue.sheet" 
     v-tooltip.bottom="labelSheet"><span v-if="!residue.last_sheet">&nbsp;&nbsp;</span><span v-else>&#9654;&nbsp;</span></span>
 
@@ -25,20 +31,55 @@
     v-if="(residue.helix !== null) && window" 
     @mouseover="helixOver(residue.helix, residue.chain)" 
     @mouseleave="helixLeave(residue.helix, residue.chain)" 
+    @click="helixClick(residue.helix, residue.chain)"
     :data-helix="residue.chain + ':' + residue.helix" 
     v-tooltip.bottom="labelHelix">&nbsp;&nbsp;</span>
 </template>
 
 <script>
 import { computed } from 'vue'
+import useZoomWindow from '@/modules/representations/useZoomWindow'
 export default {
     props: ['residue', 'sheets', 'helixes', 'window', 'index'],
     setup(props) {
+
+        // TODO: ADD TO NAVIGATION ALL THE SELECTEDS (FUNCTION ONCLICK()) AND COMPUTE HERE IF 
+        // class="sequence-item" OR class="sequence-item-selected" WHEN CREATED
+        // MAKE CONSISTEN WITH MULTIMODELS!!!!
+        //const { allSelected } = useZoomWindow()
+
+        console.log('loading ' + props.residue.num )
 
         const residue =  computed(() => props.residue)
         const sheets =  computed(() => props.sheets)
         const helixes =  computed(() => props.helixes)
         const window =  computed(() => props.window)
+
+        const onMouseOver = (e) => {
+            // console.log(e.type) // mouseover / mouseleave 
+            // TODO: ADD INTERACTIONS WITH STAGE
+            const residues = document.querySelectorAll('[data-chain="' + e.target.dataset.chain + '"][data-resnum="' + e.target.dataset.resnum + '"][data-resname="' + e.target.dataset.resname + '"]')
+            for(const res of residues) {
+                res.classList.add('sequence-item-hover')
+            }
+        }
+
+        const onMouseLeave = (e) => {
+            // console.log(e.type) // mouseover / mouseleave 
+            // TODO: ADD INTERACTIONS WITH STAGE
+            const residues = document.querySelectorAll('[data-chain="' + e.target.dataset.chain + '"][data-resnum="' + e.target.dataset.resnum + '"][data-resname="' + e.target.dataset.resname + '"]')
+            for(const res of residues) {
+                res.classList.remove('sequence-item-hover')
+            }
+        }
+
+        const onClick = (e) => {
+            const residues = document.querySelectorAll('[data-chain="' + e.target.dataset.chain + '"][data-resnum="' + e.target.dataset.resnum + '"][data-resname="' + e.target.dataset.resname + '"]')
+            for(const res of residues) {
+                if(res.className.indexOf('sequence-item-selected') === -1) res.classList.add('sequence-item-selected')
+                else res.classList.remove('sequence-item-selected', 'sequence-item-hover')
+            }
+        }
 
         const labelSheet = computed(() => {
             if(sheets && residue.value.id) {
@@ -80,26 +121,44 @@ export default {
             }
         }
 
-        const helixOver = (sheet, chain) => {
-            const helixes = document.querySelectorAll('[data-helix="' + chain + ':' + sheet + '"]')
+        const sheetClick = (sheet, chain) => {
+            const residues = document.querySelectorAll('[data-sheet="' + chain + ':' + sheet + '"]')
+            for(const res of residues) {
+                if(res.className.indexOf('sequence-item-selected') === -1 && res.className.indexOf('sequence-item') !== -1) res.classList.add('sequence-item-selected')
+                else res.classList.remove('sequence-item-selected', 'sequence-item-hover')
+            }
+        }
+
+        const helixOver = (helix, chain) => {
+            const helixes = document.querySelectorAll('[data-helix="' + chain + ':' + helix + '"]')
             for(const s of helixes) {
                 if(s.className == 'helix') s.style.backgroundPosition = 'center top'
                 if(s.className == 'sequence-item')  s.classList.add('sequence-item-hover')
             }
         }
 
-        const helixLeave = (sheet, chain) => {
-            const helixes = document.querySelectorAll('[data-helix="' + chain + ':' + sheet + '"]')
+        const helixLeave = (helix, chain) => {
+            const helixes = document.querySelectorAll('[data-helix="' + chain + ':' + helix + '"]')
             for(const s of helixes) {
                 if(s.className == 'helix') s.style.backgroundPosition = 'center bottom'
                 if(s.className == 'sequence-item sequence-item-hover')  s.classList.remove('sequence-item-hover')
             }
         }
 
-        return { residue, window,
+        const helixClick = (helix, chain) => {
+            const residues = document.querySelectorAll('[data-helix="' + chain + ':' + helix + '"]')
+            for(const res of residues) {
+                if(res.className.indexOf('sequence-item-selected') === -1 && res.className.indexOf('sequence-item') !== -1) res.classList.add('sequence-item-selected')
+                else res.classList.remove('sequence-item-selected', 'sequence-item-hover')
+            }
+        }
+
+        return { 
+            residue, window,
+            onClick, onMouseOver, onMouseLeave,
             labelSheet, labelHelix,
-            sheetOver, sheetLeave,
-            helixOver, helixLeave,
+            sheetOver, sheetLeave, sheetClick,
+            helixOver, helixLeave, helixClick
         }
     }
 }
