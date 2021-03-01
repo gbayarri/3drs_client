@@ -18,12 +18,14 @@
 
 <script>
 import { inject, ref } from 'vue'
+import useModals from '@/modules/common/useModals'
 export default {
     props: ['texts'],
     setup() {
 
-        const $axios = inject('$axios');
-        const $router = inject('$router');
+        const $axios = inject('$axios')
+        const $router = inject('$router')
+        const { openModal, setBlockUI } = useModals()
 
         let disableFileUpload = ref(false)
 
@@ -43,6 +45,10 @@ export default {
         }
 
         const uploader = (e) => {
+
+            setBlockUI('upload_pdb')
+            openModal('block')
+
             disableFileUpload.value = true
             let filesList =  Object.assign([], e.files)
             let formData = new FormData();
@@ -70,6 +76,9 @@ export default {
                             show: true
                         }
                         disableFileUpload.value = false
+                    } else if(resp.status === 'success') {
+                        setBlockUI('load')
+                        $router.push({ name: 'Representation', params: { id: resp.id } }) 
                     }
                 })
         }

@@ -1,7 +1,7 @@
 <template>
   <div id="stage">
       <div id="viewport">
-          <ProgressSpinner v-if="!stageLoaded" strokeWidth="6" animationDuration=".8s"/>
+          <!--<ProgressSpinner v-if="!stageLoaded" strokeWidth="6" animationDuration=".8s"/>-->
       </div>
   </div>
 </template>
@@ -11,18 +11,22 @@ import { computed, onMounted } from 'vue'
 import useFlags from '@/modules/common/useFlags'
 import useStage from '@/modules/ngl/useStage'
 import useTools from '@/modules/ngl/useTools'
+import useModals from '@/modules/common/useModals'
 import loadStructure from '@/modules/ngl/loadStructure'
 import structureStorage from '@/modules/structure/structureStorage'
 import structureNavigation from '@/modules/structure/structureNavigation'
 export default {
-  setup() {
+  props: ['project_id'],
+  setup(props) {
 
     const { flags, setFlagStatus } = useFlags()
     const stageLoaded = computed(() => flags.stageLoaded)
     const { updateOrientation } = useTools()
+    const { dialog, openModal, closeModal, setBlockUI } = useModals()
     const { loadFileToStage, checkSignals } = loadStructure()
     const { /*structure, */resetStructure } = structureStorage()
     const { setCurrentStructure } = structureNavigation()
+    const project_id = props.project_id
     
     const createViewport = () => {
       const { createStage } = useStage()
@@ -40,11 +44,15 @@ export default {
 
       // see https://youtu.be/KsNXsxKoXlY (async fetch composable function)
 
+      // get structures from the new composable or structureStorage where I've saved all project info
+
       const structures = [/*{ name:"1pik", id: "1" }, { name:"2kod", id: "3" },*/ { name:"2rgp", id: "4" }/*{ name:"6ACC", id: "4" }, { name:"2rgp", id: "1" }, /*{ name:"1mbs", id: "2" }, { name:"1pik", id: "3" }, { name:"2kod", id: "4" }, { name:"2vgb", id: "5" },*/  ]
       const array_promises = []
       for(const str of structures) {
         array_promises
           .push(
+            // change by http://mmb.irbbarcelona.org/webdev/slim/3dRS/api/public/download/file.id
+            // call to URL process.env.VUE_APP_API_LOCATION + 'download/' + file.id
             loadFileToStage(stage, "https://files.rcsb.org/download/" + str.name + ".pdb", str.name, str.id)
           )
       }
@@ -75,6 +83,9 @@ export default {
           setCurrentStructure('4')
           // ************************
           // ************************
+
+          // CLOSE LOAD MODAL
+          closeModal('block')
 
           //console.log(structure)
 
@@ -112,6 +123,19 @@ export default {
     }
 
     onMounted(() => {
+      // if entering representation directly, show BlockUI
+      if(!dialog.block) {
+        setBlockUI('load')
+        openModal('block')
+      }
+      console.log(project_id)
+
+      // get info from process.env.VUE_APP_API_LOCATION + 'structure/' + project_id
+      // and save it to structureStorage or to new composable (????)
+      // see https://youtu.be/KsNXsxKoXlY (async fetch composable function)
+      // PUT DESCRIPTIONS TO ALL COMPOSABLES:
+      // loadStructure
+
       createViewport()
     })
     

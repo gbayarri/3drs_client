@@ -45,10 +45,10 @@ export default {
 
         // TODO: ADD TO NAVIGATION ALL THE SELECTEDS (FUNCTION ONCLICK()) AND COMPUTE HERE IF 
         // class="sequence-item" OR class="sequence-item-selected" WHEN CREATED
-        // MAKE CONSISTEN WITH MULTIMODELS!!!!
+        // MAKE CONSISTENT WITH MULTIMODELS!!!!
         //const { allSelected } = useZoomWindow()
 
-        console.log('loading ' + props.residue.num )
+        //console.log('loading ' + props.residue.num )
 
         const residue =  computed(() => props.residue)
         const sheets =  computed(() => props.sheets)

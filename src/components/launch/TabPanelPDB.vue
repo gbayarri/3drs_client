@@ -1,5 +1,6 @@
 <template>
     <p>{{ texts.desc }}</p>
+    <Message :severity="msg.severity" :key="msg.content" v-if="msg.show">{{msg.content}}</Message>
     <form class="send-pdb" @submit.prevent="submitPDB">
     <div class="p-fluid p-formgrid p-grid">
         <div class="p-field p-col-12 p-md-6">
@@ -21,15 +22,24 @@
 
 <script>
 import { inject, ref } from "vue"
+import useModals from '@/modules/common/useModals'
 export default {
     props: ['texts'],
     setup() {
 
         const $axios = inject('$axios');
+        const $router = inject('$router')
+        const { openModal, setBlockUI } = useModals()
 
         const selectedStructures = ref([])
         const filteredStructures = ref([])
         const formDisabled = ref(true)
+
+        let msg = ref({
+            severity: null,
+            content: null,
+            show: false
+        })
 
         // call API to get PDB's with given query
         const searchStructure = (event) => {
@@ -52,18 +62,42 @@ export default {
 
         // submit list of PDB's
         const submitPDB = () => {
-            //console.log(Object.assign([], selectedStructures.value))
+
+            setBlockUI('upload_pdb')
+            openModal('block')
+
+            let resp = null
+
             $axios
                 .post(process.env.VUE_APP_API_LOCATION + 'upload/pdb/', {
                     structures: Object.assign([], selectedStructures.value)
                 })
                 .then(function (response) {
-                    console.log(response);
+                    //console.log(response);
+                    resp = response.data
+                })
+                .catch(err => console.error(err.message))
+                .finally( () => {
+                    if(resp.status === 'error') {
+                        msg.value = {
+                            severity: 'error',
+                            content: resp.message,
+                            show: true
+                        }
+                    } else if(resp.status === 'success') {
+                        setBlockUI('load')
+                        $router.push({ name: 'Representation', params: { id: resp.id } }) 
+                    }
                 })
         }
 
-        return { selectedStructures, filteredStructures, searchStructure, formDisabled, 
-                selectItem, unselectItem, submitPDB }
+        return { 
+            selectedStructures, filteredStructures, searchStructure,
+            msg, 
+            formDisabled, 
+            selectItem, unselectItem, 
+            submitPDB 
+        }
     }
 }
 </script>

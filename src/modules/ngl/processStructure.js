@@ -1,6 +1,7 @@
 import useStage from '@/modules/ngl/useStage'
 import globals from '@/globals'
 
+// get object structure from NGL
 export default function processStructure() {
 
     const { createSelection } = useStage()

@@ -23,6 +23,7 @@
     </Panel>
   </div>
   <Footer />
+
 </template>
 
 <script>
@@ -30,42 +31,6 @@ import TabPanelPDB from '@/components/launch/TabPanelPDB'
 import TabPanelFile from '@/components/launch/TabPanelFile'
 export default {
   components: { TabPanelPDB, TabPanelFile },
-  /*data() {
-		return {
-      home : { icon: 'pi pi-home', to: { name: 'About'} },
-      breadcrumbs : [
-          { label: 'Launch', to: { name: 'Launch'}}
-      ],
-      selectedStructures: [],
-      filteredStructures: null,
-      formDisabled: true,
-      launchPanel: {
-        header: " Launch new 3DRS project",
-        description: `<p>Please start uploading one or more structure files from your computer or with a Protein Data Bank ID and the structure will be atomatically uploaded to our server:</p>`
-      }
-		}
-  },
-	methods: {
-    selectItem() {
-      if(this.selectedStructures.length) this.formDisabled = false
-    },
-    unselectItem() {
-      if(!this.selectedStructures.length) this.formDisabled = true
-    },
-    searchStructure(event) {
-      fetch(process.env.VUE_APP_API_LOCATION + 'pdb/' + event.query.toLowerCase())
-          .then(res => res.json())
-          .then(data => this.filteredStructures = data)
-          .catch(err => console.log(err.message))
-    },
-    submitPDB() {
-      console.log(this.selectedStructures)
-    },
-    onUpload() {
-      // muntar la api o una api mock per tractar tot aquest tema
-      console.log('uploaded!!!!')
-    }
-  }*/
   setup() {
 
     const header = "Launch Project"
@@ -83,8 +48,8 @@ export default {
     const tabPanel = {
         pdb: {
             header: "Launch from PDB",
-            desc: "Please type the PDB ID you want to use and a list of options will be shown:",
-            label: "Insert here the PDB ID"
+            desc: "Please type the PDB ID(s) you want to use and a list of options will be shown:",
+            label: "Insert here the PDB ID(s)"
         }, 
         file: {
             header: "Upload your own structure",

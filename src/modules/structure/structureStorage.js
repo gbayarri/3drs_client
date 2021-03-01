@@ -3,6 +3,8 @@ import structureNavigation from '@/modules/structure/structureNavigation'
 
 const project = ref([])
 
+// stores data to project value
+// CHACK IF ALL THIS STRUCTURE FITS WITH MONGO STRUCTURE
 export default function structureStorage() {
 
     const { navigation, currentStructure/*, getCurrentChains*/ } = structureNavigation()

@@ -12,7 +12,7 @@
 
     <Legend v-if="stageLoaded" />
 
-    <Viewport />
+    <Viewport :project_id="project_id" />
 
     <ModalTrajectory />
     <ModalStructure />
@@ -34,7 +34,12 @@ import ModalTrajectory from '@/components/representation/modals/ModalTrajectory'
 import ModalStructure from '@/components/representation/modals/ModalStructure'
 import ModalShare from '@/components/representation/modals/ModalShare'
 export default {
-    components: { Tools, ZoomWindow, RepresentationSettings, Settings, Share, Legend, Viewport, ModalTrajectory, ModalStructure, ModalShare },
+    components: { 
+        Tools, ZoomWindow, 
+        RepresentationSettings, Settings, 
+        Share, Legend, 
+        Viewport, 
+        ModalTrajectory, ModalStructure, ModalShare },
     props: ['id'],
     setup(props) {
 
@@ -48,9 +53,9 @@ export default {
         setFlagStatus('sidebarEnabled', false)
         setFlagStatus('legendEnabled', false)
 
-        console.log(props.id)
+        const project_id = props.id
 
-        return { stageLoaded }
+        return { stageLoaded, project_id }
     }
 }
 </script>

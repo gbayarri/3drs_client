@@ -3,6 +3,7 @@ import processStructure from '@/modules/ngl/processStructure'
 import structureStorage from '@/modules/structure/structureStorage'
 import useFlags from '@/modules/common/useFlags'
 
+// Stage interactions
 export default function loadStructure() {
 
     const { updateLegend } = useLegend()
@@ -25,6 +26,7 @@ export default function loadStructure() {
             //console.log('structure ' + name + ' loaded')
 
             // get structure
+            // ONLY IF FIRST TIME AND project.structure IS EMPTY
             const structure = getStructure(component, name)
             //console.log(structure)
             updateStructure(structure, id)

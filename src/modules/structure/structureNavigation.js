@@ -3,6 +3,7 @@ import { ref } from 'vue'
 const navigation = ref([])
 let currentStructure = ref(null)
 
+// navigation for settings module
 export default function structureNavigation() {
 
     const setCurrentStructure = function (value) {

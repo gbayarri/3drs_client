@@ -27,6 +27,7 @@ import Message from 'primevue/message'
 //import ToastService from 'primevue/toastservice'
 
 // generic components
+import Header from '@/components/global/Header'
 import Footer from '@/components/global/Footer'
 
 // import App, router 
@@ -55,6 +56,7 @@ app.use(PrimeVue, {ripple: true})
 
 // create global components
 app.component('TabMenu', TabMenu)
+app.component('Header', Header)
 app.component('Footer', Footer)
 app.component('Panel', Panel)
 app.component('Card', Card)
