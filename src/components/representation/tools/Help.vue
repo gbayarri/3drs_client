@@ -1,5 +1,5 @@
 <template>
-  <Button icon="fas fa-question-circle" v-tooltip.right="ttp"  @click="handleClick" />
+  <Button icon="fas fa-question-circle" class="p-shadow-2" v-tooltip.right="ttp"  @click="handleClick" />
 </template>
 
 <script>

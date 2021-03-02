@@ -34,13 +34,11 @@
 
 <script>
 import { ref, computed, watch } from 'vue'
-import structureStorage from '@/modules/structure/structureStorage'
-import structureNavigation from '@/modules/structure/structureNavigation'
+import structureSettings from '@/modules/structure/structureSettings'
 export default {
     setup() {
 
-        const { getChains } = structureStorage()
-        const { updateCurrentChains, getCurrentChains } = structureNavigation()
+        const { updateCurrentChains, getCurrentChains, getChains } = structureSettings()
 
         const isCollapsed = ref(true)
 

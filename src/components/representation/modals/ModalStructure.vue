@@ -74,7 +74,7 @@ export default {
             console.log('Uploading structure files!!!')
 
             /*$axios
-                .post(process.env.VUE_APP_API_LOCATION + 'upload/file/', formData)
+                .post(process.env.VUE_APP_API_LOCATION + '/upload/file/', formData)
                 .then(function (response) {
                     //console.log(response);
                     resp = response.data

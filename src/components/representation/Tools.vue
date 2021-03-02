@@ -1,5 +1,5 @@
 <template>
-    <div id="tools">
+    <div id="tools" >
         <Reload :stage="stage" />
         <Rotate :stage="stage" />
         <Center :stage="stage" />

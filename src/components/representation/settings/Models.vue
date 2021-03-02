@@ -24,13 +24,11 @@
 
 <script>
 import { ref, computed, watch } from 'vue'
-import structureStorage from '@/modules/structure/structureStorage'
-import structureNavigation from '@/modules/structure/structureNavigation'
+import structureSettings from '@/modules/structure/structureSettings'
 export default {
     setup() {
 
-        const { getModels } = structureStorage()
-        const { updateCurrentModel, getCurrentModel } = structureNavigation()
+        const { updateCurrentModel, getCurrentModel, getModels } = structureSettings()
 
         const isCollapsed = ref(true)
 

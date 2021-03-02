@@ -1,5 +1,6 @@
 /* GOOGLE FONTS */
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all');
+
 /* GENERIC STYLES */
 body, html { margin:0; height:100%; overflow-x: hidden; }
 a { color:#6f96a9; font-weight: 600; }
@@ -146,7 +147,7 @@ body, html { scrollbar-color: #858f98 #f1f1f1; scrollbar-width: thin; }
 .p-fileupload-row > div { width: 33%; word-break: break-word; }
 .p-fileupload-row > div:last-child { padding: 0!important;  width: auto; }
 
-/* progress spinner */
+/* progress spinner 
 @keyframes p-progress-spinner-color {
     100%,
     0% {
@@ -162,7 +163,7 @@ body, html { scrollbar-color: #858f98 #f1f1f1; scrollbar-width: thin; }
     90% {
         stroke: #95a5a6;
     }
-}
+}*/
 
 /* tab panels */
 .p-tabview .p-tabview-nav li .p-tabview-nav-link:not(.p-disabled):focus {

@@ -1,5 +1,5 @@
 <template>
-  <Button icon="fas fa-crosshairs" v-tooltip.right="ttp" @click="handleClick" />
+  <Button icon="fas fa-bullseye" class="p-shadow-2" v-tooltip.right="ttp" @click="handleClick" />
 </template>
 
 <script>

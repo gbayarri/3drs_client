@@ -151,6 +151,7 @@ export default {
     /* buttons */
     #sidebar .settings-button { width: 95%; margin: 0 2.5%; background:#fff; color:#6f96a9; text-align: left; }
     #sidebar .settings-button:hover { background:#546974; color:#fff; }
+    #sidebar .p-panel .p-panel-header .p-button:disabled { color: #b4c6d6;}
 
     .settings-panel button.p-button-rounded.p-button-text { height: 1.8rem; width: 1.8rem; font-size: 13px; color:#6c757d; }
     .settings-panel button.p-button-rounded.p-button-text:hover { color:#fff; background:#849096!important; }

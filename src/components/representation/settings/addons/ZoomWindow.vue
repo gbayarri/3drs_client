@@ -51,8 +51,7 @@
 import { computed, watch, reactive, toRefs } from 'vue'
 import useFlags from '@/modules/common/useFlags'
 import useZoomWindow from '@/modules/representations/useZoomWindow'
-import structureStorage from '@/modules/structure/structureStorage'
-import structureNavigation from '@/modules/structure/structureNavigation'
+import structureSettings from '@/modules/structure/structureSettings'
 import Residue from '@/components/representation/settings/addons/Residue'
 import Water from '@/components/representation/settings/addons/Water'
 export default {
@@ -61,9 +60,8 @@ export default {
         
         const { flags, setFlagStatus } = useFlags()
         const { windowType, allSelected, setWindowType, toggleAllSelected  } = useZoomWindow()
-
-        const { getChainContent } = structureStorage()
-        const { getCurrentChains } = structureNavigation()
+        
+        const { getCurrentChains, getChainContent } = structureSettings()
 
         const isActive = computed(() => flags.zoomWindowEnabled)
         const sidebarEnabled = computed(() => flags.sidebarEnabled)

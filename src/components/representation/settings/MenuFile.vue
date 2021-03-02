@@ -11,16 +11,21 @@
         class="p-button-rounded p-button-text" 
         v-tooltip.top="ttphf"
         @click="hideFile"  />
+        <Button 
+        icon="fas fa-bullseye" 
+        class="p-button-rounded p-button-text" 
+        v-tooltip.top="ttpcf"
+        @click="centerFile"  />
     </div>
 </template>
 
 <script>
 import { ref } from 'vue'
-import structureStorage from '@/modules/structure/structureStorage'
+import structureSettings from '@/modules/structure/structureSettings'
 export default {
     setup() {
-        
-        const { currentStructure, getNumStructures } = structureStorage()
+
+        const { currentStructure, getNumStructures } = structureSettings()
 
         // REMOVE STRUCTURE 
         const ttprf = "Remove structure (double click)"
@@ -36,9 +41,16 @@ export default {
             console.log("hiding file " + currentStructure.value)
         }
 
+        // CENTER STRUCTURE
+        let ttpcf = ref("Center structure")
+        const centerFile = () => {
+            console.log("centering file " + currentStructure.value)
+        }
+
         return { 
             ttprf, numStructures, removeFile,
-            ttphf, hideFile
+            ttphf, hideFile,
+            ttpcf, centerFile
         }
     }
 }

@@ -1,3 +1,4 @@
+import { computed } from 'vue'
 import useLegend from '@/modules/viewport/useLegend'
 import processStructure from '@/modules/ngl/processStructure'
 import structureStorage from '@/modules/structure/structureStorage'
@@ -9,7 +10,9 @@ export default function loadStructure() {
     const { updateLegend } = useLegend()
     const { getType, getStructure } = processStructure()
     const { setFlagStatus } = useFlags()
-    const { updateStructure } = structureStorage()
+    const { projectData, updateStructure } = structureStorage()
+
+    const dataProject = computed(() => projectData.value)
 
     const loadFileToStage = (stage, url, name, id) => {
         return stage.loadFile(url, { defaultRepresentation: false, ext: 'pdb', name:name })
@@ -27,11 +30,18 @@ export default function loadStructure() {
 
             // get structure
             // ONLY IF FIRST TIME AND project.structure IS EMPTY
-            const structure = getStructure(component, name)
-            //console.log(structure)
-            updateStructure(structure, id)
+            let structure = null
+            if(dataProject.value.structure.length === 0) {
+                structure = getStructure(component, name)
+                //console.log(structure)
+                updateStructure(structure, id)
+            } else {
+                // TODO????
+                // structure = CONTENT FROM API!!!!
+            }
 
             // add default representations
+            // this is representation #1
             component.addRepresentation( "cartoon", { name: "struc_1", sele: "*", color: "sstruc"} )
             if(structure.type.isNucleic) component.addRepresentation( "base", { name: "base_1", sele: "*", color: "resname" } )
             component.addRepresentation( "ball+stick", { name: "ligand_1", sele: "hetero and not(water or ion)",  radius: .4, aspectRatio: 1.5 } )
@@ -62,6 +72,16 @@ export default function loadStructure() {
                 setFlagStatus('legendEnabled', false)
             }
         })
+
+        /*stage.mouseObserver.signals.dragged.add(function (delta) {
+            //console.log(delta)
+            console.log(stage.viewerControls.getOrientation())
+        })
+
+        stage.mouseObserver.signals.scrolled.add(function (scroll) {
+            //console.log(scroll)
+            console.log(stage.viewerControls.getOrientation())
+        })*/
 
         /*stage.signals.hovered.add( function(pickingProxy){ 
             if (pickingProxy && pickingProxy.atom) {

@@ -7,30 +7,36 @@
 </template>
 
 <script>
-import { computed, onMounted } from 'vue'
+import { inject, computed, onMounted } from 'vue'
 import useFlags from '@/modules/common/useFlags'
 import useStage from '@/modules/ngl/useStage'
 import useTools from '@/modules/ngl/useTools'
 import useModals from '@/modules/common/useModals'
+import useMessages from '@/modules/common/useMessages'
+import useAPI from '@/modules/api/useAPI'
 import loadStructure from '@/modules/ngl/loadStructure'
 import structureStorage from '@/modules/structure/structureStorage'
-import structureNavigation from '@/modules/structure/structureNavigation'
+import structureSettings from '@/modules/structure/structureSettings'
 export default {
   props: ['project_id'],
   setup(props) {
 
+    const $router = inject('$router')
     const { flags, setFlagStatus } = useFlags()
+    const { setMessage } = useMessages()
     const stageLoaded = computed(() => flags.stageLoaded)
     const { updateOrientation } = useTools()
     const { dialog, openModal, closeModal, setBlockUI } = useModals()
+    const { apiData, fetchProject } = useAPI()
     const { loadFileToStage, checkSignals } = loadStructure()
-    const { /*structure, */resetStructure } = structureStorage()
-    const { setCurrentStructure } = structureNavigation()
+    const { processedStructure, projectData, initProject, resetStructure } = structureStorage()
+    const { setCurrentStructure } = structureSettings()
     const project_id = props.project_id
-    
+
     const createViewport = () => {
       const { createStage } = useStage()
       const stage = createStage("viewport")
+      const dataProject = computed(() => projectData.value)
 
       resetStructure()
       setFlagStatus('stageLoaded', false)
@@ -42,18 +48,14 @@ export default {
       // 1pik: multimodel + multichain DNA (no structure)
       // 4gxy: RNA
 
-      // see https://youtu.be/KsNXsxKoXlY (async fetch composable function)
-
-      // get structures from the new composable or structureStorage where I've saved all project info
-
-      const structures = [/*{ name:"1pik", id: "1" }, { name:"2kod", id: "3" },*/ { name:"2rgp", id: "4" }/*{ name:"6ACC", id: "4" }, { name:"2rgp", id: "1" }, /*{ name:"1mbs", id: "2" }, { name:"1pik", id: "3" }, { name:"2kod", id: "4" }, { name:"2vgb", id: "5" },*/  ]
+      //const structures = [{ name:"1pik", id: "1" }, { name:"2kod", id: "3" }, { name:"2rgp", id: "4" }/*{ name:"6ACC", id: "4" }, { name:"2rgp", id: "1" }, /*{ name:"1mbs", id: "2" }, { name:"1pik", id: "3" }, { name:"2kod", id: "4" }, { name:"2vgb", id: "5" },*/  ]
+      const structures = dataProject.value.files
       const array_promises = []
       for(const str of structures) {
         array_promises
           .push(
-            // change by http://mmb.irbbarcelona.org/webdev/slim/3dRS/api/public/download/file.id
-            // call to URL process.env.VUE_APP_API_LOCATION + 'download/' + file.id
-            loadFileToStage(stage, "https://files.rcsb.org/download/" + str.name + ".pdb", str.name, str.id)
+            //loadFileToStage(stage, "https://files.rcsb.org/download/" + str.name + ".pdb", str.name, str.id)
+            loadFileToStage(stage, process.env.VUE_APP_API_LOCATION + '/download/' + str.id, str.name, str.id)
           )
       }
 
@@ -63,6 +65,18 @@ export default {
           ol[ 0 ].autoView(":A")*/
 
           //console.log(ol)
+
+          // TODO: ONCE ALL STRUCTURES LOADED, IN CASE IS FIRST TIME (dataProject.value.structure empty) SEND 
+          // ALL STRUCTURE DATA TO API AS WELL AS files.type AND ORIENTATION
+          if(dataProject.value.structure.length === 0) {
+            // ADD processedStructure.value TO project.structure
+            // TYPE IS INSIDE
+            console.log(processedStructure.value)
+            // https://nglviewer.org/ngl/api/manual/usage/interaction-controls.html
+            const pos = stage.viewerControls.getOrientation()//.toArray()
+            // TO CHECK loadStructure.js
+            console.log(pos.elements)
+          }
 
           // set all components to visible
           for(const c of stage.compList){
@@ -74,18 +88,17 @@ export default {
           updateOrientation(stage.viewerControls.getOrientation())
 
           setFlagStatus('stageLoaded', true)
-          //store.dispatch('stageIsLoaded', true)
 
           checkSignals(stage)
 
-          // ************************
-          // TO CHECK!!!!!
-          setCurrentStructure('4')
-          // ************************
-          // ************************
+          // set current structure          
+          setCurrentStructure(dataProject.value.currentStructure)
+          //setCurrentStructure('4')
 
           // CLOSE LOAD MODAL
           closeModal('block')
+
+
 
           //console.log(structure)
 
@@ -102,7 +115,7 @@ export default {
           /*setTimeout( () => {
             stage.getComponentsByName('first_str').list[0].reprList.forEach( function( repre ){
               //repre.setVisibility( false );
-              //repre.setParameters( { color: '#555'} );
+              //repre.setParameters( { color: '#555'} );603e1a99f7aa6046c8103204
               //repre.setParameters( { opacity: 0.6} );
               //console.log(repre)
               //repre.dispose()
@@ -128,15 +141,33 @@ export default {
         setBlockUI('load')
         openModal('block')
       }
-      console.log(project_id)
 
-      // get info from process.env.VUE_APP_API_LOCATION + 'structure/' + project_id
-      // and save it to structureStorage or to new composable (????)
-      // see https://youtu.be/KsNXsxKoXlY (async fetch composable function)
-      // PUT DESCRIPTIONS TO ALL COMPOSABLES:
-      // loadStructure
+      fetchProject(project_id)
+        .then(() => {
+          // save project.value to structureStorage
+          //console.log(projectData.value)
 
-      createViewport()
+          //  project doesn't exist, redirect to launch
+          if(apiData.value.code === 404) {
+            const msg = {
+                severity: 'warn',
+                content: 'You tried to access to an unexisting project, please check your project id or create a new one',
+                show: true
+            }
+            setMessage('launch', msg)
+            closeModal('block')
+            $router.push({ name: 'Launch' }) 
+            return false
+          }
+
+          initProject(apiData.value)
+
+          createViewport()
+        })
+
+        //******************
+        //createViewport()
+
     })
     
     return { stageLoaded }

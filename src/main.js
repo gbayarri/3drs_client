@@ -16,7 +16,7 @@ import Sidebar from 'primevue/sidebar'
 import Dropdown from 'primevue/dropdown'
 import Dialog from 'primevue/dialog'
 import ColorPicker from 'primevue/colorpicker'
-import ProgressSpinner from 'primevue/progressspinner'
+//import ProgressSpinner from 'primevue/progressspinner'
 import MultiSelect from 'primevue/multiselect'
 import Slider from 'primevue/slider'
 import Chip from 'primevue/chip'
@@ -70,7 +70,7 @@ app.component('Sidebar', Sidebar)
 app.component('Dropdown', Dropdown)
 app.component('Dialog', Dialog)
 app.component('ColorPicker', ColorPicker)
-app.component('ProgressSpinner', ProgressSpinner)
+//app.component('ProgressSpinner', ProgressSpinner)
 app.component('MultiSelect', MultiSelect)
 app.component('Slider', Slider)
 app.component('Chip', Chip)

@@ -10,15 +10,13 @@
 
 <script>
 import { ref, computed } from 'vue'
-import structureNavigation from '@/modules/structure/structureNavigation'
-import structureStorage from '@/modules/structure/structureStorage'
+import structureSettings from '@/modules/structure/structureSettings'
 export default {
     setup() {
 
         const placeholder = "Select a File"
 
-        const { currentStructure, setCurrentStructure } = structureNavigation()
-        const { getFileNames } = structureStorage()
+        const { currentStructure, setCurrentStructure, getFileNames } = structureSettings()
         
         const filesList = computed(() => getFileNames())
 

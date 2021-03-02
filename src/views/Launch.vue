@@ -6,6 +6,7 @@
       <template #header>
           <i class="fas fa-rocket"></i> <div class="p-panel-title">{{ launchPanel.header }}</div>
       </template>
+      <Message :severity="msg.severity" :key="msg.content" v-if="msg.show">{{msg.content}}</Message>
       <div v-html="launchPanel.description"></div>
 
       <TabView>
@@ -27,11 +28,15 @@
 </template>
 
 <script>
+import { computed } from 'vue'
+import useMessages from '@/modules/common/useMessages'
 import TabPanelPDB from '@/components/launch/TabPanelPDB'
 import TabPanelFile from '@/components/launch/TabPanelFile'
 export default {
   components: { TabPanelPDB, TabPanelFile },
   setup() {
+
+    const { messages } = useMessages()
 
     const header = "Launch Project"
 
@@ -39,6 +44,8 @@ export default {
     const breadcrumbs = [
           { label: 'Launch', to: { name: 'Launch'}}  
       ]
+
+    const msg = computed(() => messages.launch)
 
     const launchPanel = {
       header: " Launch new 3DRS project",
@@ -58,7 +65,7 @@ export default {
         }
       }
 
-    return { header, home, breadcrumbs, launchPanel, tabPanel }
+    return { header, home, breadcrumbs, msg, launchPanel, tabPanel }
   }
 }
 </script>

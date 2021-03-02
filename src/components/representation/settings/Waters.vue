@@ -40,8 +40,7 @@
 import { ref, reactive, computed, watch, toRefs } from 'vue'
 import useFlags from '@/modules/common/useFlags'
 import useZoomWindow from '@/modules/representations/useZoomWindow'
-import structureStorage from '@/modules/structure/structureStorage'
-import structureNavigation from '@/modules/structure/structureNavigation'
+import structureSettings from '@/modules/structure/structureSettings'
 import Water from '@/components/representation/settings/addons/Water'
 export default {
     components: { Water },
@@ -49,8 +48,7 @@ export default {
 
         const { flags, setFlagStatus } = useFlags()
         const { windowType, allSelected, setWindowType } = useZoomWindow()
-        const { getChainContent } = structureStorage()
-        const { getCurrentChains } = structureNavigation()
+        const { getCurrentChains, getChainContent } = structureSettings()
 
         const isCollapsed = ref(true)
         //const allSelected = ref(false)

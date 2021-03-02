@@ -1,6 +1,5 @@
 <template>
     <p>{{ texts.desc }}</p>
-    <Message :severity="msg.severity" :key="msg.content" v-if="msg.show">{{msg.content}}</Message>
     <form class="send-pdb" @submit.prevent="submitPDB">
     <div class="p-fluid p-formgrid p-grid">
         <div class="p-field p-col-12 p-md-6">
@@ -22,29 +21,25 @@
 
 <script>
 import { inject, ref } from "vue"
+import useMessages from '@/modules/common/useMessages'
 import useModals from '@/modules/common/useModals'
 export default {
     props: ['texts'],
     setup() {
 
-        const $axios = inject('$axios');
+        const $axios = inject('$axios')
         const $router = inject('$router')
-        const { openModal, setBlockUI } = useModals()
+        const { setMessage } = useMessages()
+        const { openModal, setBlockUI, closeModal } = useModals()
 
         const selectedStructures = ref([])
         const filteredStructures = ref([])
         const formDisabled = ref(true)
 
-        let msg = ref({
-            severity: null,
-            content: null,
-            show: false
-        })
-
         // call API to get PDB's with given query
         const searchStructure = (event) => {
             $axios
-                .get(process.env.VUE_APP_API_LOCATION + 'pdb/' + event.query.toLowerCase())
+                .get(process.env.VUE_APP_API_LOCATION + '/pdb/' + event.query.toLowerCase())
                 .then(response => filteredStructures.value = response.data)
                 .catch(err => console.log(err.message))
                 .finally( /*() => console.log('done!')*/ )
@@ -69,7 +64,7 @@ export default {
             let resp = null
 
             $axios
-                .post(process.env.VUE_APP_API_LOCATION + 'upload/pdb/', {
+                .post(process.env.VUE_APP_API_LOCATION + '/upload/pdb/', {
                     structures: Object.assign([], selectedStructures.value)
                 })
                 .then(function (response) {
@@ -79,11 +74,14 @@ export default {
                 .catch(err => console.error(err.message))
                 .finally( () => {
                     if(resp.status === 'error') {
-                        msg.value = {
+                        closeModal('block')
+                        const msg = {
                             severity: 'error',
                             content: resp.message,
                             show: true
                         }
+                        setMessage('launch', msg)
+                        disableFileUpload.value = false
                     } else if(resp.status === 'success') {
                         setBlockUI('load')
                         $router.push({ name: 'Representation', params: { id: resp.id } }) 
@@ -92,8 +90,7 @@ export default {
         }
 
         return { 
-            selectedStructures, filteredStructures, searchStructure,
-            msg, 
+            selectedStructures, filteredStructures, searchStructure, 
             formDisabled, 
             selectItem, unselectItem, 
             submitPDB 

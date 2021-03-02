@@ -15,7 +15,7 @@
             </div>
         </div>
         <div class="p-grid">
-            <div class="p-col-9" style="padding-right:0">
+            <div class="p-col-10" style="padding-right:0">
                 <Dropdown 
                 v-model="representationSelected" 
                 :options="reprType" 
@@ -23,13 +23,7 @@
                 @change="onChangeRepresentation"
                 />
             </div>
-            <div class="p-col-3" style="padding-left:0; text-align: center;">
-                <Button 
-                icon="far fa-trash-alt" 
-                class="p-button-rounded repr-button" 
-                v-on:dblclick="removeRepresentation"
-                v-tooltip.top="ttprr" 
-                v-if="representationSelected.id != 1" />
+            <div class="p-col-2" style="padding-left:0; text-align: center;">
                 <Button 
                 icon="far fa-eye" 
                 class="p-button-rounded repr-button" 
@@ -127,6 +121,32 @@
                     <Slider v-model="opacity" :min="0" :max="100" :step="1" />
                 </div>
             </div>
+
+            <div v-if="representationSelected.id != 1">
+
+                <hr />
+
+                <div class="p-grid ">
+                    <div class="p-col">
+                        <Button 
+                        label="Remove"
+                        icon="far fa-trash-alt" 
+                        class="settings-button" 
+                        v-on:dblclick="removeRepresentation"
+                        v-tooltip="ttprr" />
+                    </div>
+                    <div class="p-col">
+                        <Button 
+                        label="Structure"
+                        icon="fas fa-project-diagram" 
+                        class="settings-button" 
+                        @click="visualizeStructure"
+                        v-tooltip="ttpvs" />
+                    </div>
+                </div>
+
+            </div>
+
         </div>
 
     </div>
@@ -171,8 +191,13 @@ export default {
         // REMOVE REPRESENTATION 
         /* stage.getComponentsByName('first_str').list[0].dispose() */
         const ttprr = "Remove representation (double click)"
+        const ttpvs = "View representation structure"
         const removeRepresentation = () => {
             console.log("double click!!")
+        }
+        const visualizeStructure = () => {
+            // open modal with all the content of dataProject.representation[this structure].settings
+            console.log("visualize structure")
         }
 
         let ttphr = ref("Hide representation")
@@ -223,15 +248,17 @@ export default {
         const label_opacity = "Select opacity"
         let opacity = ref(100)
 
-        return { isCollapsed, 
-        ttpu, unfoldRepresentations,
-        label_repr, label_new_repr, reprType, representationSelected, onChangeRepresentation, 
-        ttprr, removeRepresentation, ttphr,
-        nrbDisabled, modelNewSel, placeholderNewSel, newRepresentation,
-        label_mol_repr, molReprType, molRepresentation, onChangeMolRepresentation,
-        label_radius, radius, hasRadius,
-        label_color, colorScheme, mainStructureColor, onChangeColorScheme, colorUniform, color,
-        label_opacity, opacity }
+        return { 
+            isCollapsed, 
+            ttpu, unfoldRepresentations,
+            label_repr, label_new_repr, reprType, representationSelected, onChangeRepresentation, 
+            ttprr, removeRepresentation, ttphr, ttpvs, visualizeStructure,
+            nrbDisabled, modelNewSel, placeholderNewSel, newRepresentation,
+            label_mol_repr, molReprType, molRepresentation, onChangeMolRepresentation,
+            label_radius, radius, hasRadius,
+            label_color, colorScheme, mainStructureColor, onChangeColorScheme, colorUniform, color,
+            label_opacity, opacity 
+        }
     }
 }
 </script>
@@ -263,6 +290,8 @@ export default {
         z-index:2;
     }
     #minisettings .p-button-nr:hover { background: #6f96a9; color:#fff; }
+    #minisettings .settings-button { width: 95%; margin: 0 2.5%; background:#fff; color:#6f96a9; text-align: left; font-size:15px; }
+    #minisettings .settings-button:hover { background:#546974; color:#fff; }
     /* label */
     #minisettings label { margin:0 2.5%; color:#fff;}
     /* label */

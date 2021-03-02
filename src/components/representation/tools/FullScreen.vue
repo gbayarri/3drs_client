@@ -1,5 +1,5 @@
 <template>
-  <Button :icon="isFullScreen ? 'fas fa-compress' : 'fas fa-expand'" v-tooltip.right="ttp" @click="handleClick" />
+  <Button :icon="isFullScreen ? 'fas fa-compress' : 'fas fa-expand'" class="p-shadow-2" v-tooltip.right="ttp" @click="handleClick" />
 </template>
 
 <script>
@@ -8,7 +8,7 @@ export default {
   props: ['stage'],
   setup(props) {
 
-    const ttp = ref("View in full screen mode")
+    const ttp = ref("Toggle full screen mode")
 
     const isFullScreen = ref(false)
     const stage = props.stage

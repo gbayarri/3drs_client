@@ -1,5 +1,5 @@
 <template>
-  <Button icon="fas fa-image" v-tooltip.right="ttp" @click="handleClick" />
+  <Button icon="fas fa-image" class="p-shadow-2" v-tooltip.right="ttp" @click="handleClick" />
   <div v-if="cpVisible" id="picker-container">
       <ColorPicker v-model="color" :inline="true" />
   </div>

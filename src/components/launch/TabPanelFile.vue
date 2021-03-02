@@ -1,6 +1,5 @@
 <template>
     <p>{{ texts.desc }}</p>
-    <Message :severity="msg.severity" :key="msg.content" v-if="msg.show">{{msg.content}}</Message>
     <FileUpload 
     @uploader="uploader"
     @select="selector"
@@ -18,6 +17,7 @@
 
 <script>
 import { inject, ref } from 'vue'
+import useMessages from '@/modules/common/useMessages'
 import useModals from '@/modules/common/useModals'
 export default {
     props: ['texts'],
@@ -25,15 +25,10 @@ export default {
 
         const $axios = inject('$axios')
         const $router = inject('$router')
-        const { openModal, setBlockUI } = useModals()
+        const { setMessage } = useMessages()
+        const { openModal, setBlockUI, closeModal } = useModals()
 
         let disableFileUpload = ref(false)
-
-        let msg = ref({
-            severity: null,
-            content: null,
-            show: false
-        })
 
         const selector = () => {
             setTimeout(function(){
@@ -59,22 +54,21 @@ export default {
             }
 
             $axios
-                .post(process.env.VUE_APP_API_LOCATION + 'upload/file/', formData)
+                .post(process.env.VUE_APP_API_LOCATION + '/upload/file/', formData)
                 .then(function (response) {
                     //console.log(response);
                     resp = response.data
                 })
                 .catch(err => console.error(err.message))
                 .finally( () => {
-                    //router.push({ name: 'Contact', params: { id } }) 
-                    //$router.push({ path: `/representation/${id}` }) 
-                    console.log(resp)
                     if(resp.status === 'error') {
-                        msg.value = {
+                        closeModal('block')
+                        const msg = {
                             severity: 'error',
                             content: resp.message,
                             show: true
                         }
+                        setMessage('launch', msg)
                         disableFileUpload.value = false
                     } else if(resp.status === 'success') {
                         setBlockUI('load')
@@ -83,7 +77,11 @@ export default {
                 })
         }
 
-        return { disableFileUpload, msg, selector, uploader }
+        return { 
+            disableFileUpload, 
+            selector, 
+            uploader 
+        }
     }
 }
 </script>
