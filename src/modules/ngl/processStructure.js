@@ -17,7 +17,8 @@ export default function processStructure() {
             if(rp.isNucleic()) isNucleic = true
             if(rp.isProtein()) isProtein = true
         })
-        return { isNucleic, isProtein }
+        //return { isNucleic, isProtein }
+        return isProtein ? 'protein' : 'nucleic'
     }
 
     const getModels = (component) => {
@@ -56,9 +57,9 @@ export default function processStructure() {
         structureView.eachResidue(function (rp) {
           if(rp.isHelix()) {
             arraux.push({
-                'label': rp.resname.toUpperCase(),
-                'num': rp.resno,
-                'chain': rp.chainname
+                label: rp.resname.toUpperCase(),
+                num: rp.resno,
+                chain: rp.chainname
             })
           }
           if(!rp.isHelix() && prev) {
@@ -81,9 +82,9 @@ export default function processStructure() {
         structureView.eachResidue(function (rp) {
           if(rp.isSheet()) {
             arraux.push({
-                'label': rp.resname.toUpperCase(),
-                'num': rp.resno,
-                'chain': rp.chainname
+                label: rp.resname.toUpperCase(),
+                num: rp.resno,
+                chain: rp.chainname
             })
           }
           if(!rp.isSheet() && prev) {
@@ -147,8 +148,6 @@ export default function processStructure() {
                 last_sheet: false,
                 sheet: sheet,
                 helix: helix,
-                fsheet: Math.random(),
-                lsheet: Math.random(),
                 longname: globals.aminoacids[rp.resname.toLowerCase()].name
             }
             sequence.push(res)
@@ -166,10 +165,10 @@ export default function processStructure() {
         let heteros = []
         structureView.eachResidue(function (rp) {
             let res = {
-                'num': rp.resno,
-                'name': rp.resname.toUpperCase(),
-                'chain': rp.chainname,
-                'description': rp.entity.description
+                num: rp.resno,
+                name: rp.resname.toUpperCase(),
+                chain: rp.chainname,
+                description: rp.entity.description
             }
             heteros.push(res)
         })
@@ -184,9 +183,9 @@ export default function processStructure() {
         let ions = []
         structureView.eachResidue(function (rp) {
             let res = {
-                'num': rp.resno,
-                'name': rp.resname.toUpperCase(),
-                'chain': rp.chainname
+                num: rp.resno,
+                name: rp.resname.toUpperCase(),
+                chain: rp.chainname
             }
             ions.push(res)
         })
@@ -214,9 +213,9 @@ export default function processStructure() {
             }
             // push water
             let res = {
-                'num': rp.resno,
-                'name': rp.resname.toUpperCase(),
-                'chain': rp.chainname
+                num: rp.resno,
+                name: rp.resname.toUpperCase(),
+                chain: rp.chainname
             }
             waters.push(res)
             prev_wat = rp.resno
@@ -227,9 +226,9 @@ export default function processStructure() {
     const getStructure = (component, name) => {
 
         const structure = { 
-            'name': name,
-            'type': getType(component),
-            'models': [] 
+            name: name,
+            type: getType(component),
+            models: [] 
         }
 
         for(const model of getModels(component)) {

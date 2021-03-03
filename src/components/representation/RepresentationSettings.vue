@@ -165,6 +165,12 @@ export default {
         // SHOW / HIDE STRUCTURE, BASES (CHECK IF NA in getResidues()), HETERO, IONS & WATERS.
         // ALLOW TO MODIFY OPACITY BUT NO COLORSCHEME
 
+        // TODO: GET projectData REPRESENTATIONS AND START WITH THAT: 
+        // 1) DROPDOWN WITH REPRESENTATIONS
+        // 2) MODIFY OPACITY AND SAVE TO API (ALSO TIMEOUT AS IN ORIENTATION)
+        // 3) SHOW / HIDE REPRESENTATION 1 (MODIFY REPRESENTATION 1 BY UNIQUE ID IN API)
+        // 4) CREATE NEW REPRESENTATION ()
+
         // fold / unfold
         let ttpu = ref("Unfold representation settings")
 

@@ -10,13 +10,13 @@
 import { inject, computed, onMounted } from 'vue'
 import useFlags from '@/modules/common/useFlags'
 import useStage from '@/modules/ngl/useStage'
-import useTools from '@/modules/ngl/useTools'
 import useModals from '@/modules/common/useModals'
 import useMessages from '@/modules/common/useMessages'
 import useAPI from '@/modules/api/useAPI'
 import loadStructure from '@/modules/ngl/loadStructure'
 import structureStorage from '@/modules/structure/structureStorage'
 import structureSettings from '@/modules/structure/structureSettings'
+import mouseObserver from '@/modules/ngl/mouseObserver'
 export default {
   props: ['project_id'],
   setup(props) {
@@ -25,12 +25,12 @@ export default {
     const { flags, setFlagStatus } = useFlags()
     const { setMessage } = useMessages()
     const stageLoaded = computed(() => flags.stageLoaded)
-    const { updateOrientation } = useTools()
     const { dialog, openModal, closeModal, setBlockUI } = useModals()
-    const { apiData, fetchProject } = useAPI()
-    const { loadFileToStage, checkSignals } = loadStructure()
-    const { processedStructure, projectData, initProject, resetStructure } = structureStorage()
-    const { setCurrentStructure } = structureSettings()
+    const { apiData, fetchProject, updateFirst } = useAPI()
+    const { loadFileToStage } = loadStructure()
+    const { setInitOrientation/*, updateOrientation*/, checkMouseSignals } = mouseObserver()
+    const { /*processedStructure,*/ projectData, updateProject, resetStructure, getFirstProjectData } = structureStorage()
+    const { settings, setCurrentStructure } = structureSettings()
     const project_id = props.project_id
 
     const createViewport = () => {
@@ -66,16 +66,30 @@ export default {
 
           //console.log(ol)
 
-          // TODO: ONCE ALL STRUCTURES LOADED, IN CASE IS FIRST TIME (dataProject.value.structure empty) SEND 
-          // ALL STRUCTURE DATA TO API AS WELL AS files.type AND ORIENTATION
-          if(dataProject.value.structure.length === 0) {
-            // ADD processedStructure.value TO project.structure
-            // TYPE IS INSIDE
-            console.log(processedStructure.value)
-            // https://nglviewer.org/ngl/api/manual/usage/interaction-controls.html
-            const pos = stage.viewerControls.getOrientation()//.toArray()
-            // TO CHECK loadStructure.js
-            console.log(pos.elements)
+          //IN CASE IS FIRST TIME SEND ALL DATA TO API
+          if(dataProject.value.structure.length === 0 && dataProject.value.settings.length === 0) {
+
+            setBlockUI('update')
+
+            stage.autoView()
+            setInitOrientation(stage.viewerControls.getOrientation())
+
+            const orientation = stage.viewerControls.getOrientation().elements
+            const data = getFirstProjectData(orientation)
+
+            updateFirst(project_id, data)
+              .then((r) => {
+                if(r.code != 404) console.log(r.message)
+                else console.error(r.message)
+              })
+            
+          } else {
+            // update current orientation for reload component
+            stage.animationControls.orient(dataProject.value.orientation)
+            const orientation = {
+              elements: dataProject.value.orientation
+            }
+            setInitOrientation(orientation)
           }
 
           // set all components to visible
@@ -83,19 +97,20 @@ export default {
             c.setVisibility(true)
           }
 
-          stage.autoView()
-          //store.dispatch('initOrientation', stage.viewerControls.getOrientation())
-          updateOrientation(stage.viewerControls.getOrientation())
+          // set initial orientation for reload button
+          //setInitOrientation(stage.viewerControls.getOrientation())
 
-          setFlagStatus('stageLoaded', true)
-
-          checkSignals(stage)
+          // init mouse observer
+          checkMouseSignals(stage)
 
           // set current structure          
           setCurrentStructure(dataProject.value.currentStructure)
           //setCurrentStructure('4')
 
-          // CLOSE LOAD MODAL
+          // set stage flag
+          setFlagStatus('stageLoaded', true)
+
+          // close BlockUI
           closeModal('block')
 
 
@@ -142,12 +157,10 @@ export default {
         openModal('block')
       }
 
+      // get project_id from API
       fetchProject(project_id)
         .then(() => {
-          // save project.value to structureStorage
-          //console.log(projectData.value)
-
-          //  project doesn't exist, redirect to launch
+          //  project doesn't exist, redirect to launch and show warning
           if(apiData.value.code === 404) {
             const msg = {
                 severity: 'warn',
@@ -160,8 +173,10 @@ export default {
             return false
           }
 
-          initProject(apiData.value)
+          // save apiData to structureStorage.projectData
+          updateProject(apiData.value)
 
+          // create viewport
           createViewport()
         })
 

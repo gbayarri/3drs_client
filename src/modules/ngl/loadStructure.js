@@ -1,15 +1,11 @@
 import { computed } from 'vue'
-import useLegend from '@/modules/viewport/useLegend'
 import processStructure from '@/modules/ngl/processStructure'
 import structureStorage from '@/modules/structure/structureStorage'
-import useFlags from '@/modules/common/useFlags'
 
 // Stage interactions
 export default function loadStructure() {
 
-    const { updateLegend } = useLegend()
-    const { getType, getStructure } = processStructure()
-    const { setFlagStatus } = useFlags()
+    const { getStructure } = processStructure()
     const { projectData, updateStructure } = structureStorage()
 
     const dataProject = computed(() => projectData.value)
@@ -29,21 +25,24 @@ export default function loadStructure() {
             //console.log('structure ' + name + ' loaded')
 
             // get structure
-            // ONLY IF FIRST TIME AND project.structure IS EMPTY
+            // ONLY PARSE NGL IF FIRST TIME
             let structure = null
-            if(dataProject.value.structure.length === 0) {
+            if(dataProject.value.structure.length === 0 && dataProject.value.settings.length === 0) {
                 structure = getStructure(component, name)
-                //console.log(structure)
-                updateStructure(structure, id)
             } else {
-                // TODO????
-                // structure = CONTENT FROM API!!!!
+                structure = {
+                    name: dataProject.value.files.filter(item => item.id === id)[0].name,
+                    type: dataProject.value.files.filter(item => item.id === id)[0].type,
+                    models: dataProject.value.structure.filter(item => item.id === id)[0].models 
+                }
             }
+            updateStructure(structure, id)
 
             // add default representations
             // this is representation #1
             component.addRepresentation( "cartoon", { name: "struc_1", sele: "*", color: "sstruc"} )
-            if(structure.type.isNucleic) component.addRepresentation( "base", { name: "base_1", sele: "*", color: "resname" } )
+            //if(structure.type.isNucleic) component.addRepresentation( "base", { name: "base_1", sele: "*", color: "resname" } )
+            if(structure.type === 'nucleic') component.addRepresentation( "base", { name: "base_1", sele: "*", color: "resname" } )
             component.addRepresentation( "ball+stick", { name: "ligand_1", sele: "hetero and not(water or ion)",  radius: .4, aspectRatio: 1.5 } )
             component.addRepresentation( "ball+stick", { name: "water_1", sele: "water",  radius: .4, aspectRatio: 1.5 } )
             component.addRepresentation( "ball+stick", { name: "ion_1", sele: "ion",  radius: .4, aspectRatio: 1.5 } )
@@ -52,74 +51,7 @@ export default function loadStructure() {
   
         })
     }
-  
-    const checkSignals = (stage) => {
 
-        stage.signals.hovered.add( function(pickingProxy){ 
-            // update / show legend
-            if (pickingProxy && pickingProxy.atom) {
-                updateLegend({
-                    name: pickingProxy.atom.structure.name,
-                    chainname: pickingProxy.atom.chainname,
-                    resname: pickingProxy.atom.resname,
-                    resno: pickingProxy.atom.resno,
-                    atomname: pickingProxy.atom.atomname
-                })
-                setFlagStatus('legendEnabled', true)
-            }
-            // hide legend
-            if (!pickingProxy) {
-                setFlagStatus('legendEnabled', false)
-            }
-        })
-
-        /*stage.mouseObserver.signals.dragged.add(function (delta) {
-            //console.log(delta)
-            console.log(stage.viewerControls.getOrientation())
-        })
-
-        stage.mouseObserver.signals.scrolled.add(function (scroll) {
-            //console.log(scroll)
-            console.log(stage.viewerControls.getOrientation())
-        })*/
-
-        /*stage.signals.hovered.add( function(pickingProxy){ 
-            if (pickingProxy && pickingProxy.atom) {
-                if(typeof repr_res !== 'undefined') component.removeRepresentation(repr_res);
-                chain = pickingProxy.atom.chainname;
-                num = pickingProxy.atom.resno;
-                name = pickingProxy.atom.resname;
-                Widgets.showLegend(str, chain, name, num);
-                repr_res = component.addRepresentation( "backbone", { sele: '(' + num + ':' + chain + ')', aspectRatio: 10, opacity:.5, color:'#5E738B' });
-
-                //var s = sequence.find(e => e.num === num);
-                if(chain == current_chain) {
-                    cleanSequence();
-                    var seq_item = $('.sequence-item[data-chain="' + current_chain + '"][data-resnum="' + num + '"]');
-                    seq_item.css('background', '#5E738B');
-                    seq_item.css('color', '#fff');
-                }
-            }
-            if (!pickingProxy) {
-                Widgets.hideLegend();
-                if(typeof repr_res !== 'undefined') component.removeRepresentation(repr_res);
-                cleanSequence();
-            }
-        });
-
-        stage.signals.clicked.add( function(pickingProxy){ 
-            if (pickingProxy && pickingProxy.atom) {
-                if(typeof repr_res !== 'undefined') component.removeRepresentation(repr_res);
-                if(typeof repr_res_detail !== 'undefined') component.removeRepresentation(repr_res_detail);
-                chain = pickingProxy.atom.chainname;
-                num = pickingProxy.atom.resno;
-                name = pickingProxy.atom.resname;
-                Widgets.showLegend(str, chain, name, num);
-                repr_res_detail = component.addRepresentation( "ball+stick", { sele: '(' + num + ':' + chain + ')', aspectRatio: 1 });
-                component.autoView('(' + num + ':' + chain + ')', 500);
-            */
-    }
-
-  return { loadFileToStage, checkSignals }
+  return { loadFileToStage }
 
 }

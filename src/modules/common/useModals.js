@@ -24,9 +24,9 @@ const blockProperties = [
     message: 'The structures are being downloaded from the server, please don\'t close the tab.'
   },
   {
-    status: 'process',
-    header: 'Processing structures',
-    message: 'The structures are being processed, please don\'t close the tab.'
+    status: 'update',
+    header: 'Updating data',
+    message: 'The project data is being updated, please don\'t close the tab.'
   }
 ]
 
