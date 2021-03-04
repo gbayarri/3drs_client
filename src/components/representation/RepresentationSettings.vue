@@ -18,15 +18,17 @@
             <div class="p-col-10" style="padding-right:0">
                 <Dropdown 
                 v-model="representationSelected" 
-                :options="reprType" 
+                :options="reprList" 
                 optionLabel="name" 
                 @change="onChangeRepresentation"
+                :disabled="reprList.length <= 1"
                 />
             </div>
             <div class="p-col-2" style="padding-left:0; text-align: center;">
                 <Button 
-                icon="far fa-eye" 
+                :icon="isVisible ? 'far fa-eye' : 'far fa-eye-slash'" 
                 class="p-button-rounded repr-button" 
+                @click="setVisibility"
                 v-tooltip.top="ttphr" />
             </div>
         </div>
@@ -53,7 +55,7 @@
 
             <hr />
             
-            <div v-if="representationSelected.id != 1">
+            <div v-if="representationSelected.id != defaultRepresentation">
             
                 <!-- molecular representation -->
                 <div class="p-grid">
@@ -82,7 +84,7 @@
                 </div>
                 <div class="p-grid" v-if="hasRadius" >
                     <div class="p-col">
-                        <Slider v-model="radius" :min="0" :max="500" :step="5" />
+                        <Slider v-model="radius" :min="0" :max="500" :step="5" @change="onChangeRadius" />
                     </div>
                 </div>
 
@@ -118,11 +120,11 @@
             </div>
             <div class="p-grid margin-bottom-20">
                 <div class="p-col">
-                    <Slider v-model="opacity" :min="0" :max="100" :step="1" />
+                    <Slider v-model="opacity" :min="0" :max="100" :step="1" @change="onChangeOpacity" />
                 </div>
             </div>
 
-            <div v-if="representationSelected.id != 1">
+            <div v-if="representationSelected.id != defaultRepresentation">
 
                 <hr />
 
@@ -153,17 +155,34 @@
 </template>
 
 <script>
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, reactive, toRefs } from 'vue'
 import globals from '@/globals'
+import useStage from '@/modules/ngl/useStage'
+import structureStorage from '@/modules/structure/structureStorage'
+import useRepresentations from '@/modules/representations/useRepresentations'
+import useAPI from '@/modules/api/useAPI'
 export default {
     setup() {
 
-        let isCollapsed = ref(true)
+        const { createRepresentation, updateRepresentationData } = useAPI()
+        const { stage/*, createRepresentation*/ } = useStage()
+        const { 
+            defaultRepresentation, 
+            currentRepresentation, 
+            getRepresentationNames, 
+            getCurrentRepresentationSettings,
+            setCurrentRepresentation 
+        } = useRepresentations()
+        const { projectData } = structureStorage()
 
-        // TODO: SPECIAL MENU FOR REPRESENTATION 1 => NO MOL REPR / RADIUS AND 
-        // ALLOW MOL REPR SEPARATELY???
-        // SHOW / HIDE STRUCTURE, BASES (CHECK IF NA in getResidues()), HETERO, IONS & WATERS.
-        // ALLOW TO MODIFY OPACITY BUT NO COLORSCHEME
+        let isCollapsed = ref(true)
+        let isVisible = ref(true)
+
+        const timeOut = 5000
+
+        const prjID = projectData.value._id
+        const currReprSettings = computed(() => getCurrentRepresentationSettings())
+        const currReprVal = computed(() => currentRepresentation.value).value
 
         // TODO: GET projectData REPRESENTATIONS AND START WITH THAT: 
         // 1) DROPDOWN WITH REPRESENTATIONS
@@ -171,33 +190,153 @@ export default {
         // 3) SHOW / HIDE REPRESENTATION 1 (MODIFY REPRESENTATION 1 BY UNIQUE ID IN API)
         // 4) CREATE NEW REPRESENTATION ()
 
-        // fold / unfold
-        let ttpu = ref("Unfold representation settings")
+        const re = new RegExp('(' + currReprVal + '\-[0-9a-z]*\-[a-z]*)', 'g')
+
+        const page = reactive({
+            ttpu: computed(() => isCollapsed.value ? 'Unfold representation settings' : 'Fold representation settings'),
+            label_repr: "Select representation",
+            label_new_repr: "Create new representation",
+            ttprr: "Remove representation (double click)",
+            ttpvs: "View representation structure",
+            ttphr: computed(() => isVisible.value ? 'Hide representation' : 'Show representation'),
+            placeholderNewSel: "Insert new name",
+            label_mol_repr: "Select molecular representation",
+            label_radius: "Select radius",
+            label_color: "Select color scheme",
+            label_opacity: "Select opacity"
+        })
 
         const unfoldRepresentations = (e) => {
-            ttpu.value = isCollapsed.value ? 'Fold representation settings' : 'Unfold representation settings'
             isCollapsed.value = !isCollapsed.value
         }
 
-        // representation
-        const label_repr = "Select representation"
-        const label_new_repr = "Create new representation"
-        const reprType =  [
-            { name: 'Representation 1', id: 1 },
-            { name: 'Representation 2', id: 2 },
-            { name: 'Representation 3', id: 3 },
-            { name: 'Representation 4', id: 4 }
-        ]
-        let representationSelected = ref({ name: 'Representation 1', id: 1 })
+        // select representation
+        const reprList = computed(() => getRepresentationNames())
+        let representationSelected = ref(reprList.value.filter(item => item.id === currReprVal)[0])
 
         const onChangeRepresentation = (e) => {
+            //hasRadius.value = !(e.value.id == 'line' || e.value.id == 'surface')
+            setCurrentRepresentation(e.value.id)
+        }
+
+        // set visibility
+        const setVisibility = () => {
+            isVisible.value = !isVisible.value
+            for(const item of stage.getRepresentationsByName(re).list){
+                item.setVisibility( isVisible.value )
+
+                // EXAMPLES FOR OTHER SECTIONS!!!
+                //item.setParameters( { color: 'chainindex'} )
+                //item.setColor( '#f00' )
+                //item.dispose()
+
+                // TRICKY WAY TO CHANGE RESPRESENTATION TYPE????
+                //item.parent.addRepresentation("ball+stick", { name: "ligand_1", sele: "*",  radius: .4, aspectRatio: 1.5 } )
+                //item.parent.removeRepresentation(item)
+                //item.setRepresentation( 'cartoon' )
+                /*
+                OJU QUE AIXÒ NOMÉS SELECCIONA CADENA B
+                item.setSelection( ':B' )
+                item.setParameters( { opacity: 0.5} )*/
+            }
+            updateRepresentationData(prjID, currReprVal, { visible: isVisible.value })
+                .then((r) => {
+                    if(r.code != 404) console.log(r.message)
+                    else console.error(r.message)
+                })
+        }
+
+        // new representation
+        let modelNewSel = ref('')
+        let nrbDisabled = computed(() => !modelNewSel.value.length)
+        //const placeholderNewSel = "Insert new name"
+        const newRepresentation = () => {
+            //console.log("New representation " + modelNewSel.value + "!!!")
+            createRepresentation(prjID, { name: modelNewSel.value } )
+                .then((r) => {
+                    if(r.code != 404) console.log(r.message)
+                    else console.error(r.message)
+                })
+        }
+
+        // molecular representation
+        //const label_mol_repr = "Select molecular representation"
+        const molReprType =  globals.representation_str
+        let molRepresentation = ref({ name: 'Cartoon', id: 'cartoon' })
+
+        const onChangeMolRepresentation = (e) => {
+            // DEFINE AS A COMPUTED GLOBAL CONSTANT
             hasRadius.value = !(e.value.id == 'line' || e.value.id == 'surface')
         }
 
-        // REMOVE REPRESENTATION 
+        // radius
+        //const label_radius = "Select radius"
+        let hasRadius = ref(true)
+        let radius = ref(100)
+        let myTimeOutRadius = null
+        const onChangeRadius = () => {
+            for(const item of stage.getRepresentationsByName(re).list) {
+                item.setParameters( { radius: (radius.value / 100) } )
+            }
+            clearTimeout(myTimeOutRadius)
+            myTimeOutRadius = setTimeout(() => {
+                updateRepresentationData(prjID, currReprVal, { radius: (radius.value / 100) })
+                    .then((r) => {
+                        if(r.code != 404) console.log(r.message)
+                        else console.error(r.message)
+                    })
+            }, timeOut)
+        }
+
+        // color
+        //const label_color = "Select color scheme"
+        const colorScheme =  globals.colorScheme
+        let colorUniform = ref(false)
+        // TODO: DEFAULT COLOR IN API
+        let color = ref('#6f96a9')
+        let mainStructureColor = ref({ name: 'Secondary structure', id: 'sstruc' })
+
+        const onChangeColorScheme = (e) => {
+            colorUniform.value = (e.value.id == 'uniform')
+        }
+
+        let myTimeOutColor = null
+        watch(color, (color, prevColor) => {
+            //console.log(color, prevColor)
+            for(const item of stage.getRepresentationsByName(re).list) {
+                item.setColor( color )
+            }
+            clearTimeout(myTimeOutColor)
+            myTimeOutColor = setTimeout(() => {
+                updateRepresentationData(prjID, currReprVal, { color: color })
+                    .then((r) => {
+                        if(r.code != 404) console.log(r.message)
+                        else console.error(r.message)
+                    })
+            }, timeOut)
+        })
+
+        // opacity
+        let opacity = ref(currReprSettings.value.opacity * 100)
+        let myTimeOutOpacity = null
+        const onChangeOpacity = () => {
+            for(const item of stage.getRepresentationsByName(re).list) {
+                item.setParameters( { opacity: (opacity.value / 100) } )
+            }
+            clearTimeout(myTimeOutOpacity)
+            myTimeOutOpacity = setTimeout(() => {
+                updateRepresentationData(prjID, currReprVal, { opacity: (opacity.value / 100) })
+                .then((r) => {
+                    if(r.code != 404) console.log(r.message)
+                    else console.error(r.message)
+                })
+            }, timeOut)
+        }
+
+        // REMOVE REPRESENTATION / VISUALIZE REPRESENTATION STRUCTURE
         /* stage.getComponentsByName('first_str').list[0].dispose() */
-        const ttprr = "Remove representation (double click)"
-        const ttpvs = "View representation structure"
+        //const ttprr = "Remove representation (double click)"
+        //const ttpvs = "View representation structure"
         const removeRepresentation = () => {
             console.log("double click!!")
         }
@@ -206,64 +345,19 @@ export default {
             console.log("visualize structure")
         }
 
-        let ttphr = ref("Hide representation")
-
-        // SET VISIBILITY
-        /*stage.getComponentsByName('first_str').list[0].setVisibility( false )*/
-
-        let modelNewSel = ref('')
-        let nrbDisabled = computed(() => !modelNewSel.value.length)
-        const placeholderNewSel = "Insert new name"
-        const newRepresentation = () => {
-            console.log("New representation " + modelNewSel.value + "!!!")
-        }
-
-        // representation
-        const label_mol_repr = "Select molecular representation"
-        const molReprType =  globals.representation_str
-        let molRepresentation = ref({ name: 'Cartoon', id: 'cartoon' })
-
-        const onChangeMolRepresentation = (e) => {
-            hasRadius.value = !(e.value.id == 'line' || e.value.id == 'surface')
-        }
-
-        // radius
-        const label_radius = "Select radius"
-        let hasRadius = ref(true)
-        let radius = ref(100)
-
-        // color
-        const label_color = "Select color scheme"
-        const colorScheme =  globals.colorScheme
-        let colorUniform = ref(false)
-        let color = ref('#6f96a9')
-        let mainStructureColor = ref({ name: 'Secondary structure', id: 'sstruc' })
-
-        const onChangeColorScheme = (e) => {
-            colorUniform.value = (e.value.id == 'uniform')
-        }
-
-        watch(color, (color, prevColor) => {
-            console.log(color, prevColor)
-        })
-
-        // opacity
-        /*stage.getComponentsByName('first_str').list[0].reprList.forEach( function( repre ){
-              //repre.setParameters( { opacity: 0.5} )
-            } )*/
-        const label_opacity = "Select opacity"
-        let opacity = ref(100)
-
         return { 
-            isCollapsed, 
-            ttpu, unfoldRepresentations,
-            label_repr, label_new_repr, reprType, representationSelected, onChangeRepresentation, 
-            ttprr, removeRepresentation, ttphr, ttpvs, visualizeStructure,
-            nrbDisabled, modelNewSel, placeholderNewSel, newRepresentation,
-            label_mol_repr, molReprType, molRepresentation, onChangeMolRepresentation,
-            label_radius, radius, hasRadius,
-            label_color, colorScheme, mainStructureColor, onChangeColorScheme, colorUniform, color,
-            label_opacity, opacity 
+            isCollapsed, isVisible, 
+            ...toRefs(page), 
+            defaultRepresentation,
+            unfoldRepresentations,
+            reprList, representationSelected, onChangeRepresentation, 
+            setVisibility,
+            modelNewSel, nrbDisabled, newRepresentation,
+            molReprType, molRepresentation, onChangeMolRepresentation,
+            radius, hasRadius, onChangeRadius,
+            colorScheme, mainStructureColor, onChangeColorScheme, colorUniform, color,
+            opacity, onChangeOpacity,
+            removeRepresentation, visualizeStructure,
         }
     }
 }

@@ -37,6 +37,8 @@ export default {
     components: {  },
     setup() {
 
+        // TODO!! ADD TWO TABS FROM LAUNCH AND CUSTOM SOME DATA FOR REUSE THE SAME TabPanelFile.vue AND TabPanelPDB.vue COMPONENTS
+
         /* MODAL */
         const header = "Upload Structure"
         //const modals = inject('modals')

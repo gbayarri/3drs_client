@@ -37,16 +37,18 @@ module.exports = {
         { name: 'Cartoon', id: 'cartoon' },
         { name: 'Licorice', id: 'licorice' },
         { name: 'Line', id: 'line' },
+        // TODO A TRICK WITH BASE + CARTOON
+        { name: 'Base', id: 'base' },
         { name: 'Spacefill', id: 'spacefill' },
         { name: 'Surface', id: 'surface' },
         { name: 'Ribbon', id: 'ribbon' }
     ],
-    representation_sm: [
+    /*representation_sm: [
         { name: 'Ball and stick', id: 'ball+stick' },
         { name: 'Licorice', id: 'licorice' },
         { name: 'Spacefill', id: 'spacefill' },
         { name: 'Surface', id: 'surface' }
-    ],
+    ],*/
     colorScheme: [
         { name: 'Atom index', id: 'atomindex' },
         { name: 'B-factor', id: 'bfactor' },

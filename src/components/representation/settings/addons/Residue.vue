@@ -135,6 +135,11 @@ export default {
                 if(s.className == 'helix') s.style.backgroundPosition = 'center top'
                 if(s.className == 'sequence-item')  s.classList.add('sequence-item-hover')
             }
+
+            // DON'T REMOVE
+            //component.addRepresentation( "cartoon", {  sele: "helix", color: "#f00", opacity:.4, aspectRatio:10 } )
+            //component.addRepresentation( "cartoon", {  sele: "sheet", color: "#0f0", opacity:.4, aspectRatio:10 } )
+            // DON'T REMOVE
         }
 
         const helixLeave = (helix, chain) => {

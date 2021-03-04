@@ -6,11 +6,12 @@
         v-on:dblclick="removeFile"
         v-tooltip.top="ttprf" 
         v-if="numStructures > 1" />
-        <Button 
+        <!-- NOT SURE ABOUT THIS BUTTON -->
+        <!--<Button 
         icon="fas fa-eye" 
         class="p-button-rounded p-button-text" 
         v-tooltip.top="ttphf"
-        @click="hideFile"  />
+        @click="hideFile"  />-->
         <Button 
         icon="fas fa-bullseye" 
         class="p-button-rounded p-button-text" 

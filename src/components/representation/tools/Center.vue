@@ -11,7 +11,7 @@ export default {
   setup(props) {
 
     const { projectData } = structureStorage()
-    const { updateOrientation } = useAPI()
+    const { updateProjectData } = useAPI()
 
     const dataProject = computed(() => projectData.value)
 
@@ -19,7 +19,7 @@ export default {
     const stage = props.stage
 
     const autoSaveOrientation = function(orientation) {
-        updateOrientation(dataProject.value._id, orientation)
+        updateProjectData(dataProject.value._id, { orientation: orientation })
             .then((r) => {
                 if(r.code != 404) console.log(r.message)
                 else console.error(r.message)
@@ -28,7 +28,7 @@ export default {
 
     const handleClick = () => {
       stage.autoView(500)
-      setTimeout(() => autoSaveOrientation(stage.viewerControls.getOrientation().elements), 500)
+      setTimeout(() => autoSaveOrientation(stage.viewerControls.getOrientation().elements), 1000)
     }
 
     return { ttp, handleClick }

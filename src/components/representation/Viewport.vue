@@ -16,6 +16,7 @@ import useAPI from '@/modules/api/useAPI'
 import loadStructure from '@/modules/ngl/loadStructure'
 import structureStorage from '@/modules/structure/structureStorage'
 import structureSettings from '@/modules/structure/structureSettings'
+import useRepresentations from '@/modules/representations/useRepresentations'
 import mouseObserver from '@/modules/ngl/mouseObserver'
 export default {
   props: ['project_id'],
@@ -26,11 +27,12 @@ export default {
     const { setMessage } = useMessages()
     const stageLoaded = computed(() => flags.stageLoaded)
     const { dialog, openModal, closeModal, setBlockUI } = useModals()
-    const { apiData, fetchProject, updateFirst } = useAPI()
+    const { apiData, fetchProject, updateProjectData } = useAPI()
     const { loadFileToStage } = loadStructure()
-    const { setInitOrientation/*, updateOrientation*/, checkMouseSignals } = mouseObserver()
+    const { setInitOrientation, checkMouseSignals } = mouseObserver()
     const { /*processedStructure,*/ projectData, updateProject, resetStructure, getFirstProjectData } = structureStorage()
     const { settings, setCurrentStructure } = structureSettings()
+    const { setCurrentRepresentation } = useRepresentations()
     const project_id = props.project_id
 
     const createViewport = () => {
@@ -72,12 +74,13 @@ export default {
             setBlockUI('update')
 
             stage.autoView()
+            // set initial orientation for reload button
             setInitOrientation(stage.viewerControls.getOrientation())
 
             const orientation = stage.viewerControls.getOrientation().elements
             const data = getFirstProjectData(orientation)
 
-            updateFirst(project_id, data)
+            updateProjectData(project_id, data)
               .then((r) => {
                 if(r.code != 404) console.log(r.message)
                 else console.error(r.message)
@@ -97,11 +100,11 @@ export default {
             c.setVisibility(true)
           }
 
-          // set initial orientation for reload button
-          //setInitOrientation(stage.viewerControls.getOrientation())
-
           // init mouse observer
           checkMouseSignals(stage)
+
+          // set current representation          
+          setCurrentRepresentation(dataProject.value.currentRepresentation)
 
           // set current structure          
           setCurrentStructure(dataProject.value.currentStructure)

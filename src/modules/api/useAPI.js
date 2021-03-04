@@ -4,6 +4,9 @@ export default function useAPI() {
 
   const apiData = ref({})
 
+  // TRY TO MIGRATE TO AXIOS? 
+  // TRY TO INTEGRATE UPLOADS? AND MIGRATE TO FETCH??
+
   // fetch project data
   const fetchProject = async (id) => {
       
@@ -12,8 +15,7 @@ export default function useAPI() {
 
   }
 
-  // update project for first time
-  const updateFirst = async (id, data) => {
+  const updateProjectData = async (id, data) => {
       
     const response = await fetch(process.env.VUE_APP_API_LOCATION + '/update/' + id, {
       method: 'POST',
@@ -28,14 +30,12 @@ export default function useAPI() {
 
   }
 
-  // update orientation (TODO updateFirst AND updateOrientation IN ONE FUNCTION???)
-  const updateOrientation = async (id, orientation) => {
+  const createRepresentation = async (id, data) => {
       
-    const data = {
-      orientation: orientation
-    }
+    console.log(process.env.VUE_APP_API_LOCATION + '/representation/' + id)
+    console.log(data)
 
-    const response = await fetch(process.env.VUE_APP_API_LOCATION + '/update/' + id, {
+    /*const response = await fetch(process.env.VUE_APP_API_LOCATION + '/representation/' + id, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -44,7 +44,25 @@ export default function useAPI() {
     })
     const resp = await response.json()
 
-    return resp
+    return resp*/
+
+  }
+
+  const updateRepresentationData = async (id, representation, data) => {
+      
+    console.log(process.env.VUE_APP_API_LOCATION + '/representation/' + id + '/' + representation)
+    console.log(data)
+
+    /*const response = await fetch(process.env.VUE_APP_API_LOCATION + '/representation/' + id + '/' + representation, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+    const resp = await response.json()
+
+    return resp*/
 
   }
 
@@ -55,8 +73,9 @@ export default function useAPI() {
   return { 
     apiData, 
     fetchProject, 
-    updateFirst,
-    updateOrientation
+    updateProjectData,
+    createRepresentation,
+    updateRepresentationData
   }
 
 }

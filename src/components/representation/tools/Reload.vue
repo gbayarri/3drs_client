@@ -13,7 +13,7 @@ export default {
     //const initialOrientation = mouseObserver().initialOrientation.value
     const { initialOrientation } = mouseObserver()
     const { projectData } = structureStorage()
-    const { updateOrientation } = useAPI()
+    const { updateProjectData } = useAPI()
 
     const initOr = computed(() => initialOrientation)
     const dataProject = computed(() => projectData.value)
@@ -23,7 +23,7 @@ export default {
     const stage = props.stage
 
     const autoSaveOrientation = function(orientation) {
-        updateOrientation(dataProject.value._id, orientation)
+        updateProjectData(dataProject.value._id, { orientation: orientation })
             .then((r) => {
                 if(r.code != 404) console.log(r.message)
                 else console.error(r.message)
@@ -34,7 +34,7 @@ export default {
       //console.log(initOr.value.value.elements)
       //stage.animationControls.orient(initOr.elements, 500);
       stage.animationControls.orient(initOr.value.value.elements, 500);
-      setTimeout(() => autoSaveOrientation(stage.viewerControls.getOrientation().elements), 500)
+      setTimeout(() => autoSaveOrientation(stage.viewerControls.getOrientation().elements), 1000)
     }
 
     return { ttp, handleClick }

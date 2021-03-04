@@ -1,8 +1,16 @@
 <template>
+
+    <Button 
+    v-if="reprList.length <= 1"
+    id="settings-impostor"
+    v-tooltip.left="page.ttdb"
+    />
+
     <Button icon="pi pi-angle-double-left" 
     @click="visibleRight = true" 
     v-if="!visibleRight"
-    id="settings-handle" />
+    id="settings-handle"
+    :disabled="reprList.length <= 1" />
 
     <Sidebar 
     v-model:visible="visibleRight" 
@@ -20,26 +28,27 @@
             <hr class="subsection" />
             <UploadFile />
             <hr />
-            <TitleSettings :title="tit_mod_chs" />
+            <TitleSettings :title="page.tit_mod_chs" />
             <Models class="settings-panel models" />
             <Chains class="settings-panel chains" />
             <hr class="subsection" />
-            <TitleSettings :title="tit_mols" />
+            <TitleSettings :title="page.tit_mols" />
             <Residues class="settings-panel residues" />
             <Heteroatoms class="settings-panel hetero" />
             <Ions class="settings-panel ions" />
             <Waters class="settings-panel water" />
             <CustomSelection class="settings-panel custom" />
             <hr class="subsection" />
-            <TitleSettings :title="tit_traj" />
+            <TitleSettings :title="page.tit_traj" />
             <Trajectory />
         </div>
     </Sidebar>
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import useFlags from '@/modules/common/useFlags'
+import useRepresentations from '@/modules/representations/useRepresentations'
 import TitleSettings from '@/components/representation/settings/TitleSettings'
 import SelectFile from '@/components/representation/settings/SelectFile'
 import UploadFile from '@/components/representation/settings/UploadFile'
@@ -57,10 +66,16 @@ export default {
     setup() {
         const visibleRight = ref(false)
         const { setFlagStatus } = useFlags()
+        const { getRepresentationNames } = useRepresentations()
 
-        const tit_mod_chs = "models / chains"
-        const tit_mols = "molecules"
-        const tit_traj = "trajectory"
+        const reprList = computed(() => getRepresentationNames())
+
+        const page = {
+            tit_mod_chs: "models / chains",
+            tit_mols: "molecules",
+            tit_traj: "trajectory",
+            ttdb: "Settings are disabled until you create a new representation"
+        }
 
         const onSidebarShown = () => {
             setFlagStatus('sidebarEnabled', true)
@@ -71,7 +86,11 @@ export default {
         }
 
         return { 
-            visibleRight, onSidebarShown, onSidebarHidden, tit_mod_chs, tit_mols, tit_traj
+            visibleRight, 
+            onSidebarShown, 
+            onSidebarHidden, 
+            page,
+            reprList
         }
     }
 }
@@ -94,6 +113,20 @@ export default {
         z-index: 2;
         border-radius: 5px 0 0 5px;
         box-shadow: -3px 0 3px -2px rgba(0,0,0,0.3);
+    }
+    #settings-impostor {
+        position: absolute;
+        right: 0px;
+        top: 50%;
+        cursor: pointer;
+        -ms-transform: translateY(-50%);
+        transform: translateY(-50%);
+        background: transparent;
+        width: 30px;
+        font-size: 20px;
+        padding: 10px;
+        z-index: 3;
+        border:none;
     }
     .p-sidebar { padding:0!important; background: transparent!important; }
     .p-sidebar-right { width:25%; }

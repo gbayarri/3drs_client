@@ -12,17 +12,17 @@ export default function mouseObserver() {
     const { updateLegend } = useLegend()
     const { setFlagStatus } = useFlags()
     const { projectData } = structureStorage()
-    const { updateOrientation } = useAPI()
+    const { updateProjectData } = useAPI()
 
     const dataProject = computed(() => projectData.value)
-    const timeOutOrientation = 5000
+    const timeOut = 5000
 
     const setInitOrientation = function (orientation) {
         initialOrientation.value = orientation
     }
   
     const autoSaveOrientation = function(orientation) {
-        updateOrientation(dataProject.value._id, orientation)
+        updateProjectData(dataProject.value._id, { orientation: orientation })
             .then((r) => {
                 if(r.code != 404) console.log(r.message)
                 else console.error(r.message)
@@ -64,12 +64,12 @@ export default function mouseObserver() {
         let myTimeOut = null
         stage.mouseObserver.signals.dragged.add(function (delta) {
             clearTimeout(myTimeOut)
-            myTimeOut = setTimeout(() => autoSaveOrientation(stage.viewerControls.getOrientation().elements), timeOutOrientation)
+            myTimeOut = setTimeout(() => autoSaveOrientation(stage.viewerControls.getOrientation().elements), timeOut)
         })
 
         stage.mouseObserver.signals.scrolled.add(function (scroll) {
             clearTimeout(myTimeOut)
-            myTimeOut = setTimeout(() => autoSaveOrientation(stage.viewerControls.getOrientation().elements), timeOutOrientation)
+            myTimeOut = setTimeout(() => autoSaveOrientation(stage.viewerControls.getOrientation().elements), timeOut)
         })
 
         /*stage.signals.hovered.add( function(pickingProxy){ 

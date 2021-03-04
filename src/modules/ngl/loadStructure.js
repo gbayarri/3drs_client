@@ -1,7 +1,6 @@
 import { computed } from 'vue'
 import processStructure from '@/modules/ngl/processStructure'
 import structureStorage from '@/modules/structure/structureStorage'
-
 // Stage interactions
 export default function loadStructure() {
 
@@ -9,6 +8,8 @@ export default function loadStructure() {
     const { projectData, updateStructure } = structureStorage()
 
     const dataProject = computed(() => projectData.value)
+    const curr_repr = computed(() => projectData.value.currentRepresentation) 
+    const def_repr = computed(() => projectData.value.defaultRepresentation) 
 
     const loadFileToStage = (stage, url, name, id) => {
         return stage.loadFile(url, { defaultRepresentation: false, ext: 'pdb', name:name })
@@ -16,13 +17,6 @@ export default function loadStructure() {
 
             // set visibility to false until all structures are loaded
             component.setVisibility(false)
-  
-            // DON'T REMOVE
-            //component.addRepresentation( "cartoon", {  sele: "helix", color: "#f00", opacity:.4, aspectRatio:10 } )
-            //component.addRepresentation( "cartoon", {  sele: "sheet", color: "#0f0", opacity:.4, aspectRatio:10 } )
-            // DON'T REMOVE
-
-            //console.log('structure ' + name + ' loaded')
 
             // get structure
             // ONLY PARSE NGL IF FIRST TIME
@@ -38,14 +32,17 @@ export default function loadStructure() {
             }
             updateStructure(structure, id)
 
-            // add default representations
-            // this is representation #1
-            component.addRepresentation( "cartoon", { name: "struc_1", sele: "*", color: "sstruc"} )
-            //if(structure.type.isNucleic) component.addRepresentation( "base", { name: "base_1", sele: "*", color: "resname" } )
-            if(structure.type === 'nucleic') component.addRepresentation( "base", { name: "base_1", sele: "*", color: "resname" } )
-            component.addRepresentation( "ball+stick", { name: "ligand_1", sele: "hetero and not(water or ion)",  radius: .4, aspectRatio: 1.5 } )
-            component.addRepresentation( "ball+stick", { name: "water_1", sele: "water",  radius: .4, aspectRatio: 1.5 } )
-            component.addRepresentation( "ball+stick", { name: "ion_1", sele: "ion",  radius: .4, aspectRatio: 1.5 } )
+            // add representations
+            if(def_repr.value === curr_repr.value) {
+                // default representation
+                component.addRepresentation( "cartoon", { name: curr_repr.value + "-" + id + "-struc", sele: "*", color: "sstruc"} )
+                if(structure.type === 'nucleic') component.addRepresentation( "base", { name: curr_repr.value + "-" + id + "-base", sele: "*", color: "resname" } )
+                component.addRepresentation( "ball+stick", { name: curr_repr.value + "-" + id + "-ligand", sele: "hetero and not(water or ion)",  radius: .4, aspectRatio: 1.5 } )
+                component.addRepresentation( "ball+stick", { name: curr_repr.value + "-" + id + "-water", sele: "water",  radius: .4, aspectRatio: 1.5 } )
+                component.addRepresentation( "ball+stick", { name: curr_repr.value + "-" + id + "-ion", sele: "ion",  radius: .4, aspectRatio: 1.5 } )
+            } else {
+                // TODO!!!!
+            }
 
             return component
   
