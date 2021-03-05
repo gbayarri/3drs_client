@@ -35,6 +35,7 @@
 
         <div v-if="!isCollapsed">
 
+            <!-- new representation -->
             <div class="p-grid">
                 <div class="p-col">
                     <label>{{ label_new_repr }}</label>
@@ -128,6 +129,7 @@
 
                 <hr />
 
+                <!-- remove / schema -->
                 <div class="p-grid ">
                     <div class="p-col">
                         <Button 
@@ -158,39 +160,28 @@
 import { ref, watch, computed, reactive, toRefs } from 'vue'
 import globals from '@/globals'
 import useStage from '@/modules/ngl/useStage'
-import structureStorage from '@/modules/structure/structureStorage'
 import useRepresentations from '@/modules/representations/useRepresentations'
-import useAPI from '@/modules/api/useAPI'
 export default {
     setup() {
 
-        const { createRepresentation, updateRepresentationData } = useAPI()
-        const { stage/*, createRepresentation*/ } = useStage()
+        const { stage } = useStage()
         const { 
             defaultRepresentation, 
             currentRepresentation, 
             getRepresentationNames, 
             getCurrentRepresentationSettings,
-            setCurrentRepresentation 
+            updateRepresentationProperty,
+            setCurrentRepresentation,
+            setVisibilityRepresentation,
+            setOpacityRepresentation,
+            createNewRepresentation
         } = useRepresentations()
-        const { projectData } = structureStorage()
 
         let isCollapsed = ref(true)
-        let isVisible = ref(true)
-
-        const timeOut = 5000
-
-        const prjID = projectData.value._id
         const currReprSettings = computed(() => getCurrentRepresentationSettings())
-        const currReprVal = computed(() => currentRepresentation.value).value
+        const currReprVal = computed(() => currentRepresentation.value)
 
-        // TODO: GET projectData REPRESENTATIONS AND START WITH THAT: 
-        // 1) DROPDOWN WITH REPRESENTATIONS
-        // 2) MODIFY OPACITY AND SAVE TO API (ALSO TIMEOUT AS IN ORIENTATION)
-        // 3) SHOW / HIDE REPRESENTATION 1 (MODIFY REPRESENTATION 1 BY UNIQUE ID IN API)
-        // 4) CREATE NEW REPRESENTATION ()
-
-        const re = new RegExp('(' + currReprVal + '\-[0-9a-z]*\-[a-z]*)', 'g')
+        const re = computed(() => new RegExp('(' + currReprVal.value + '\-[0-9a-z]*\-[a-z]*)', 'g'))
 
         const page = reactive({
             ttpu: computed(() => isCollapsed.value ? 'Unfold representation settings' : 'Fold representation settings'),
@@ -212,85 +203,51 @@ export default {
 
         // select representation
         const reprList = computed(() => getRepresentationNames())
-        let representationSelected = ref(reprList.value.filter(item => item.id === currReprVal)[0])
-
+        const representationSelected = ref(reprList.value.filter(item => item.id === currReprVal.value)[0])
+        const watchedRepresentationSelected = computed(() => reprList.value.filter(item => item.id === currReprVal.value)[0])
         const onChangeRepresentation = (e) => {
             //hasRadius.value = !(e.value.id == 'line' || e.value.id == 'surface')
-            setCurrentRepresentation(e.value.id)
+            setCurrentRepresentation(e.value.id, true)
         }
 
         // set visibility
+        const isVisible = computed(() => currReprSettings.value.visible)
+        setVisibilityRepresentation(stage, isVisible.value, re.value, false)
         const setVisibility = () => {
-            isVisible.value = !isVisible.value
-            for(const item of stage.getRepresentationsByName(re).list){
-                item.setVisibility( isVisible.value )
-
-                // EXAMPLES FOR OTHER SECTIONS!!!
-                //item.setParameters( { color: 'chainindex'} )
-                //item.setColor( '#f00' )
-                //item.dispose()
-
-                // TRICKY WAY TO CHANGE RESPRESENTATION TYPE????
-                //item.parent.addRepresentation("ball+stick", { name: "ligand_1", sele: "*",  radius: .4, aspectRatio: 1.5 } )
-                //item.parent.removeRepresentation(item)
-                //item.setRepresentation( 'cartoon' )
-                /*
-                OJU QUE AIXÒ NOMÉS SELECCIONA CADENA B
-                item.setSelection( ':B' )
-                item.setParameters( { opacity: 0.5} )*/
-            }
-            updateRepresentationData(prjID, currReprVal, { visible: isVisible.value })
-                .then((r) => {
-                    if(r.code != 404) console.log(r.message)
-                    else console.error(r.message)
-                })
+            const newVal = !isVisible.value
+            updateRepresentationProperty('visible', newVal)
+            setVisibilityRepresentation(stage, newVal, re.value, true)
         }
 
         // new representation
         let modelNewSel = ref('')
         let nrbDisabled = computed(() => !modelNewSel.value.length)
-        //const placeholderNewSel = "Insert new name"
         const newRepresentation = () => {
-            //console.log("New representation " + modelNewSel.value + "!!!")
-            createRepresentation(prjID, { name: modelNewSel.value } )
-                .then((r) => {
-                    if(r.code != 404) console.log(r.message)
-                    else console.error(r.message)
-                })
+            createNewRepresentation(modelNewSel.value)
+            modelNewSel.value = ''
         }
 
         // molecular representation
-        //const label_mol_repr = "Select molecular representation"
         const molReprType =  globals.representation_str
+         // DEFINE AS A COMPUTED GLOBAL CONSTANT
         let molRepresentation = ref({ name: 'Cartoon', id: 'cartoon' })
-
         const onChangeMolRepresentation = (e) => {
             // DEFINE AS A COMPUTED GLOBAL CONSTANT
-            hasRadius.value = !(e.value.id == 'line' || e.value.id == 'surface')
+            hasRadius.value = !(e.value.id == 'line' || e.value.id == 'surface' || e.value.id == 'cartoon' || e.value.id == 'ribbon')
         }
 
         // radius
-        //const label_radius = "Select radius"
-        let hasRadius = ref(true)
+        // DEFINE AS A COMPUTED GLOBAL CONSTANT (line / surface / cartoon / ribbon)
+        let hasRadius = ref(false)
+        // DEFINE AS A COMPUTED
         let radius = ref(100)
-        let myTimeOutRadius = null
         const onChangeRadius = () => {
-            for(const item of stage.getRepresentationsByName(re).list) {
-                item.setParameters( { radius: (radius.value / 100) } )
-            }
-            clearTimeout(myTimeOutRadius)
-            myTimeOutRadius = setTimeout(() => {
-                updateRepresentationData(prjID, currReprVal, { radius: (radius.value / 100) })
-                    .then((r) => {
-                        if(r.code != 404) console.log(r.message)
-                        else console.error(r.message)
-                    })
-            }, timeOut)
+            setRadiusRepresentation(stage, radius.value, re.value)
         }
 
         // color
-        //const label_color = "Select color scheme"
         const colorScheme =  globals.colorScheme
+        // DEFINE AS A COMPUTED
         let colorUniform = ref(false)
         // TODO: DEFAULT COLOR IN API
         let color = ref('#6f96a9')
@@ -300,45 +257,35 @@ export default {
             colorUniform.value = (e.value.id == 'uniform')
         }
 
-        let myTimeOutColor = null
-        watch(color, (color, prevColor) => {
-            //console.log(color, prevColor)
-            for(const item of stage.getRepresentationsByName(re).list) {
-                item.setColor( color )
-            }
-            clearTimeout(myTimeOutColor)
-            myTimeOutColor = setTimeout(() => {
-                updateRepresentationData(prjID, currReprVal, { color: color })
-                    .then((r) => {
-                        if(r.code != 404) console.log(r.message)
-                        else console.error(r.message)
-                    })
-            }, timeOut)
-        })
-
         // opacity
-        let opacity = ref(currReprSettings.value.opacity * 100)
-        let myTimeOutOpacity = null
+        const watchedOpacity = computed(() => (currReprSettings.value.opacity * 100))
+        const opacity = ref(Math.round(currReprSettings.value.opacity * 100))
+        setOpacityRepresentation(stage, opacity.value, re.value, false)
         const onChangeOpacity = () => {
-            for(const item of stage.getRepresentationsByName(re).list) {
-                item.setParameters( { opacity: (opacity.value / 100) } )
-            }
-            clearTimeout(myTimeOutOpacity)
-            myTimeOutOpacity = setTimeout(() => {
-                updateRepresentationData(prjID, currReprVal, { opacity: (opacity.value / 100) })
-                .then((r) => {
-                    if(r.code != 404) console.log(r.message)
-                    else console.error(r.message)
-                })
-            }, timeOut)
+            updateRepresentationProperty('opacity', (opacity.value / 100))
+            setOpacityRepresentation(stage, opacity.value, re.value, true)
         }
+
+        // watchers
+        watch([watchedRepresentationSelected, color, watchedOpacity], (newValues, prevValues) => {
+            // select representations
+            const wrs = newValues[0]
+            representationSelected.value = wrs
+            // colors
+            const wcl = newValues[1]
+            //setColorRepresentation(stage, color, re.value)
+            // opacity
+            const wop = newValues[2]
+            opacity.value = Math.round(wop)
+        })
 
         // REMOVE REPRESENTATION / VISUALIZE REPRESENTATION STRUCTURE
         /* stage.getComponentsByName('first_str').list[0].dispose() */
         //const ttprr = "Remove representation (double click)"
         //const ttpvs = "View representation structure"
         const removeRepresentation = () => {
-            console.log("double click!!")
+            // ON REMOVE MODIFY ALSO currentRepresentation BY OTHER VALUE (DIFFERENT THAN DEFAULT IF THERE ARE MORE!!!)
+            console.log("remove " + representationSelected.value.id)
         }
         const visualizeStructure = () => {
             // open modal with all the content of dataProject.representation[this structure].settings

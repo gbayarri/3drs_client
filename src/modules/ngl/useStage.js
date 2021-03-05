@@ -1,14 +1,10 @@
 import { reactive } from 'vue'
-import { Stage, Selection/*, Representation*/ } from 'ngl'
+import { Stage, Selection } from 'ngl'
 
 let stage = reactive({})
 let selection = reactive({})
 
 export default function useStage() {
-
-    //type, object, viewer, params)
-    //const new_repr = new Representation()
-    //console.log(new_repr)
 
     const createStage = function (layer) {
         stage = new Stage(layer, { tooltip:false })
@@ -26,13 +22,7 @@ export default function useStage() {
         //console.log('stage created')
         return selection 
     }
-
-    /*const createRepresentation = function (v, p) {
-        console.log(new Representation())
-        //var representation = new Representation(v, p)
-        //return representation 
-    }*/
   
-    return { stage, selection, createStage, getStage, createSelection/*, createRepresentation*/ }
+    return { stage, selection, createStage, getStage, createSelection }
   
   }

@@ -1,16 +1,17 @@
 <template>
 
     <Button 
-    v-if="reprList.length <= 1"
+    v-if="reprList.length <= 1 || currReprVal === defaultRepresentation"
     id="settings-impostor"
-    v-tooltip.left="page.ttdb"
+    v-tooltip.left="ttdb"
     />
 
     <Button icon="pi pi-angle-double-left" 
     @click="visibleRight = true" 
     v-if="!visibleRight"
     id="settings-handle"
-    :disabled="reprList.length <= 1" />
+    :disabled="reprList.length <= 1 || currReprVal === defaultRepresentation" 
+    v-tooltip.left="ttst"/>
 
     <Sidebar 
     v-model:visible="visibleRight" 
@@ -28,25 +29,25 @@
             <hr class="subsection" />
             <UploadFile />
             <hr />
-            <TitleSettings :title="page.tit_mod_chs" />
+            <TitleSettings :title="tit_mod_chs" />
             <Models class="settings-panel models" />
             <Chains class="settings-panel chains" />
             <hr class="subsection" />
-            <TitleSettings :title="page.tit_mols" />
+            <TitleSettings :title="tit_mols" />
             <Residues class="settings-panel residues" />
             <Heteroatoms class="settings-panel hetero" />
             <Ions class="settings-panel ions" />
             <Waters class="settings-panel water" />
             <CustomSelection class="settings-panel custom" />
             <hr class="subsection" />
-            <TitleSettings :title="page.tit_traj" />
+            <TitleSettings :title="tit_traj" />
             <Trajectory />
         </div>
     </Sidebar>
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref, reactive, computed, toRefs } from 'vue'
 import useFlags from '@/modules/common/useFlags'
 import useRepresentations from '@/modules/representations/useRepresentations'
 import TitleSettings from '@/components/representation/settings/TitleSettings'
@@ -66,16 +67,18 @@ export default {
     setup() {
         const visibleRight = ref(false)
         const { setFlagStatus } = useFlags()
-        const { getRepresentationNames } = useRepresentations()
+        const { currentRepresentation, defaultRepresentation, getRepresentationNames } = useRepresentations()
 
         const reprList = computed(() => getRepresentationNames())
+        const currReprVal = computed(() => currentRepresentation.value)
 
-        const page = {
+        const page = reactive({
             tit_mod_chs: "models / chains",
             tit_mols: "molecules",
             tit_traj: "trajectory",
-            ttdb: "Settings are disabled until you create a new representation"
-        }
+            ttdb: computed(() => (reprList.value.length <= 1 && currReprVal.value === defaultRepresentation) ? "Settings are disabled until you create a new representation" : "Default representation has no access to settings"),
+            ttst: "Open representation settings"
+        })
 
         const onSidebarShown = () => {
             setFlagStatus('sidebarEnabled', true)
@@ -89,8 +92,8 @@ export default {
             visibleRight, 
             onSidebarShown, 
             onSidebarHidden, 
-            page,
-            reprList
+            ...toRefs(page),
+            reprList, currReprVal, defaultRepresentation
         }
     }
 }

@@ -32,8 +32,9 @@ export default {
     const { setInitOrientation, checkMouseSignals } = mouseObserver()
     const { /*processedStructure,*/ projectData, updateProject, resetStructure, getFirstProjectData } = structureStorage()
     const { settings, setCurrentStructure } = structureSettings()
-    const { setCurrentRepresentation } = useRepresentations()
+    const { setCurrentRepresentation, getCurrentRepresentationSettings } = useRepresentations()
     const project_id = props.project_id
+    const currReprSettings = computed(() => getCurrentRepresentationSettings())
 
     const createViewport = () => {
       const { createStage } = useStage()
@@ -95,20 +96,20 @@ export default {
             setInitOrientation(orientation)
           }
 
-          // set all components to visible
-          for(const c of stage.compList){
-            c.setVisibility(true)
-          }
-
           // init mouse observer
           checkMouseSignals(stage)
 
           // set current representation          
-          setCurrentRepresentation(dataProject.value.currentRepresentation)
+          setCurrentRepresentation(dataProject.value.currentRepresentation, false)
 
           // set current structure          
           setCurrentStructure(dataProject.value.currentStructure)
           //setCurrentStructure('4')
+
+          // set all components to visible
+          for(const c of stage.compList){
+            c.setVisibility(true)
+          }
 
           // set stage flag
           setFlagStatus('stageLoaded', true)
@@ -116,9 +117,7 @@ export default {
           // close BlockUI
           closeModal('block')
 
-
-
-          //console.log(structure)
+          
 
           //stage.getRepresentationsByName('ligand_1').setVisibility(false)
 
@@ -175,6 +174,9 @@ export default {
             $router.push({ name: 'Launch' }) 
             return false
           }
+
+          // set background color
+          document.getElementById("viewport").style.background = apiData.value.background
 
           // save apiData to structureStorage.projectData
           updateProject(apiData.value)

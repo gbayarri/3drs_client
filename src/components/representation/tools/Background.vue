@@ -6,35 +6,45 @@
 </template>
 
 <script>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
+import structureStorage from '@/modules/structure/structureStorage'
+import useAPI from '@/modules/api/useAPI'
 export default {
 props: ['stage'],
 setup(props) {
-    const ttp = ref("Change background color")
-    const color = ref('#f1f1f1')
+
+    const { projectData } = structureStorage()
+    const { updateProjectData } = useAPI()
+
+    const dataProject = computed(() => projectData.value)
+
+    const ttp = computed(() => cpVisible.value ? "Click to close color picker" : "Change background color")
+    const color = ref(dataProject.value.background)
     const cpVisible = ref(false)
 
-    const stage = props.stage
+    //const stage = props.stage
 
     const handleClick = () => {
         cpVisible.value = !cpVisible.value;
-
-        if(cpVisible.value) ttp.value = "Click to close color picker"
-        else ttp.value = "Change background color"
-
-        //stage.setParameters( { backgroundColor: '#ff0000' } );
     }
 
     /*const closePicker = () => {
        console.log('close???')
     }*/
 
+    const autoSaveBackground = function(color) {
+        updateProjectData(dataProject.value._id, { background: color })
+            .then((r) => {
+                if(r.code != 404) console.log(r.message)
+                else console.error(r.message)
+            })
+    }
+
+    let myTimeOut = null
     watch(color, (color, prevColor) => {
         document.getElementById("viewport").style.background = '#' + color
-        // ????????????????
-        //console.log(stage)
-        //stage.setParameters( { backgroundColor: '#' + color } );
-        // ????????????????
+        clearTimeout(myTimeOut)
+        myTimeOut = setTimeout(() => autoSaveBackground('#' + color), 5000)
     })
 
     return { ttp, color, cpVisible, handleClick/*, closePicker*/ }

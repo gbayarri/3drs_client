@@ -31,11 +31,8 @@ export default function useAPI() {
   }
 
   const createRepresentation = async (id, data) => {
-      
-    console.log(process.env.VUE_APP_API_LOCATION + '/representation/' + id)
-    console.log(data)
 
-    /*const response = await fetch(process.env.VUE_APP_API_LOCATION + '/representation/' + id, {
+    const response = await fetch(process.env.VUE_APP_API_LOCATION + '/representation/' + id, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -44,17 +41,14 @@ export default function useAPI() {
     })
     const resp = await response.json()
 
-    return resp*/
+    return resp
 
   }
 
   const updateRepresentationData = async (id, representation, data) => {
-      
-    console.log(process.env.VUE_APP_API_LOCATION + '/representation/' + id + '/' + representation)
-    console.log(data)
 
-    /*const response = await fetch(process.env.VUE_APP_API_LOCATION + '/representation/' + id + '/' + representation, {
-      method: 'POST',
+    const response = await fetch(process.env.VUE_APP_API_LOCATION + '/representation/' + id + '/' + representation, {
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json'
       },
@@ -62,7 +56,7 @@ export default function useAPI() {
     })
     const resp = await response.json()
 
-    return resp*/
+    return resp
 
   }
 
