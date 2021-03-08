@@ -60,16 +60,29 @@ export default function useAPI() {
 
   }
 
-  // updateStructure (when new file added)
+  const eliminateRepresentation = async (id, representation) => {
 
-  // updateRepresentation (when new one or modified, send id and all the content of the representation again)
+    const response = await fetch(process.env.VUE_APP_API_LOCATION + '/representation/' + id + '/' + representation, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    const resp = await response.json()
+
+    return resp
+
+  }
+
+  // updateStructure (when new file added)
 
   return { 
     apiData, 
     fetchProject, 
     updateProjectData,
     createRepresentation,
-    updateRepresentationData
+    updateRepresentationData,
+    eliminateRepresentation
   }
 
 }

@@ -13,7 +13,7 @@ import useStage from '@/modules/ngl/useStage'
 import useModals from '@/modules/common/useModals'
 import useMessages from '@/modules/common/useMessages'
 import useAPI from '@/modules/api/useAPI'
-import loadStructure from '@/modules/ngl/loadStructure'
+import loadRepresentations from '@/modules/ngl/loadRepresentations'
 import structureStorage from '@/modules/structure/structureStorage'
 import structureSettings from '@/modules/structure/structureSettings'
 import useRepresentations from '@/modules/representations/useRepresentations'
@@ -28,7 +28,7 @@ export default {
     const stageLoaded = computed(() => flags.stageLoaded)
     const { dialog, openModal, closeModal, setBlockUI } = useModals()
     const { apiData, fetchProject, updateProjectData } = useAPI()
-    const { loadFileToStage } = loadStructure()
+    const { loadFileToStage } = loadRepresentations()
     const { setInitOrientation, checkMouseSignals } = mouseObserver()
     const { /*processedStructure,*/ projectData, updateProject, resetStructure, getFirstProjectData } = structureStorage()
     const { settings, setCurrentStructure } = structureSettings()

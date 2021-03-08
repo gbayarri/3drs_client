@@ -160,21 +160,27 @@
 import { ref, watch, computed, reactive, toRefs } from 'vue'
 import globals from '@/globals'
 import useStage from '@/modules/ngl/useStage'
+import loadRepresentations from '@/modules/ngl/loadRepresentations'
 import useRepresentations from '@/modules/representations/useRepresentations'
+import structureStorage from '@/modules/structure/structureStorage'
 export default {
     setup() {
 
         const { stage } = useStage()
+        const { addRepresentation } = loadRepresentations()
+        const { projectData, updateProject } = structureStorage()
         const { 
             defaultRepresentation, 
             currentRepresentation, 
             getRepresentationNames, 
             getCurrentRepresentationSettings,
             updateRepresentationProperty,
+            removeRepresentationFromStructure,
             setCurrentRepresentation,
             setVisibilityRepresentation,
             setOpacityRepresentation,
-            createNewRepresentation
+            createNewRepresentation,
+            deleteRepresentation
         } = useRepresentations()
 
         let isCollapsed = ref(true)
@@ -214,9 +220,14 @@ export default {
         const isVisible = computed(() => currReprSettings.value.visible)
         setVisibilityRepresentation(stage, isVisible.value, re.value, false)
         const setVisibility = () => {
+            console.log(stage)
             const newVal = !isVisible.value
             updateRepresentationProperty('visible', newVal)
             setVisibilityRepresentation(stage, newVal, re.value, true)
+                .then((r) => {
+                    if(r.code != 404) console.log(r.message)
+                    else console.error(r.message)
+                })
         }
 
         // new representation
@@ -224,6 +235,20 @@ export default {
         let nrbDisabled = computed(() => !modelNewSel.value.length)
         const newRepresentation = () => {
             createNewRepresentation(modelNewSel.value)
+                .then((r) => {
+                    if(r.code != 404) {
+                        // insert new representation to projectData
+                        let dp = projectData.value
+                        dp.representations.push(r.representation)
+                        updateProject(dp)
+                        setCurrentRepresentation(r.representation.id, true)
+                        // DRAW REPRESENTATION!!!!!!
+                        addRepresentation(stage, r.representation)
+                        console.log(r.message)
+                    } else {
+                        console.error(r.message)
+                    }
+                })
             modelNewSel.value = ''
         }
 
@@ -280,12 +305,27 @@ export default {
         })
 
         // REMOVE REPRESENTATION / VISUALIZE REPRESENTATION STRUCTURE
+        // *****************************************************
+        // *****************************************************
+        // *****************************************************
         /* stage.getComponentsByName('first_str').list[0].dispose() */
+        // *****************************************************
+        // *****************************************************
+        // *****************************************************
         //const ttprr = "Remove representation (double click)"
         //const ttpvs = "View representation structure"
         const removeRepresentation = () => {
-            // ON REMOVE MODIFY ALSO currentRepresentation BY OTHER VALUE (DIFFERENT THAN DEFAULT IF THERE ARE MORE!!!)
-            console.log("remove " + representationSelected.value.id)
+            deleteRepresentation(representationSelected.value.id)
+                .then((r) => {
+                    if(r.code != 404) {
+                        // remove representation from  projectData
+                        setCurrentRepresentation(r.newCurrentRepresentation, true)
+                        removeRepresentationFromStructure(representationSelected.value.id)
+                        console.log(r.message)
+                    } else {
+                        console.error(r.message)
+                    }
+                })
         }
         const visualizeStructure = () => {
             // open modal with all the content of dataProject.representation[this structure].settings

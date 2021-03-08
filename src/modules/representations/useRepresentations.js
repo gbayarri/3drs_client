@@ -7,16 +7,22 @@ let currentRepresentation = ref(null)
 export default function useRepresentations() {
 
     const { projectData, updateProject } = structureStorage()
-    const { updateProjectData, createRepresentation, updateRepresentationData } = useAPI()
+    const { 
+        updateProjectData, 
+        createRepresentation, 
+        updateRepresentationData, 
+        eliminateRepresentation 
+    } = useAPI()
     const defaultRepresentation = projectData.value.defaultRepresentation
-
     const prjID = projectData.value._id
+
+    const dataProject = computed(() => projectData.value)
 
     // NAVIGATION
 
-    const getRepresentationNames = function () {
+    const getRepresentationNames = () => {
         const names = []
-        for(const item of projectData.value.representations) {
+        for(const item of dataProject.value.representations) {
             names.push({
                 name: item.name,
                 id: item.id
@@ -25,7 +31,7 @@ export default function useRepresentations() {
         return names
     }
 
-    const setCurrentRepresentation = function (value, update) {
+    const setCurrentRepresentation = (value, update) => {
         currentRepresentation.value = value
         //console.log(currentRepresentation.value)
         if(update) {
@@ -37,13 +43,17 @@ export default function useRepresentations() {
         }
     }
 
-    const getCurrentRepresentationSettings = function () {
-        return projectData.value.representations.filter(item => item.id === currentRepresentation.value)[0]
+    const getCurrentRepresentationSettings = () => {
+        return dataProject.value.representations.filter(item => item.id === currentRepresentation.value)[0]
     }
 
-    const updateRepresentationProperty= function (property, value) {
-        //const settings = projectData.value.representations.filter(item => item.id === currentRepresentation.value)[0]
-        projectData.value.representations.filter(item => item.id === currentRepresentation.value)[0][property] = value
+    const updateRepresentationProperty = (property, value) => {
+        //const settings = dataProject.value.representations.filter(item => item.id === currentRepresentation.value)[0]
+        dataProject.value.representations.filter(item => item.id === currentRepresentation.value)[0][property] = value
+    }
+
+    const removeRepresentationFromStructure = (value) => {
+        projectData.value.representations = projectData.value.representations.filter(item => item.id !== value)
     }
 
     // NGL / REST API
@@ -51,8 +61,10 @@ export default function useRepresentations() {
     const longTimeOut = 5000
     const shortTimeOut = 500
 
-    const setVisibilityRepresentation = function (stage, status, re, update) {
+    const setVisibilityRepresentation = async (stage, status, re, update) => {
+        //console.log(re)
         for(const item of stage.getRepresentationsByName(re).list){
+            //console.log(item)
             item.setVisibility( status )
 
             // EXAMPLES FOR OTHER SECTIONS!!!
@@ -71,30 +83,15 @@ export default function useRepresentations() {
         }
         //console.log(status)
         if(update) {
-            updateRepresentationData(prjID, currentRepresentation.value, { visible: status })
-                .then((r) => {
-                    if(r.code != 404) console.log(r.message)
-                    else console.error(r.message)
-                })
+            return await updateRepresentationData(prjID, currentRepresentation.value, { visible: status })
         }
     }
 
-    const createNewRepresentation = function(value) {
-        createRepresentation(prjID, { name: value } )
-            .then((r) => {
-                if(r.code != 404) {
-                    // insert new representation to projectData
-                    let dp = projectData.value
-                    dp.representations.push(r.representation)
-                    updateProject(dp)
-                    setCurrentRepresentation(r.representation.id, true)
-                    console.log(r.message)
-                } else {
-                    console.error(r.message)
-                }
-            })
+    const createNewRepresentation = async (value) => {
+        return await createRepresentation(prjID, { name: value })
     }
 
+    // TODO
     let myTimeOutRadius = null
     const setRadiusRepresentation = function (stage, radius, re) {
         for(const item of stage.getRepresentationsByName(re).list) {
@@ -110,6 +107,7 @@ export default function useRepresentations() {
         }, longTimeOut)
     }
 
+    // TODO
     let myTimeOutColor = null
     const setColorRepresentation = function (stage, color, re) {
         for(const item of stage.getRepresentationsByName(re).list) {
@@ -125,8 +123,33 @@ export default function useRepresentations() {
         }, longTimeOut)
     }
 
+    // TODO
+    /*const later = (delay, value) => {
+        let timer = 0;
+        let reject = null;
+        const promise = new Promise((resolve, _reject) => {
+            reject = _reject;
+            timer = setTimeout(resolve, delay, value);
+        });
+        return {
+            get promise() { return promise; },
+            cancel() {
+                if (timer) {
+                    clearTimeout(timer);
+                    timer = 0;
+                    reject();
+                    reject = null;
+                }
+            }
+        };
+    };
+    const l1 = later(2000, "l1");
+        l1.promise
+          .then(msg => { console.log(msg); })
+          .catch(() => { console.log("l1 cancelled"); });*/
+    
     let myTimeOutOpacity = null
-    const setOpacityRepresentation = function (stage, opacity, re, update) {
+    const setOpacityRepresentation = async (stage, opacity, re, update) => {
         for(const item of stage.getRepresentationsByName(re).list) {
             item.setParameters( { opacity: (opacity / 100) } )
         }
@@ -142,6 +165,10 @@ export default function useRepresentations() {
         }
     }
 
+    const deleteRepresentation = async (value) => {
+        return await eliminateRepresentation(prjID, value )
+    }
+
     return { 
         representations, 
         currentRepresentation,
@@ -150,11 +177,13 @@ export default function useRepresentations() {
         setCurrentRepresentation,
         getCurrentRepresentationSettings,
         updateRepresentationProperty,
+        removeRepresentationFromStructure,
         setVisibilityRepresentation,
         setOpacityRepresentation,
         createNewRepresentation,
         setRadiusRepresentation,
-        setColorRepresentation
+        setColorRepresentation,
+        deleteRepresentation
     }
 
 }

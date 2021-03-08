@@ -3,7 +3,7 @@ import processStructure from '@/modules/ngl/processStructure'
 import structureStorage from '@/modules/structure/structureStorage'
 import useRepresentations from '@/modules/representations/useRepresentations'
 // Stage interactions
-export default function loadStructure() {
+export default function loadRepresentations() {
 
     const { getStructure } = processStructure()
     const { projectData, updateStructure } = structureStorage()
@@ -18,8 +18,10 @@ export default function loadStructure() {
     const representations = computed(() => dataProject.value.representations) 
 
     const loadFileToStage = (stage, url, name, id) => {
-        return stage.loadFile(url, { defaultRepresentation: false, ext: 'pdb', name:name })
+        return stage.loadFile(url, { defaultRepresentation: false, ext: 'pdb', name:id })
             .then(function (component) {
+
+            //console.log(component.parameters.name)
 
             // set visibility to false until all structures are loaded
             component.setVisibility(false)
@@ -73,6 +75,30 @@ export default function loadStructure() {
         })
     }
 
-  return { loadFileToStage }
+    const addRepresentation = (stage, representation) => {
+
+        /*'id' => $repr, 
+			'name' => $data['name'],
+			'visible' => true,prjID
+			'opacity' => 1,
+			'navigation' => [],
+			'structures' => $structures,
+			'mol_repr' => 'cartoon',
+            'radius' => 5,
+            'color_scheme' => 'sstruc',
+			'color' => '#f1f1f1'*/
+        
+        // PUT CONDITIONALS FOR COLOR, RADIUS...    
+
+        //stage.eachComponent()
+
+        stage.eachComponent( function( component ){
+            //console.log(component.parameters.name)
+            component.addRepresentation( representation.mol_repr, { name: representation.id + "-" + component.parameters.name + "-all", sele: "not(*)", color: representation.color_scheme} )
+        } )
+
+    }
+
+  return { loadFileToStage, addRepresentation }
 
 }
