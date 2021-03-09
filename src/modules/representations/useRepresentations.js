@@ -108,7 +108,9 @@ export default function useRepresentations() {
             console.log(item.parent)*/
 
             const name_new = representation.id + "-" + item.parameters.name.split('-')[1]
+            // remove current representation
             addRepresentationToComponent(representation, item.parent, name_new, item.parameters.sele)
+            // create new
             item.parent.removeRepresentation(item)
 
             //console.log(item)

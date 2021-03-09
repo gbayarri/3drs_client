@@ -3,7 +3,7 @@ import useLegend from '@/modules/viewport/useLegend'
 import structureStorage from '@/modules/structure/structureStorage'
 import useFlags from '@/modules/common/useFlags'
 import useAPI from '@/modules/api/useAPI'
-
+import structureSettings from '@/modules/structure/structureSettings'
 const initialOrientation = ref([])
 
 // Stage interactions
@@ -13,7 +13,9 @@ export default function mouseObserver() {
     const { setFlagStatus } = useFlags()
     const { projectData } = structureStorage()
     const { updateProjectData } = useAPI()
+    const { getFileNames } = structureSettings()
 
+    const filesList = computed(() => getFileNames())
     const dataProject = computed(() => projectData.value)
     const timeOut = 5000
 
@@ -35,8 +37,9 @@ export default function mouseObserver() {
         stage.signals.hovered.add( function(pickingProxy){ 
             // update / show legend
             if (pickingProxy && pickingProxy.atom) {
+                const name = filesList.value.filter(item => item.id === pickingProxy.atom.structure.name)[0].name
                 updateLegend({
-                    name: pickingProxy.atom.structure.name,
+                    name: name,
                     chainname: pickingProxy.atom.chainname,
                     resname: pickingProxy.atom.resname,
                     resno: pickingProxy.atom.resno,
@@ -45,8 +48,9 @@ export default function mouseObserver() {
                 setFlagStatus('legendEnabled', true)
             }
             if (pickingProxy && pickingProxy.bond) {
+                const name = filesList.value.filter(item => item.id === pickingProxy.bond.structure.name)[0].name
                 updateLegend({
-                    name: pickingProxy.bond.structure.name,
+                    name: name,
                     chainname: pickingProxy.bond.atom1.chainname,
                     resname: pickingProxy.bond.atom1.resname,
                     resno: pickingProxy.bond.atom1.resno,

@@ -234,6 +234,7 @@ export default {
         }
 
         // new representation
+        // TODO: SHOW A TOAST COMPONENT WARNING THAT USER SHOULD OPEN SETTINGS
         let modelNewSel = ref('')
         let nrbDisabled = computed(() => !modelNewSel.value.length)
         const newRepresentation = () => {
