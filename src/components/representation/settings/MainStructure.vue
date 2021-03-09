@@ -86,7 +86,7 @@ export default {
 
         // representation
         const label_repr = "Select representation"
-        const reprType =  globals.representation_str
+        const reprType =  globals.representation
         const mainStructureRepresentation = ref({ name: 'Ribbon', id: 'ribbon' })
 
         const onChangeRepresentation = (e) => {

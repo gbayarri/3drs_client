@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue'
 import structureStorage from '@/modules/structure/structureStorage'
 import useAPI from '@/modules/api/useAPI'
+import drawRepresentation from '@/modules/ngl/drawRepresentation'
 const representations = ref({})
 let currentRepresentation = ref(null)
 
@@ -13,6 +14,7 @@ export default function useRepresentations() {
         updateRepresentationData, 
         eliminateRepresentation 
     } = useAPI()
+    const { addRepresentationToComponent } = drawRepresentation()
     const defaultRepresentation = projectData.value.defaultRepresentation
     const prjID = projectData.value._id
 
@@ -91,6 +93,36 @@ export default function useRepresentations() {
         return await createRepresentation(prjID, { name: value })
     }
 
+    const setMolecularRepresentation = async (stage, representation, mol_repr, re, update) => {
+        //return await createRepresentation(prjID, { name: value })
+
+        //console.log(representation)
+
+        for(const item of stage.getRepresentationsByName(re).list){
+
+            //const name_new = representation.id + "-" + component.parameters.name
+
+            /*console.log(item.parameters.name.split('-')) // explode that to get repre.id and file.id
+            console.log(item.parameters.sele) 
+            console.log(item.parameters.color) 
+            console.log(item.parent)*/
+
+            const name_new = representation.id + "-" + item.parameters.name.split('-')[1]
+            addRepresentationToComponent(representation, item.parent, name_new, item.parameters.sele)
+            item.parent.removeRepresentation(item)
+
+            //console.log(item)
+            // update addRepresentationToComponent with the rest of options
+            // new function addRepresentationToComponent here? :____(    )
+            //item.parent.addRepresentation("ball+stick", { name: "ligand_1", sele: "*",  radius: .4, aspectRatio: 1.5 } )
+            // ok
+            //item.parent.removeRepresentation(item)
+        }
+        if(update) {
+            return await updateRepresentationData(prjID, currentRepresentation.value, { mol_repr: mol_repr })
+        }
+    }
+
     // TODO
     let myTimeOutRadius = null
     const setRadiusRepresentation = function (stage, radius, re) {
@@ -107,20 +139,32 @@ export default function useRepresentations() {
         }, longTimeOut)
     }
 
-    // TODO
+    const setColorSchemeRepresentation = async (stage, color_scheme, color, re, update) => {
+        for(const item of stage.getRepresentationsByName(re).list) {
+            console.log(color_scheme)
+            if(color_scheme === 'uniform') item.setColor( color )
+            else item.setColor( color_scheme )
+        }
+        if(update) {
+            return await updateRepresentationData(prjID, currentRepresentation.value, { color_scheme: color_scheme })
+        }
+    }
+
     let myTimeOutColor = null
-    const setColorRepresentation = function (stage, color, re) {
+    const setColorRepresentation = function (stage, color, re, update) {
         for(const item of stage.getRepresentationsByName(re).list) {
             item.setColor( color )
         }
-        clearTimeout(myTimeOutColor)
-        myTimeOutColor = setTimeout(() => {
-            updateRepresentationData(prjID, currentRepresentation.value, { color: color })
-                .then((r) => {
-                    if(r.code != 404) console.log(r.message)
-                    else console.error(r.message)
-                })
-        }, longTimeOut)
+        if(update) {
+            clearTimeout(myTimeOutColor)
+            myTimeOutColor = setTimeout(() => {
+                updateRepresentationData(prjID, currentRepresentation.value, { color: color })
+                    .then((r) => {
+                        if(r.code != 404) console.log(r.message)
+                        else console.error(r.message)
+                    })
+            }, shortTimeOut)
+        }
     }
 
     // TODO
@@ -179,9 +223,11 @@ export default function useRepresentations() {
         updateRepresentationProperty,
         removeRepresentationFromStructure,
         setVisibilityRepresentation,
+        setMolecularRepresentation,
         setOpacityRepresentation,
         createNewRepresentation,
         setRadiusRepresentation,
+        setColorSchemeRepresentation,
         setColorRepresentation,
         deleteRepresentation
     }
