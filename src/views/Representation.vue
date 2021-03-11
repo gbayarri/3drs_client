@@ -12,6 +12,8 @@
 
     <Legend v-if="stageLoaded" />
 
+    <Toast />
+
     <Viewport :project_id="project_id" />
 
     <ModalTrajectory />

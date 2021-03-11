@@ -9,7 +9,6 @@
         :options="chains" 
         optionLabel="name" 
         :placeholder="page.placeholder" 
-        @change="onChange"
         class="multiselect-custom">
             <template #value="slotProps">
                 <Chip 
@@ -48,37 +47,40 @@ export default {
         }
 
         // trick for creating reactivity with computed property
-        const watchedChains = computed(() => getCurrentChains())
-        const selectedChains = ref(getCurrentChains())
+        //const watchedChains = computed(() => getCurrentChains())
+        //const selectedChains = ref(getCurrentChains())
+        const selectedChains = computed({
+            get: () => getCurrentChains(),
+            set: val => updateNav(val)
+        })
 
         const chains = computed(() => getChains())
 
-        const updateNav = () => {
+        const updateNav = (value) => {
             const chs = []
-            for(const chain of selectedChains.value){
+            for(const chain of value){
                 chs.push(chain)
             }
             updateCurrentChains(chs )
         }
 
-        const onChange = () => {
+        /*const onChange = () => {
             updateNav()
-        }
+        }*/
 
         const removeChip = (e) => {
-            selectedChains.value = selectedChains.value.filter(item => item.id !== e.path[1].innerText)
-            updateNav()
+            //console.log(e)
+            //selectedChains.value = selectedChains.value.filter(item => item.id !== e.path[1].innerText)
+            updateNav(selectedChains.value.filter(item => item.id !== e.path[1].innerText))
         }
 
+        // TODO: REPLACE BY COMPUTED GETTER / SETTER
         // modifying isCollapsed & selectedChains v-model properties without computed()
-        watch([watchedChains, chains], (newValues, prevValues) => {
-            const wch = newValues[0]
-            const chs = newValues[1]
-            selectedChains.value = wch
+        watch(chains, (chs, prevChs) => {
             if(chs.length <= 1) isCollapsed.value = true
         })
 
-        return { page, isCollapsed, selectedChains, chains, onChange, removeChip }
+        return { page, isCollapsed, selectedChains, chains, /*onChange,*/ removeChip }
     }
 }
 </script>

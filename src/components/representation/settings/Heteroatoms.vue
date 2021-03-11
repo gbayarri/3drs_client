@@ -85,6 +85,7 @@ export default {
             allSelected.value = !allSelected.value
         }
 
+        // TODO: REPLACE BY COMPUTED GETTER / SETTER
         watch([watchedChains, selectedHets], (newValues, prevValues) => {
             const wch = newValues[0]
             const shts = newValues[1]

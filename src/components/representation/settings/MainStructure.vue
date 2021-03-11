@@ -109,6 +109,7 @@ export default {
             colorUniform.value = (e.value.id == 'uniform')
         }
 
+        // TODO: REPLACE BY COMPUTED GETTER / SETTER
         watch(color, (color, prevColor) => {
             console.log(color, prevColor)
         })

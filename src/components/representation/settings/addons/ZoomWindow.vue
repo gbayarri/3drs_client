@@ -122,6 +122,7 @@ export default {
 
         let modelWater = computed(() => getModelContent(watchedChains.value, 'waters'))
 
+        // TODO: REPLACE BY COMPUTED GETTER / SETTER
         watch([watchedChains], (newValues, prevValues) => {
             const wch = newValues[0]
             // residues

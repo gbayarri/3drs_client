@@ -32,9 +32,9 @@ export default {
     const { setInitOrientation, checkMouseSignals } = mouseObserver()
     const { /*processedStructure,*/ projectData, updateProject, resetStructure, getFirstProjectData } = structureStorage()
     const { settings, setCurrentStructure } = structureSettings()
-    const { setCurrentRepresentation, getCurrentRepresentationSettings } = useRepresentations()
+    const { setCurrentRepresentation/*, getCurrentRepresentationSettings*/ } = useRepresentations()
     const project_id = props.project_id
-    const currReprSettings = computed(() => getCurrentRepresentationSettings())
+    //const currReprSettings = computed(() => getCurrentRepresentationSettings())
 
     const createViewport = () => {
       const { createStage } = useStage()

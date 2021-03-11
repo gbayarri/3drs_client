@@ -7,7 +7,7 @@
         @click="unfoldRepresentations" 
         id="unfold-button"
         v-tooltip.top="ttpu" />
-        
+
         <!-- representation -->
         <div class="p-grid">
             <div class="p-col">
@@ -20,7 +20,6 @@
                 v-model="representationSelected" 
                 :options="reprList" 
                 optionLabel="name" 
-                @change="onChangeRepresentation"
                 :disabled="reprList.length <= 1"
                 />
             </div>
@@ -69,8 +68,7 @@
                         <Dropdown 
                         v-model="molRepresentation" 
                         :options="molReprType" 
-                        optionLabel="name" 
-                        @change="onChangeMolRepresentation"/>
+                        optionLabel="name"  />
                     </div>
                 </div>
 
@@ -85,7 +83,7 @@
                 </div>
                 <div class="p-grid" v-if="hasRadius" >
                     <div class="p-col">
-                        <Slider v-model="radius" :min="0" :max="500" :step="5" @change="onChangeRadius" />
+                        <Slider v-model="radius" :min="min_radius" :max="max_radius" :step="1" />
                     </div>
                 </div>
 
@@ -100,8 +98,7 @@
                         <Dropdown
                         v-model="mainStructureColor" 
                         :options="colorScheme" 
-                        optionLabel="name" 
-                        @change="onChangeColorScheme"/>
+                        optionLabel="name" />
                     </div>
                     <div class="p-col-fixed" v-if="colorUniform" style="width:3rem; ">
                         <ColorPicker v-model="color" style="margin-left:-.5rem;margin-top:2px;" />
@@ -121,7 +118,7 @@
             </div>
             <div class="p-grid margin-bottom-20">
                 <div class="p-col">
-                    <Slider v-model="opacity" :min="0" :max="100" :step="1" @change="onChangeOpacity" />
+                    <Slider v-model="opacity" :min="0" :max="100" :step="1" />
                 </div>
             </div>
 
@@ -157,7 +154,8 @@
 </template>
 
 <script>
-import { ref, watch, computed, reactive, toRefs } from 'vue'
+import { ref, watch, computed, reactive, toRefs, inject } from 'vue'
+import { useToast } from 'primevue/usetoast'
 import globals from '@/globals'
 import useStage from '@/modules/ngl/useStage'
 import useComponents from '@/modules/ngl/useComponents'
@@ -182,6 +180,7 @@ export default {
             setColorSchemeRepresentation,
             setColorRepresentation,
             setOpacityRepresentation,
+            setRadiusRepresentation,
             createNewRepresentation,
             deleteRepresentation
         } = useRepresentations()
@@ -210,18 +209,32 @@ export default {
             isCollapsed.value = !isCollapsed.value
         }
 
+        const toast = useToast()
+
         // select representation
         const reprList = computed(() => getRepresentationNames())
-        const representationSelected = ref(reprList.value.filter(item => item.id === currReprVal.value)[0])
-        const watchedRepresentationSelected = computed(() => reprList.value.filter(item => item.id === currReprVal.value)[0])
-        const onChangeRepresentation = (e) => {
+        //const representationSelected = ref(reprList.value.filter(item => item.id === currReprVal.value)[0])
+        const representationSelected = computed({
+            get: () => reprList.value.filter(item => item.id === currReprVal.value)[0],
+            set: val => {
+                setCurrentRepresentation(val.id, true)
+                .then((r) => {
+                    if(r.code != 404) console.log(r.message)
+                    else console.error(r.message)
+                })
+            }
+        })
+        // TO REMOVE???
+        //const watchedRepresentationSelected = computed(() => reprList.value.filter(item => item.id === currReprVal.value)[0])
+
+        /*const onChangeRepresentation = (e) => {
             //hasRadius.value = !(e.value.id == 'line' || e.value.id == 'surface')
-            setCurrentRepresentation(e.value.id, true)
-        }
+            //setCurrentRepresentation(e.value.id, true)
+        }*/
 
         // set visibility
         const isVisible = computed(() => currReprSettings.value.visible)
-        setVisibilityRepresentation(stage, isVisible.value, re.value, false)
+        //setVisibilityRepresentation(stage, isVisible.value, re.value, false)
         const setVisibility = () => {
             console.log(stage)
             const newVal = !isVisible.value
@@ -234,7 +247,6 @@ export default {
         }
 
         // new representation
-        // TODO: SHOW A TOAST COMPONENT WARNING THAT USER SHOULD OPEN SETTINGS
         let modelNewSel = ref('')
         let nrbDisabled = computed(() => !modelNewSel.value.length)
         const newRepresentation = () => {
@@ -246,8 +258,14 @@ export default {
                         dp.representations.push(r.representation)
                         updateProject(dp)
                         setCurrentRepresentation(r.representation.id, true)
+                            .then((r) => {
+                                if(r.code != 404) console.log(r.message)
+                                else console.error(r.message)
+                            })
                         // DRAW REPRESENTATION!!!!!!
                         addRepresentation(stage, r.representation)
+                        // TOAST
+                        toast.add({ severity:'info', summary: 'New representation', detail:'The new representation ' + r.representation.name + ' has been successfully created. Now you have to integrate components to it from the right Settings menu.', life: 10000 });
                         console.log(r.message)
                     } else {
                         console.error(r.message)
@@ -258,24 +276,27 @@ export default {
 
         // molecular representation
         const molReprType =  globals.representation
-         // DEFINE AS A COMPUTED GLOBAL CONSTANT
-        //let molRepresentation = ref({ name: 'Cartoon', id: 'cartoon' })
-        const molRepresentation = ref(molReprType.filter(item => item.id === currReprSettings.value.mol_repr)[0])
-        const watchedMolRepresentation = computed(() => molReprType.filter(item => item.id === currReprSettings.value.mol_repr)[0])
-        const onChangeMolRepresentation = (e) => {
-            // DEFINE AS A COMPUTED GLOBAL CONSTANT
-            //hasRadius.value = !(e.value.id == 'line' || e.value.id == 'surface' || e.value.id == 'cartoon' || e.value.id == 'ribbon')
+        //const molRepresentation = ref(molReprType.filter(item => item.id === currReprSettings.value.mol_repr)[0])
 
+        const changeMolRepresentation = (value) => {
             if(currReprVal.value !== defaultRepresentation) {
-                //console.log(molRepresentation.value.id)
-                updateRepresentationProperty('mol_repr', molRepresentation.value.id)
-                setMolecularRepresentation(stage, currReprSettings.value, molRepresentation.value.id, re.value, true)
+                //console.log(value.id)
+                updateRepresentationProperty('mol_repr',value.id)
+                setMolecularRepresentation(stage, currReprSettings.value, value.id, re.value, true)
                     .then((r) => {
                         if(r.code != 404) console.log(r.message)
                         else console.error(r.message)
                     })
-            }
+                }
         }
+
+        const molRepresentation = computed({
+            get: () => molReprType.filter(item => item.id === currReprSettings.value.mol_repr)[0],
+            set: val => changeMolRepresentation(val)
+        })
+
+        // TO REMOVE???
+        //const watchedMolRepresentation = computed(() => molReprType.filter(item => item.id === currReprSettings.value.mol_repr)[0])
 
         // radius
         // DEFINE AS A COMPUTED GLOBAL CONSTANT (line / surface / cartoon / ribbon)
@@ -284,61 +305,107 @@ export default {
                                             || currReprSettings.value.mol_repr == 'surface' 
                                             || currReprSettings.value.mol_repr == 'cartoon' 
                                             || currReprSettings.value.mol_repr == 'ribbon'))
-        // DEFINE AS A COMPUTED
-        let radius = ref(100)
-        const onChangeRadius = () => {
-            setRadiusRepresentation(stage, radius.value, re.value)
+        const radius = computed({
+            get: () => currReprSettings.value.radius[currReprSettings.value.mol_repr] !== undefined ? currReprSettings.value.radius[currReprSettings.value.mol_repr].value*10 : null,
+            set: val => changeRadius(val)
+        })
+        const min_radius = computed(() => radius.value ? currReprSettings.value.radius[currReprSettings.value.mol_repr].min * 10 : null)
+        const max_radius = computed(() => radius.value ? currReprSettings.value.radius[currReprSettings.value.mol_repr].max * 10 : null)
+        const changeRadius = (value) => {
+            updateRepresentationProperty(['radius', currReprSettings.value.mol_repr, 'value' ], value / 10 )
+            setRadiusRepresentation(stage, currReprSettings.value.mol_repr, value, re.value, true)
+            .then((r) => {
+                if(r.code != 404) console.log(r.message)
+                else console.error(r.message)
+            })
         }
 
         // color
         const colorScheme =  globals.colorScheme
-        const colorUniform = ref(currReprSettings.value.color_scheme === 'uniform')
-        const watchedColorUniform = computed(() => currReprSettings.value.color_scheme === 'uniform')
-        const color = ref(currReprSettings.value.color)
-        const watchedColor = computed(() => currReprSettings.value.color)
-        const mainStructureColor = ref(colorScheme.filter(item => item.id === currReprSettings.value.color_scheme)[0])
-        const watchedMainStructureColor = computed(() => colorScheme.filter(item => item.id === currReprSettings.value.color_scheme)[0])
+        //const colorUniform = ref(currReprSettings.value.color_scheme === 'uniform')
+        const colorUniform = computed(() => currReprSettings.value.color_scheme === 'uniform')
+        // TO REMOVE???
+        //const watchedColorUniform = computed(() => currReprSettings.value.color_scheme === 'uniform')
+
+        // change uniform color from picker
+        const changeColor = (value) => {
+            if(currReprVal.value !== defaultRepresentation) {
+                let col = value
+                if (!col.startsWith('#') && col.length < 7) col = '#' + value
+                updateRepresentationProperty('color', col)
+                //console.log(stage)
+                //setColorRepresentation(stage, col, re.value, true)
+                setColorRepresentation(stage, col, re.value, true)
+                .then((r) => {
+                    if(r.code != 404) console.log(r.message)
+                    else console.error(r.message)
+                })
+            }
+        }
+
+        //const color = ref(currReprSettings.value.color)
+        const color = computed({
+            get: () => currReprSettings.value.color,
+            set: val => changeColor(val)
+        })
+        // TO REMOVE???
+        //const watchedColor = computed(() => currReprSettings.value.color)
+
 
         // change color schema from dropdown
-        const onChangeColorScheme = (e) => {
+        const changeColorScheme = (value) => {
             if(currReprVal.value !== defaultRepresentation) {
-                updateRepresentationProperty('color_scheme', mainStructureColor.value.id)
-                setColorSchemeRepresentation(stage, mainStructureColor.value.id, color.value, re.value, true)
+                updateRepresentationProperty('color_scheme', value.id)
+                setColorSchemeRepresentation(stage, value.id, color.value, re.value, true)
                     .then((r) => {
+                        //console.log(stage)
                         if(r.code != 404) console.log(r.message)
                         else console.error(r.message)
                     })
             }
         }
 
-        // change uniform color from picker
-        const changeColor = () => {
-            if(currReprVal.value !== defaultRepresentation) {
-                let col = color.value
-                if (!col.startsWith('#') && col.length < 7) col = '#' + color.value
-                updateRepresentationProperty('color', col)
-                //console.log(projectData.value)
-                setColorRepresentation(stage, col, re.value, true)
-            }
-        }
+        //const mainStructureColor = ref(colorScheme.filter(item => item.id === currReprSettings.value.color_scheme)[0])
+        const mainStructureColor = computed({
+            get: () => colorScheme.filter(item => item.id === currReprSettings.value.color_scheme)[0],
+            set: val => changeColorScheme(val)
+        })
+        // TO REMOVE???
+        //const watchedMainStructureColor = computed(() => colorScheme.filter(item => item.id === currReprSettings.value.color_scheme)[0])
 
         // opacity
-        const watchedOpacity = computed(() => (currReprSettings.value.opacity * 100))
-        const opacity = ref(Math.round(currReprSettings.value.opacity * 100))
-        setOpacityRepresentation(stage, opacity.value, re.value, false)
-        const onChangeOpacity = () => {
-            updateRepresentationProperty('opacity', (opacity.value / 100))
-            setOpacityRepresentation(stage, opacity.value, re.value, true)
+
+        const changeOpacity = (value) => {
+            //console.log(value)
+            updateRepresentationProperty('opacity', (value / 100))
+            setOpacityRepresentation(stage, value, re.value, true)
+                .then((r) => {
+                    if(r.code != 404) console.log(r.message)
+                    else console.error(r.message)
+                })
         }
+
+        //const opacity = ref(Math.round(currReprSettings.value.opacity * 100))
+        const opacity = computed({
+            get: () => Math.round(currReprSettings.value.opacity * 100),
+            set: val => changeOpacity(val)
+        })
+        // TO REMOVE???
+        //const watchedOpacity = computed(() => (currReprSettings.value.opacity * 100))
+
+        //setOpacityRepresentation(stage, opacity.value, re.value, false)
+        
 
         // watchers
         // custom color watcher
         watch(color, (col, prevColor) => {
             //console.log(col, prevColor)
-            if (color.value !== 'undefined' && colorUniform.value) changeColor()
+            //if (color.value !== 'undefined' && colorUniform.value) changeColor()
+            if (color.value !== undefined && colorUniform.value) color.value = col
         })
         // generic watcher
-        watch([watchedRepresentationSelected, 
+        // to remove
+        /*watch([watchedRepresentationSelected, 
             watchedMolRepresentation,
             watchedColorUniform, 
             watchedColor, 
@@ -346,21 +413,21 @@ export default {
             watchedOpacity], (newValues, prevValues) => {
             // select representations
             const wrs = newValues[0]
-            representationSelected.value = wrs
+            //representationSelected.value = wrs
             // change molecular respresentation
             const wmr = newValues[1]
-            molRepresentation.value = wmr
+            //molRepresentation.value = wmr
             // colors
             const wclu = newValues[2]
-            colorUniform.value = wclu
+            //colorUniform.value = wclu
             const wcl = newValues[3]
-            color.value = wcl
+            //color.value = wcl
             const wmscl = newValues[4]
-            mainStructureColor.value = wmscl
+            //mainStructureColor.value = wmscl
             // opacity
             const wop = newValues[5]
-            opacity.value = Math.round(wop)
-        })
+            //opacity.value = Math.round(wop)
+        })*/
 
         // REMOVE REPRESENTATION / VISUALIZE REPRESENTATION STRUCTURE
         // *****************************************************
@@ -377,10 +444,16 @@ export default {
             deleteRepresentation(representationSelected.value.id)
                 .then((r) => {
                     if(r.code != 404) {
-                        // remove representation from  projectData
+                        // remove representation from components
                         delRepresentation(stage, representationSelected.value.id)
-                        setCurrentRepresentation(r.newCurrentRepresentation, true)
+                        // update in-memory structure
                         removeRepresentationFromStructure(representationSelected.value.id)
+                        // set current representation in memory and REST API
+                        setCurrentRepresentation(r.newCurrentRepresentation, true)
+                            .then((r) => {
+                                if(r.code != 404) console.log(r.message)
+                                else console.error(r.message)
+                            })
                         console.log(r.message)
                     } else {
                         console.error(r.message)
@@ -397,13 +470,13 @@ export default {
             ...toRefs(page), 
             defaultRepresentation,
             unfoldRepresentations,
-            reprList, representationSelected, onChangeRepresentation, 
+            reprList, representationSelected, /*onChangeRepresentation, */
             setVisibility,
             modelNewSel, nrbDisabled, newRepresentation,
-            molReprType, molRepresentation, onChangeMolRepresentation,
-            radius, hasRadius, onChangeRadius,
-            colorScheme, mainStructureColor, onChangeColorScheme, colorUniform, color,
-            opacity, onChangeOpacity,
+            molReprType, molRepresentation, /*onChangeMolRepresentation,*/
+            radius, min_radius, max_radius, hasRadius, /*onChangeRadius,*/
+            colorScheme, mainStructureColor, /*onChangeColorScheme,*/ colorUniform, color,
+            opacity, /*onChangeOpacity,*/
             removeRepresentation, visualizeStructure,
         }
     }
@@ -480,5 +553,15 @@ export default {
         border:none;
     }
     #minisettings .repr-button:hover { background: #546974;}
+
+    .p-toast-top-right { left:calc(2% + 38px);  top:1.5%;}
+    .p-toast .p-toast-message.p-toast-message-info { 
+        background: #d7e6ec!important; 
+        border: solid #5e738b!important; 
+        border-width: 0 0 0 6px!important;
+        color: #48596d!important; 
+    }
+    .p-toast .p-toast-message.p-toast-message-info .p-toast-message-icon, 
+    .p-toast .p-toast-message.p-toast-message-info .p-toast-icon-close { color: #48596d!important; }
 
 </style>

@@ -76,6 +76,11 @@ export default function mouseObserver() {
             myTimeOut = setTimeout(() => autoSaveOrientation(stage.viewerControls.getOrientation().elements), timeOut)
         })
 
+        stage.mouseObserver.signals.doubleClicked.add(function (scroll) {
+            clearTimeout(myTimeOut)
+            myTimeOut = setTimeout(() => autoSaveOrientation(stage.viewerControls.getOrientation().elements), timeOut)
+        })
+
         /*stage.signals.hovered.add( function(pickingProxy){ 
             if (pickingProxy && pickingProxy.atom) {
                 if(typeof repr_res !== 'undefined') component.removeRepresentation(repr_res);

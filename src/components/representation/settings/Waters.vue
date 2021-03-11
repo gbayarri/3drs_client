@@ -106,6 +106,7 @@ export default {
         // TODO!!!! ADD TO NAVIGATION
         // FUNCTION onClick OR SIMILAR
 
+        // TODO: REPLACE BY COMPUTED GETTER / SETTER
         watch([watchedChains], (newValues, prevValues) => {
             const wch = newValues[0]
             modelWater  =  computed(() => getModelContent(wch, 'waters'))

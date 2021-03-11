@@ -19,33 +19,7 @@ export default function useComponents() {
     const def_repr = computed(() => projectData.value.defaultRepresentation) 
     const representations = computed(() => dataProject.value.representations) 
 
-    /*const addRepresentationToComponent = (representation, component, name_new, selection) => {
-
-        const color_scheme = computed(() => representation.color_scheme === 'uniform' ? representation.color : representation.color_scheme)
-
-        switch (representation.mol_repr) {
-            // in case of cartoon, add base (just in case is nucleic)
-            case 'cartoon':
-                ///********************************************************************* 
-                ///********************************************************************* 
-                ///********************************************************************* 
-                //component.addRepresentation( 'cartoon', { name: name_new + '-cartoon', sele: selection, color: color_scheme.value } )
-                //component.addRepresentation( 'base', { name: name_new + '-base', sele: selection, color: color_scheme.value } )
-                ///********************************************************************* 
-                ///********************************************************************* 
-                ///********************************************************************* 
-                component.addRepresentation( 'cartoon', { name: name_new + '-cartoon', sele: '*', color: color_scheme.value } )
-                component.addRepresentation( 'base', { name: name_new + '-base', sele: '*', color: color_scheme.value } )
-              break
-            default:
-              
-              break
-        }
-
-    }*/
-
     const loadFileToStage = (stage, url, name, id) => {
-        // NAME GIVES PROBLEMS IN LEGEND
         return stage.loadFile(url, { defaultRepresentation: false, ext: 'pdb', name:id })
             .then(function (component) {
 
@@ -68,24 +42,21 @@ export default function useComponents() {
             }
             updateStructure(structure, id)
 
-            // add representations
-            // CHECK THAT!!! ALL THE REPRESENTATIONS SHOULD BE SHOWN!!!!!
-            if(def_repr.value/* === curr_repr.value*/) {
+            // add default representation
+            if(def_repr.value) {
                 // default representation
-                component.addRepresentation( "cartoon", { name: def_repr.value + "-" + id + "-struc", sele: "*", color: "sstruc"} )
-                /*if(structure.type === 'nucleic') */component.addRepresentation( "base", { name: def_repr.value + "-" + id + "-base", sele: "*", color: "resname" } )
-                component.addRepresentation( "ball+stick", { name: def_repr.value + "-" + id + "-ligand", sele: "hetero and not(water or ion)",  radius: .4, aspectRatio: 1.5 } )
-                component.addRepresentation( "ball+stick", { name: def_repr.value + "-" + id + "-water", sele: "water",  radius: .4, aspectRatio: 1.5 } )
-                component.addRepresentation( "ball+stick", { name: def_repr.value + "-" + id + "-ion", sele: "ion",  radius: .4, aspectRatio: 1.5 } )
+                component.addRepresentation( "cartoon", { name: def_repr.value + "-" + id + "-struc", sele: "*", color: "sstruc", side: 'front'} )
+                component.addRepresentation( "base", { name: def_repr.value + "-" + id + "-based", sele: "*", color: "resname", side: 'front'} )
+                component.addRepresentation( "ball+stick", { name: def_repr.value + "-" + id + "-ligand", sele: "hetero and not(water or ion)",  radius: .3 } )
+                component.addRepresentation( "ball+stick", { name: def_repr.value + "-" + id + "-water", sele: "water",  radius: .3 } )
+                component.addRepresentation( "ball+stick", { name: def_repr.value + "-" + id + "-ion", sele: "ion",  radius: .3 } )
                 // set initial values for default representation
-                const re = new RegExp('(' + def_repr.value + '\-[0-9a-z]*\-[a-z]*)', 'g')
+                const re = new RegExp('(' + def_repr.value + '\-' + id + '\-[a-z]*)', 'g')
                 const visible = representations.value.filter(item => item.id === def_repr.value)[0].visible
-                setVisibilityRepresentation(stage, visible, re.value, false)
+                setVisibilityRepresentation(stage, visible, re, false)
                 const opacity = representations.value.filter(item => item.id === def_repr.value)[0].opacity * 100
-                setOpacityRepresentation(stage, opacity, re.value, false)
-            } /*else {
-                
-            }*/
+                setOpacityRepresentation(stage, opacity, re, false)
+            } 
 
             // only for user representations (not default)
             if(representations.value.length > 1) {
@@ -97,46 +68,15 @@ export default function useComponents() {
                         // get selection for this structure
                         const selection = representation.structures.filter(item => item.id === id)[0].selection
                         // add new representation to component
-                        addRepresentationToComponent(representation, component, name_new, selection)
-
-                          
-                        
-
-                        // make a switch with all the possible molecular representations
-                        //component.addRepresentation( representation.mol_repr, { name: name_new, sele: selection, color: representation.color_scheme} )
-
-                        // TODO: set initial values for other representations: opacity, radius, color...    
+                        const generatedRepresentations = addRepresentationToComponent(representation, component, name_new, selection)
                     }
-
-                    
-
                 }
-
             }
-            
             return component
-  
         })
     }
 
     const addRepresentation = (stage, representation) => {
-
-        /*'id' => $repr, 
-			'name' => $data['name'],
-			'visible' => true,prjID
-			'opacity' => 1,
-			'navigation' => [],
-			'structures' => $structures,
-			'mol_repr' => 'cartoon',
-            'radius' => 5,
-            'color_scheme' => 'sstruc',
-			'color' => '#f1f1f1'*/
-        
-        // PUT CONDITIONALS FOR COLOR, RADIUS...    
-
-        //stage.eachComponent()
-
-        console.log(representation)
 
         stage.eachComponent( function( component ){
             //console.log(component.parameters.name)
@@ -144,13 +84,11 @@ export default function useComponents() {
             const name_new = representation.id + "-" + component.parameters.name
             // get selection for this structure
             const selection = representation.structures.filter(item => item.id === component.parameters.name)[0].selection
-
-            addRepresentationToComponent(representation, component, name_new, selection)
-
-            //component.addRepresentation( representation.mol_repr, { name: representation.id + "-" + component.parameters.name + "-all", sele: representation.selection, color: representation.color_scheme} )
+            // add representation
+            const generatedRepresentations = addRepresentationToComponent(representation, component, name_new, selection)
         } )
 
-        console.log(stage)
+        //console.log(stage)
 
     }
 
@@ -176,7 +114,7 @@ export default function useComponents() {
             //component.addRepresentation( representation.mol_repr, { name: representation.id + "-" + component.parameters.name + "-all", sele: "not(*)", color: representation.color_scheme} )
         } )
 
-        console.log(stage)
+        //console.log(stage)
 
     }
 

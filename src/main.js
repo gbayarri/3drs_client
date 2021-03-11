@@ -23,8 +23,8 @@ import Chip from 'primevue/chip'
 import Listbox from 'primevue/listbox'
 import InputText from 'primevue/inputtext'
 import Message from 'primevue/message'
-//import Toast from 'primevue/toast'
-//import ToastService from 'primevue/toastservice'
+import Toast from 'primevue/toast'
+import ToastService from 'primevue/toastservice'
 
 // generic components
 import Header from '@/components/global/Header'
@@ -52,7 +52,7 @@ const app = createApp(App)
 app.use(router)
 app.use(VueAxios, axios)
 app.use(PrimeVue, {ripple: true})
-//app.use(ToastService)
+app.use(ToastService)
 
 // create global components
 app.component('TabMenu', TabMenu)
@@ -77,6 +77,7 @@ app.component('Chip', Chip)
 app.component('Listbox', Listbox)
 app.component('InputText', InputText)
 app.component('Message', Message)
+app.component('Toast', Toast)
 
 // create directives
 app.directive('tooltip', Tooltip)

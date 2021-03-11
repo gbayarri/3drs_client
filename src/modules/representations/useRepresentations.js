@@ -33,25 +33,25 @@ export default function useRepresentations() {
         return names
     }
 
-    const setCurrentRepresentation = (value, update) => {
+    const setCurrentRepresentation = async (value, update) => {
         currentRepresentation.value = value
         //console.log(currentRepresentation.value)
         if(update) {
-            updateProjectData(prjID, { currentRepresentation: currentRepresentation.value })
-                .then((r) => {
-                    if(r.code != 404) console.log(r.message)
-                    else console.error(r.message)
-                })
+            return await updateProjectData(prjID, { currentRepresentation: currentRepresentation.value })
         }
     }
 
     const getCurrentRepresentationSettings = () => {
+        //console.log(currentRepresentation.value, dataProject.value.representations)
         return dataProject.value.representations.filter(item => item.id === currentRepresentation.value)[0]
     }
 
     const updateRepresentationProperty = (property, value) => {
         //const settings = dataProject.value.representations.filter(item => item.id === currentRepresentation.value)[0]
-        dataProject.value.representations.filter(item => item.id === currentRepresentation.value)[0][property] = value
+        if(typeof property === 'object' && property.length === 3)
+            dataProject.value.representations.filter(item => item.id === currentRepresentation.value)[0][property[0]][property[1]][property[2]] = value
+        else
+            dataProject.value.representations.filter(item => item.id === currentRepresentation.value)[0][property] = value
     }
 
     const removeRepresentationFromStructure = (value) => {
@@ -66,22 +66,16 @@ export default function useRepresentations() {
     const setVisibilityRepresentation = async (stage, status, re, update) => {
         //console.log(re)
         for(const item of stage.getRepresentationsByName(re).list){
-            //console.log(item)
+            //console.log(item.parameters.name)
             item.setVisibility( status )
 
             // EXAMPLES FOR OTHER SECTIONS!!!
             //item.setParameters( { color: 'chainindex'} )
             //item.setColor( '#f00' )
             //item.dispose()
-
-            // TRICKY WAY TO CHANGE RESPRESENTATION TYPE????
-            //item.parent.addRepresentation("ball+stick", { name: "ligand_1", sele: "*",  radius: .4, aspectRatio: 1.5 } )
-            //item.parent.removeRepresentation(item)
-            //item.setRepresentation( 'cartoon' )
             
             //OJU QUE AIXÒ NOMÉS SELECCIONA CADENA B
             //item.setSelection( ':B' )
-            //item.setParameters( { opacity: 0.5} )
         }
         //console.log(status)
         if(update) {
@@ -95,50 +89,37 @@ export default function useRepresentations() {
 
     const setMolecularRepresentation = async (stage, representation, mol_repr, re, update) => {
         //return await createRepresentation(prjID, { name: value })
-
-        //console.log(representation)
-
         for(const item of stage.getRepresentationsByName(re).list){
-
-            //const name_new = representation.id + "-" + component.parameters.name
-
-            /*console.log(item.parameters.name.split('-')) // explode that to get repre.id and file.id
-            console.log(item.parameters.sele) 
-            console.log(item.parameters.color) 
-            console.log(item.parent)*/
-
-            const name_new = representation.id + "-" + item.parameters.name.split('-')[1]
+            // only create one when coming from cartoon + base
+            if(item.repr.type !== 'base') {
+                // create new
+                const name_new = representation.id + "-" + item.parameters.name.split('-')[1]
+                const generatedRepresentations = addRepresentationToComponent(representation, item.parent, name_new, item.parameters.sele)
+            }
             // remove current representation
-            addRepresentationToComponent(representation, item.parent, name_new, item.parameters.sele)
-            // create new
             item.parent.removeRepresentation(item)
-
-            //console.log(item)
-            // update addRepresentationToComponent with the rest of options
-            // new function addRepresentationToComponent here? :____(    )
-            //item.parent.addRepresentation("ball+stick", { name: "ligand_1", sele: "*",  radius: .4, aspectRatio: 1.5 } )
-            // ok
-            //item.parent.removeRepresentation(item)
         }
+        //console.log(stage)
         if(update) {
             return await updateRepresentationData(prjID, currentRepresentation.value, { mol_repr: mol_repr })
         }
     }
 
-    // TODO
     let myTimeOutRadius = null
-    const setRadiusRepresentation = function (stage, radius, re) {
+    const setRadiusRepresentation = async (stage, mol_repr, radius, re, update) => {
         for(const item of stage.getRepresentationsByName(re).list) {
-            item.setParameters( { radius: (radius / 100) } )
+            item.setParameters( { radius: radius / 10 } )
         }
-        clearTimeout(myTimeOutRadius)
-        myTimeOutRadius = setTimeout(() => {
-            updateRepresentationData(prjID, currentRepresentation.value, { radius: (radius / 100) })
-                .then((r) => {
-                    if(r.code != 404) console.log(r.message)
-                    else console.error(r.message)
-                })
-        }, longTimeOut)
+        if(update) {
+            return await new Promise((resolve) => {
+                clearTimeout(myTimeOutRadius)
+                myTimeOutRadius = setTimeout(() => {
+                    const path = 'radius.' + mol_repr + '.value'
+                    const response = updateRepresentationData(prjID, currentRepresentation.value, { [path]: (radius / 10) })
+                    resolve(response)
+                }, shortTimeOut)
+            })
+        }
     }
 
     const setColorSchemeRepresentation = async (stage, color_scheme, color, re, update) => {
@@ -153,61 +134,35 @@ export default function useRepresentations() {
     }
 
     let myTimeOutColor = null
-    const setColorRepresentation = function (stage, color, re, update) {
+    const setColorRepresentation = async (stage, color, re, update) => {
         for(const item of stage.getRepresentationsByName(re).list) {
             item.setColor( color )
         }
         if(update) {
-            clearTimeout(myTimeOutColor)
-            myTimeOutColor = setTimeout(() => {
-                updateRepresentationData(prjID, currentRepresentation.value, { color: color })
-                    .then((r) => {
-                        if(r.code != 404) console.log(r.message)
-                        else console.error(r.message)
-                    })
-            }, shortTimeOut)
+            return await new Promise((resolve) => {
+                clearTimeout(myTimeOutColor)
+                myTimeOutColor = setTimeout(() => {
+                    const response = updateRepresentationData(prjID, currentRepresentation.value, { color: color })
+                    resolve(response)
+                }, shortTimeOut)
+            })
         }
     }
-
-    // TODO
-    /*const later = (delay, value) => {
-        let timer = 0;
-        let reject = null;
-        const promise = new Promise((resolve, _reject) => {
-            reject = _reject;
-            timer = setTimeout(resolve, delay, value);
-        });
-        return {
-            get promise() { return promise; },
-            cancel() {
-                if (timer) {
-                    clearTimeout(timer);
-                    timer = 0;
-                    reject();
-                    reject = null;
-                }
-            }
-        };
-    };
-    const l1 = later(2000, "l1");
-        l1.promise
-          .then(msg => { console.log(msg); })
-          .catch(() => { console.log("l1 cancelled"); });*/
     
     let myTimeOutOpacity = null
     const setOpacityRepresentation = async (stage, opacity, re, update) => {
         for(const item of stage.getRepresentationsByName(re).list) {
+            //console.log(opacity/100)
             item.setParameters( { opacity: (opacity / 100) } )
         }
         if(update) {
-            clearTimeout(myTimeOutOpacity)
-            myTimeOutOpacity = setTimeout(() => {
-                updateRepresentationData(prjID, currentRepresentation.value, { opacity: (opacity / 100) })
-                .then((r) => {
-                    if(r.code != 404) console.log(r.message)
-                    else console.error(r.message)
-                })
-            }, shortTimeOut)
+            return await new Promise((resolve) => {
+                clearTimeout(myTimeOutOpacity)
+                myTimeOutOpacity = setTimeout(() => {
+                    const response = updateRepresentationData(prjID, currentRepresentation.value, { opacity: (opacity / 100) })
+                    resolve(response)
+                }, shortTimeOut)
+            })
         }
     }
 
@@ -231,7 +186,7 @@ export default function useRepresentations() {
         setRadiusRepresentation,
         setColorSchemeRepresentation,
         setColorRepresentation,
-        deleteRepresentation
+        deleteRepresentation,
     }
 
 }

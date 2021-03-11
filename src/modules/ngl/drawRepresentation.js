@@ -4,107 +4,154 @@ export default function drawRepresentation() {
 
     const addRepresentationToComponent = (representation, component, name_new, selection) => {
 
-        const color_scheme = computed(() => representation.color_scheme === 'uniform' ? representation.color : representation.color_scheme)
+        const color_scheme = computed(() => representation.color_scheme !== 'uniform' ? representation.color_scheme : representation.color)
+        //const color = computed(() => representation.color)
+
+        let c1, c2
+        const generatedRepresentations = []
+
+        // OPACITY ISSUE:
+        // https://github.com/nglviewer/ngl/issues/552
+        // TRY TO ADD A DEPTHWRITE SELECTOR????
 
         switch (representation.mol_repr) {
             // in case of cartoon, add base (just in case is nucleic)
             case 'cartoon':
-                ///********************************************************************* 
-                ///********************************************************************* 
-                ///********************************************************************* 
-                //component.addRepresentation( 'cartoon', { name: name_new + '-cartoon', sele: selection, color: color_scheme.value } )
-                //component.addRepresentation( 'base', { name: name_new + '-base', sele: selection, color: color_scheme.value } )
-                ///********************************************************************* 
-                ///********************************************************************* 
-                ///********************************************************************* 
-                component.addRepresentation( 'cartoon', { name: name_new + '-cartoon', sele: '*', color: color_scheme.value } )
-                component.addRepresentation( 'base', { name: name_new + '-base', sele: '*', color: color_scheme.value } )
+                c1 = component.addRepresentation( 'cartoon', { 
+                  name: name_new + '-cartoon', 
+                  ///********************************************************************* 
+                  // sele: selection, 
+                  ///********************************************************************* 
+                  sele: '*', 
+                  colorScheme: color_scheme.value,
+                  //color: color.value,
+                  visible: representation.visible, 
+                  opacity: representation.opacity,
+                  side: 'front'
+                } )
+                c2 = component.addRepresentation( 'base', { 
+                  name: name_new + '-base', 
+                  ///********************************************************************* 
+                  // sele: selection, 
+                  ///********************************************************************* 
+                  sele: '*', 
+                  colorScheme: color_scheme.value,
+                  //color: color.value,
+                  visible: representation.visible, 
+                  opacity: representation.opacity,
+                  side: 'front'
+                } )
+                generatedRepresentations.push(c1, c2)
               break
-            // CHECK RADIUS FOR ALL THE POSSIBLE REPRESENTATIONS AND TAKE AN INITIAL VALUE AND A PROPER RANGE
-            // TODO IN API:
-            /* 
-              radius: {
-                licorice: {
-                  value:
-                  min:
-                  max:
-                }, backbone, ball+stick, spacefill
-              }
-            */
             case 'licorice':
-                ///********************************************************************* 
-                ///********************************************************************* 
-                ///********************************************************************* 
-                //component.addRepresentation( 'licorice', { name: name_new + '-licorice', sele: selection, color: color_scheme.value, radius: representation.radius } )
-                ///********************************************************************* 
-                ///********************************************************************* 
-                ///********************************************************************* 
-                component.addRepresentation( 'licorice', { name: name_new + '-licorice', sele: '*', color: color_scheme.value, aspectRatio: 1 } )
-              break
-            case 'backbone':
-                ///********************************************************************* 
-                ///********************************************************************* 
-                ///********************************************************************* 
-                //component.addRepresentation( 'backbone', { name: name_new + '-backbone', sele: selection, color: color_scheme.value, radius: representation.radius } )
-                ///********************************************************************* 
-                ///********************************************************************* 
-                ///********************************************************************* 
-                component.addRepresentation( 'backbone', { name: name_new + '-backbone', sele: '*', color: color_scheme.value, aspectRatio: 1 } )
+                c1 = component.addRepresentation( 'licorice', { 
+                  name: name_new + '-licorice', 
+                  ///********************************************************************* 
+                  // sele: selection, 
+                  ///********************************************************************* 
+                  sele: '*', 
+                  //color: color.value,
+                  colorScheme: color_scheme.value, 
+                  radius: representation.radius.licorice.value,
+                  visible: representation.visible, 
+                  opacity: representation.opacity,
+                  //side: 'front'
+                  //depthWrite: false
+                } )
+                generatedRepresentations.push(c1)
               break
             case 'ball+stick':
-                ///********************************************************************* 
-                ///********************************************************************* 
-                ///********************************************************************* 
-                //component.addRepresentation( 'ball+stick', { name: name_new + '-ball+stick', sele: selection, color: color_scheme.value, radius: representation.radius } )
-                ///********************************************************************* 
-                ///********************************************************************* 
-                ///********************************************************************* 
-                component.addRepresentation( 'ball+stick', { name: name_new + '-ball+stick', sele: '*', color: color_scheme.value, radius: .4, aspectRatio: 1.6 } )
+                c1 = component.addRepresentation( 'ball+stick', { 
+                  name: name_new + '-ball+stick', 
+                  ///********************************************************************* 
+                  // sele: selection, 
+                  ///********************************************************************* 
+                  sele: '*', 
+                  colorScheme: color_scheme.value, 
+                  radius: representation.radius['ball+stick'].value, 
+                  visible: representation.visible, 
+                  opacity: representation.opacity,
+                  //side: 'front'
+                  //depthWrite: false
+                } )
+                generatedRepresentations.push(c1)
+                //console.log(name_new + '-ball+stick')
+              break
+            case 'backbone':
+                c1 = component.addRepresentation( 'backbone', { 
+                  name: name_new + '-backbone', 
+                  ///********************************************************************* 
+                  // sele: selection, 
+                  ///********************************************************************* 
+                  sele: '*', 
+                  colorScheme: color_scheme.value, 
+                  radius: representation.radius.backbone.value,
+                  visible: representation.visible, 
+                  opacity: representation.opacity
+                } )
+                generatedRepresentations.push(c1)
               break
             case 'line':
-                ///********************************************************************* 
-                ///********************************************************************* 
-                ///********************************************************************* 
-                //component.addRepresentation( 'line', { name: name_new + '-line', sele: selection, color: color_scheme.value } )
-                ///********************************************************************* 
-                ///********************************************************************* 
-                ///********************************************************************* 
-                component.addRepresentation( 'line', { name: name_new + '-line', sele: '*', color: color_scheme.value } )
+                c1 = component.addRepresentation( 'line', { 
+                  name: name_new + '-line', 
+                  ///********************************************************************* 
+                  // sele: selection, 
+                  ///********************************************************************* 
+                  sele: '*', 
+                  colorScheme: color_scheme.value,
+                  visible: representation.visible, 
+                  opacity: representation.opacity                
+                } )
+                generatedRepresentations.push(c1)
               break
             case 'spacefill':
-                ///********************************************************************* 
-                ///********************************************************************* 
-                ///********************************************************************* 
-                //component.addRepresentation( 'spacefill', { name: name_new + '-spacefill', sele: selection, color: color_scheme.value, radius: 2 } )
-                ///********************************************************************* 
-                ///********************************************************************* 
-                ///********************************************************************* 
-                component.addRepresentation( 'spacefill', { name: name_new + '-spacefill', sele: '*', color: color_scheme.value, radius: 1.5 } )
+                c1 = component.addRepresentation( 'spacefill', { 
+                  name: name_new + '-spacefill', 
+                  ///********************************************************************* 
+                  // sele: selection, 
+                  ///********************************************************************* 
+                  sele: '*', 
+                  colorScheme: color_scheme.value, 
+                  radius: representation.radius.spacefill.value,
+                  visible: representation.visible, 
+                  opacity: representation.opacity                
+                } )
+                generatedRepresentations.push(c1)
               break
             case 'surface':
-                ///********************************************************************* 
-                ///********************************************************************* 
-                ///********************************************************************* 
-                //component.addRepresentation( 'surface', { name: name_new + '-surface', sele: selection, color: color_scheme.value, surfaceType: 'av' } )
-                ///********************************************************************* 
-                ///********************************************************************* 
-                ///********************************************************************* 
-                component.addRepresentation( 'surface', { name: name_new + '-surface', sele: '*', color: color_scheme.value, surfaceType: 'av'/*, contour: true,*/ } )
+                c1 = component.addRepresentation( 'surface', { 
+                  name: name_new + '-surface', 
+                  ///********************************************************************* 
+                  // sele: selection, 
+                  ///********************************************************************* 
+                  sele: '*', 
+                  colorScheme: color_scheme.value, 
+                  surfaceType: 'av',
+                  /*contour: true,*/ 
+                  visible: representation.visible, 
+                  opacity: representation.opacity
+                } )
+                generatedRepresentations.push(c1)
               break
             case 'ribbon':
-                ///********************************************************************* 
-                ///********************************************************************* 
-                ///********************************************************************* 
-                //component.addRepresentation( 'ribbon', { name: name_new + '-ribbon', sele: selection, color: color_scheme.value, } )
-                ///********************************************************************* 
-                ///********************************************************************* 
-                ///********************************************************************* 
-                component.addRepresentation( 'ribbon', { name: name_new + '-ribbon', sele: '*', color: color_scheme.value } )
+                c1 = component.addRepresentation( 'ribbon', { 
+                  name: name_new + '-ribbon', 
+                  ///********************************************************************* 
+                  // sele: selection, 
+                  ///********************************************************************* 
+                  sele: '*', 
+                  colorScheme: color_scheme.value,
+                  visible: representation.visible, 
+                  opacity: representation.opacity
+                } )
+                generatedRepresentations.push(c1)
               break
             default:
               
               break
         }
+
+      return generatedRepresentations
 
     }
   

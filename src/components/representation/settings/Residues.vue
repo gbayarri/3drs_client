@@ -124,6 +124,7 @@ export default {
             allVisible.value = !allVisible.value
         }*/
 
+        // TODO: REPLACE BY COMPUTED GETTER / SETTER
         // modifying isCollapsed & selectedChains v-model properties without computed()
         watch([watchedChains], (newValues, prevValues) => {
             const wch = newValues[0]
