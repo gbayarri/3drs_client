@@ -159,6 +159,7 @@ import { useToast } from 'primevue/usetoast'
 import globals from '@/globals'
 import useStage from '@/modules/ngl/useStage'
 import useComponents from '@/modules/ngl/useComponents'
+import useFlags from '@/modules/common/useFlags'
 import useRepresentations from '@/modules/representations/useRepresentations'
 import structureStorage from '@/modules/structure/structureStorage'
 export default {
@@ -167,6 +168,7 @@ export default {
         const { stage } = useStage()
         const { addRepresentation, delRepresentation } = useComponents()
         const { projectData, updateProject } = structureStorage()
+        const { setFlagStatus } = useFlags()
         const { 
             defaultRepresentation, 
             currentRepresentation, 
@@ -217,6 +219,8 @@ export default {
         const representationSelected = computed({
             get: () => reprList.value.filter(item => item.id === currReprVal.value)[0],
             set: val => {
+                // if Default, close settings menu
+                if(val.id === defaultRepresentation) setFlagStatus('sidebarEnabled', false)
                 setCurrentRepresentation(val.id, true)
                 .then((r) => {
                     if(r.code != 404) console.log(r.message)

@@ -37,6 +37,7 @@
                 :sheets="modelSheets" 
                 :helixes="modelHelixes" 
                 :window="false"
+                :stage="stage"
                 />
             </div>
         </div>
@@ -51,9 +52,11 @@ import useZoomWindow from '@/modules/representations/useZoomWindow'
 import structureSettings from '@/modules/structure/structureSettings'
 import Residue from '@/components/representation/settings/addons/Residue'
 export default {
+    props: ['stage'],
     components: { Residue },
-    setup() {
+    setup(props) {
 
+        const stage = props.stage
         const { flags, setFlagStatus } = useFlags()
         const { windowType, allSelected, setWindowType } = useZoomWindow()
         const { getCurrentChains, getChainContent } = structureSettings()
@@ -138,7 +141,7 @@ export default {
         })
 
         return { 
-            ...toRefs(page), isCollapsed,
+            ...toRefs(page), isCollapsed, stage,
             modelResidues, modelSheets, modelHelixes,
             openOut, externalWindow,
             allSelected, selectAll, checkAllSelected

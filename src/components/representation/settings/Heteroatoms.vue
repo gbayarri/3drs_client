@@ -25,8 +25,22 @@
         style="width:100%"
         @change="onChange">
             <template #option="slotProps">
-                <div>{{slotProps.option.name}}</div>
-                <!--<i class="fab fas fa-eye"></i>-->
+                <!-- TODO: FIX STYLES FOR MOUSE / LEAVE ACTIONS (IN IONS AS WELL) -->
+                <div style="width:100%;padding:.5rem 1rem"
+                    @mouseover="onHover(slotProps.option.id)"
+                    @mouseleave="onLeave(slotProps.option.id)" >
+                    <!-- TODO: MOVE TO STYLES (SETTINGS.VUE) -->
+                    <div style="position:absolute;right:.5rem;z-index:100">
+                        <Button 
+                        icon="fas fa-bullseye" 
+                        class="p-button-rounded p-button-text" 
+                        v-tooltip.top="'asdasdasdasdasdasd'"
+                        @click="centerHetero(slotProps.option.id)"  />
+                    </div>
+                    <div>{{slotProps.option.name}}</div>
+                <!--TODO: CENTER BUTTON ON EACH HETERO 
+                <i class="fab fas fa-eye"></i>-->
+                </div>
             </template>
         </Listbox>
 
@@ -69,7 +83,7 @@ export default {
                 for(const het of chain.heteroatoms) {
                     hets.push({
                         name: chain.id.toUpperCase() + ': ' + het.name + ' ' + het.num,
-                        id: chain.id.toUpperCase() + ':' + het.num
+                        id: het.num + ':' + chain.id.toUpperCase() + '/' + het.model
                     })
                 }
             }
@@ -96,6 +110,21 @@ export default {
             if(shts && (shts.length === modelHeteroatoms.value.length)) allSelected.value = true
         })
 
+        const centerHetero = (v) => {
+            // TODO: SYNC WITH STAGE (IONS AS WELL!!!)
+            console.log(v)
+        }
+
+        const onHover = (v) => {
+            // TODO: SYNC WITH STAGE (IONS AS WELL!!!)
+            console.log(v)
+        }
+
+        const onLeave = (v) => {
+            // TODO: SYNC WITH STAGE (IONS AS WELL!!!)
+            console.log(v)
+        }
+
         const onChange = (e) => {
             //console.log(e.value)
             // TODO!!!! ADD TO NAVIGATION
@@ -105,7 +134,7 @@ export default {
         return { 
             ...toRefs(page), isCollapsed, 
             modelHeteroatoms,
-            selectedHets, onChange,
+            selectedHets, centerHetero, onChange, onHover, onLeave,
             allSelected, selectAll
         }
     }

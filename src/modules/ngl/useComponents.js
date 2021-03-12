@@ -15,7 +15,7 @@ export default function useComponents() {
     const { addRepresentationToComponent } = drawRepresentation()
 
     const dataProject = computed(() => projectData.value)
-    const curr_repr = computed(() => projectData.value.currentRepresentation) 
+    //const curr_repr = computed(() => projectData.value.currentRepresentation) 
     const def_repr = computed(() => projectData.value.defaultRepresentation) 
     const representations = computed(() => dataProject.value.representations) 
 
@@ -45,11 +45,11 @@ export default function useComponents() {
             // add default representation
             if(def_repr.value) {
                 // default representation
-                component.addRepresentation( "cartoon", { name: def_repr.value + "-" + id + "-struc", sele: "*", color: "sstruc", side: 'front'} )
-                component.addRepresentation( "base", { name: def_repr.value + "-" + id + "-based", sele: "*", color: "resname", side: 'front'} )
-                component.addRepresentation( "ball+stick", { name: def_repr.value + "-" + id + "-ligand", sele: "hetero and not(water or ion)",  radius: .3 } )
-                component.addRepresentation( "ball+stick", { name: def_repr.value + "-" + id + "-water", sele: "water",  radius: .3 } )
-                component.addRepresentation( "ball+stick", { name: def_repr.value + "-" + id + "-ion", sele: "ion",  radius: .3 } )
+                component.addRepresentation( "cartoon", { name: def_repr.value + "-" + id + "-struc", sele: "/0", color: "sstruc", side: 'front'} )
+                component.addRepresentation( "base", { name: def_repr.value + "-" + id + "-based", sele: "/0", color: "resname", side: 'front'} )
+                component.addRepresentation( "ball+stick", { name: def_repr.value + "-" + id + "-ligand", sele: "/0 and hetero and not(water or ion)",  radius: .3 } )
+                component.addRepresentation( "ball+stick", { name: def_repr.value + "-" + id + "-water", sele: "/0 and water",  radius: .3 } )
+                component.addRepresentation( "ball+stick", { name: def_repr.value + "-" + id + "-ion", sele: "/0 and ion",  radius: .3 } )
                 // set initial values for default representation
                 const re = new RegExp('(' + def_repr.value + '\-' + id + '\-[a-z]*)', 'g')
                 const visible = representations.value.filter(item => item.id === def_repr.value)[0].visible
@@ -72,6 +72,12 @@ export default function useComponents() {
                     }
                 }
             }
+
+            // add empty annotation
+            var elm = document.createElement("div")
+            component.addAnnotation(component.structure.getAtomProxy(), elm)
+            //component.addAnnotation(component.structure.center, elm)
+
             return component
         })
     }

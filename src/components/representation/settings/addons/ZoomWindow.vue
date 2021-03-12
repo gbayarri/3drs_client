@@ -28,6 +28,7 @@
                 :sheets="modelSheets" 
                 :helixes="modelHelixes" 
                 :window="true"
+                :stage="stage"
                 />
             </div>
         </div>
@@ -41,6 +42,7 @@
                 :water="item" 
                 :index="index"
                 :window="true"
+                :stage="stage"
                 />
             </div>
         </div>
@@ -50,19 +52,22 @@
 <script>
 import { computed, watch, reactive, toRefs } from 'vue'
 import useFlags from '@/modules/common/useFlags'
+import useStage from '@/modules/ngl/useStage'
 import useZoomWindow from '@/modules/representations/useZoomWindow'
 import structureSettings from '@/modules/structure/structureSettings'
 import Residue from '@/components/representation/settings/addons/Residue'
 import Water from '@/components/representation/settings/addons/Water'
 export default {
     components: { Residue, Water},
-    setup() {
+    setup(props) {
         
+        const { getStage } = useStage()
         const { flags, setFlagStatus } = useFlags()
         const { windowType, allSelected, setWindowType, toggleAllSelected  } = useZoomWindow()
         
         const { getCurrentChains, getChainContent } = structureSettings()
 
+        const stage = getStage()
         const isActive = computed(() => flags.zoomWindowEnabled)
         const sidebarEnabled = computed(() => flags.sidebarEnabled)
 
@@ -136,7 +141,7 @@ export default {
         })
 
         return { 
-            ...toRefs(page), windowType,
+            ...toRefs(page), windowType, stage,
             isActive, sidebarEnabled,
             closeWindow,
             modelResidues, modelSheets, modelHelixes,

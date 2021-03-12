@@ -25,8 +25,11 @@
         style="width:100%"
         @change="onChange">
             <template #option="slotProps">
-                <div>{{slotProps.option.name}}</div>
-                <!--<i class="fab fas fa-eye"></i>-->
+                <div 
+                    @mouseover="onHover(slotProps.option.id)"
+                    @mouseleave="onLeave(slotProps.option.id)">{{slotProps.option.name}}</div>
+                <!--TODO: CENTER BUTTON ON EACH ION 
+                <i class="fab fas fa-eye"></i>-->
             </template>
         </Listbox>
 
@@ -81,7 +84,8 @@ export default {
                 for(const ion of chain.ions) {
                     ions.push({
                         name: chain.id.toUpperCase() + ': ' + ion.name + ' ' + ion.num,
-                        id: chain.id.toUpperCase() + ':' + ion.num
+                        //id: chain.id.toUpperCase() + ':' + ion.num
+                        id: ion.num + ':' + chain.id.toUpperCase() + '/' + ion.model
                     })
                 }
             }
@@ -109,6 +113,14 @@ export default {
             //if(sins.length < modelIons.value.length) allSelected.value = false
         })
 
+        const onHover = (v) => {
+            console.log(v)
+        }
+
+        const onLeave = (v) => {
+            console.log(v)
+        }
+
         const onChange = (e) => {
             //console.log(e.value)
             // TODO!!!! ADD TO NAVIGATION
@@ -118,7 +130,7 @@ export default {
         return { 
             ...toRefs(page), isCollapsed, 
             modelIons,
-            selectedIons, onChange,
+            selectedIons, onChange, onHover, onLeave,
             allSelected, selectAll
          }
     }

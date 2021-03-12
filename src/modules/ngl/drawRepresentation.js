@@ -20,9 +20,9 @@ export default function drawRepresentation() {
                 c1 = component.addRepresentation( 'cartoon', { 
                   name: name_new + '-cartoon', 
                   ///********************************************************************* 
-                  // sele: selection, 
+                  sele: selection, 
                   ///********************************************************************* 
-                  sele: '*', 
+                  //sele: '*', 
                   colorScheme: color_scheme.value,
                   //color: color.value,
                   visible: representation.visible, 
@@ -32,9 +32,9 @@ export default function drawRepresentation() {
                 c2 = component.addRepresentation( 'base', { 
                   name: name_new + '-base', 
                   ///********************************************************************* 
-                  // sele: selection, 
+                  sele: selection, 
                   ///********************************************************************* 
-                  sele: '*', 
+                  //sele: '*', 
                   colorScheme: color_scheme.value,
                   //color: color.value,
                   visible: representation.visible, 
@@ -47,9 +47,9 @@ export default function drawRepresentation() {
                 c1 = component.addRepresentation( 'licorice', { 
                   name: name_new + '-licorice', 
                   ///********************************************************************* 
-                  // sele: selection, 
+                  sele: selection, 
                   ///********************************************************************* 
-                  sele: '*', 
+                  //sele: '*', 
                   //color: color.value,
                   colorScheme: color_scheme.value, 
                   radius: representation.radius.licorice.value,
@@ -64,9 +64,9 @@ export default function drawRepresentation() {
                 c1 = component.addRepresentation( 'ball+stick', { 
                   name: name_new + '-ball+stick', 
                   ///********************************************************************* 
-                  // sele: selection, 
+                  sele: selection, 
                   ///********************************************************************* 
-                  sele: '*', 
+                  //sele: '*', 
                   colorScheme: color_scheme.value, 
                   radius: representation.radius['ball+stick'].value, 
                   visible: representation.visible, 
@@ -81,9 +81,9 @@ export default function drawRepresentation() {
                 c1 = component.addRepresentation( 'backbone', { 
                   name: name_new + '-backbone', 
                   ///********************************************************************* 
-                  // sele: selection, 
+                  sele: selection, 
                   ///********************************************************************* 
-                  sele: '*', 
+                  //sele: '*', 
                   colorScheme: color_scheme.value, 
                   radius: representation.radius.backbone.value,
                   visible: representation.visible, 
@@ -95,9 +95,9 @@ export default function drawRepresentation() {
                 c1 = component.addRepresentation( 'line', { 
                   name: name_new + '-line', 
                   ///********************************************************************* 
-                  // sele: selection, 
+                  sele: selection, 
                   ///********************************************************************* 
-                  sele: '*', 
+                  //sele: '*', 
                   colorScheme: color_scheme.value,
                   visible: representation.visible, 
                   opacity: representation.opacity                
@@ -108,9 +108,9 @@ export default function drawRepresentation() {
                 c1 = component.addRepresentation( 'spacefill', { 
                   name: name_new + '-spacefill', 
                   ///********************************************************************* 
-                  // sele: selection, 
+                  sele: selection, 
                   ///********************************************************************* 
-                  sele: '*', 
+                  //sele: '*', 
                   colorScheme: color_scheme.value, 
                   radius: representation.radius.spacefill.value,
                   visible: representation.visible, 
@@ -122,9 +122,9 @@ export default function drawRepresentation() {
                 c1 = component.addRepresentation( 'surface', { 
                   name: name_new + '-surface', 
                   ///********************************************************************* 
-                  // sele: selection, 
+                  sele: selection, 
                   ///********************************************************************* 
-                  sele: '*', 
+                  //sele: '*', 
                   colorScheme: color_scheme.value, 
                   surfaceType: 'av',
                   /*contour: true,*/ 
@@ -137,9 +137,9 @@ export default function drawRepresentation() {
                 c1 = component.addRepresentation( 'ribbon', { 
                   name: name_new + '-ribbon', 
                   ///********************************************************************* 
-                  // sele: selection, 
+                  sele: selection, 
                   ///********************************************************************* 
-                  sele: '*', 
+                  //sele: '*', 
                   colorScheme: color_scheme.value,
                   visible: representation.visible, 
                   opacity: representation.opacity

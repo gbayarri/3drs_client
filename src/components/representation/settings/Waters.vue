@@ -30,6 +30,7 @@
                 :water="item" 
                 :index="index"
                 :window="false"
+                :stage="stage"
                 />
             </div>
         </div>
@@ -43,9 +44,11 @@ import useZoomWindow from '@/modules/representations/useZoomWindow'
 import structureSettings from '@/modules/structure/structureSettings'
 import Water from '@/components/representation/settings/addons/Water'
 export default {
+    props: ['stage'],
     components: { Water },
-    setup() {
+    setup(props) {
 
+        const stage = props.stage
         const { flags, setFlagStatus } = useFlags()
         const { windowType, allSelected, setWindowType } = useZoomWindow()
         const { getCurrentChains, getChainContent } = structureSettings()
@@ -115,7 +118,7 @@ export default {
         })
 
         return { 
-            ...toRefs(page), isCollapsed,
+            ...toRefs(page), isCollapsed, stage,
             modelWater,
             openOut, externalWindow,
             allSelected, selectAll, checkAllSelected

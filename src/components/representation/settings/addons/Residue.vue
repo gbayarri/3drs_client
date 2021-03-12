@@ -6,6 +6,7 @@
     </span>
     
     <span v-if="residue.id" class="sequence-item" 
+    :data-model="residue.model" 
     :data-chain="residue.chain" 
     :data-resnum="residue.num" 
     :data-resname="residue.label" 
@@ -38,9 +39,12 @@
 
 <script>
 import { computed } from 'vue'
-import useZoomWindow from '@/modules/representations/useZoomWindow'
+import structureSettings from '@/modules/structure/structureSettings'
+import structureStorage from '@/modules/structure/structureStorage'
+import useAPI from '@/modules/api/useAPI'
+//import useZoomWindow from '@/modules/representations/useZoomWindow'
 export default {
-    props: ['residue', 'sheets', 'helixes', 'window', 'index'],
+    props: ['residue', 'sheets', 'helixes', 'window', 'index', 'stage'],
     setup(props) {
 
         // TODO: ADD TO NAVIGATION ALL THE SELECTEDS (FUNCTION ONCLICK()) AND COMPUTE HERE IF 
@@ -50,31 +54,53 @@ export default {
 
         //console.log('loading ' + props.residue.num )
 
+        const stage = props.stage
+
+        const { currentStructure } = structureSettings()
+        const { projectData } = structureStorage()
+        const { updateProjectData } = useAPI()
+        
+        const dataProject = computed(() => projectData.value)
+        const currStr = computed(() => currentStructure.value)
+        const component = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0])
+
         const residue =  computed(() => props.residue)
         const sheets =  computed(() => props.sheets)
         const helixes =  computed(() => props.helixes)
         const window =  computed(() => props.window)
 
         const onMouseOver = (e) => {
+            const sele = e.target.dataset.resnum + ':' + e.target.dataset.chain + '/' + e.target.dataset.model
+            const new_name = currStr.value + '-' + sele + '-hover'
+            component.value.addRepresentation( "licorice", { 
+                name: new_name,
+                sele: '(' + sele + ')', 
+                opacity:.5, 
+                radius:.5,
+                color:'#5E738B' 
+            })
             // console.log(e.type) // mouseover / mouseleave 
-            // TODO: ADD INTERACTIONS WITH STAGE
-            const residues = document.querySelectorAll('[data-chain="' + e.target.dataset.chain + '"][data-resnum="' + e.target.dataset.resnum + '"][data-resname="' + e.target.dataset.resname + '"]')
+            const residues = document.querySelectorAll('[data-model="' + e.target.dataset.model + '"][data-chain="' + e.target.dataset.chain + '"][data-resnum="' + e.target.dataset.resnum + '"][data-resname="' + e.target.dataset.resname + '"]')
             for(const res of residues) {
                 res.classList.add('sequence-item-hover')
             }
         }
 
         const onMouseLeave = (e) => {
+            const sele = e.target.dataset.resnum + ':' + e.target.dataset.chain + '/' + e.target.dataset.model
+            const re = currStr.value + '-' + sele + '-hover'
+            for(const item of stage.getRepresentationsByName(re).list) {
+                item.dispose()
+            }
             // console.log(e.type) // mouseover / mouseleave 
-            // TODO: ADD INTERACTIONS WITH STAGE
-            const residues = document.querySelectorAll('[data-chain="' + e.target.dataset.chain + '"][data-resnum="' + e.target.dataset.resnum + '"][data-resname="' + e.target.dataset.resname + '"]')
+            const residues = document.querySelectorAll('[data-model="' + e.target.dataset.model + '"][data-chain="' + e.target.dataset.chain + '"][data-resnum="' + e.target.dataset.resnum + '"][data-resname="' + e.target.dataset.resname + '"]')
             for(const res of residues) {
                 res.classList.remove('sequence-item-hover')
             }
         }
 
         const onClick = (e) => {
-            const residues = document.querySelectorAll('[data-chain="' + e.target.dataset.chain + '"][data-resnum="' + e.target.dataset.resnum + '"][data-resname="' + e.target.dataset.resname + '"]')
+            const residues = document.querySelectorAll('[data-model="' + e.target.dataset.model + '"][data-chain="' + e.target.dataset.chain + '"][data-resnum="' + e.target.dataset.resnum + '"][data-resname="' + e.target.dataset.resname + '"]')
             for(const res of residues) {
                 if(res.className.indexOf('sequence-item-selected') === -1) res.classList.add('sequence-item-selected')
                 else res.classList.remove('sequence-item-selected', 'sequence-item-hover')

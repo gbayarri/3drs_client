@@ -13,32 +13,33 @@
     :disabled="reprList.length <= 1 || currReprVal === defaultRepresentation" 
     v-tooltip.left="ttst"/>
 
+    <!-- @show="onSidebarShown"
+    @hide="onSidebarHidden"-->
     <Sidebar 
     v-model:visible="visibleRight" 
     :baseZIndex="1" 
     :dismissable="false" 
     :modal="false" 
     position="right" 
-    @show="onSidebarShown"
-    @hide="onSidebarHidden"
+   
     id="sidebar">
         <div id="sidebar-content">
             <TitleSettings title="structures" />
-            <SelectFile />
-            <MenuFile />
+            <SelectFile :stage="stage" />
+            <MenuFile :stage="stage" />
             <hr class="subsection" />
             <UploadFile />
             <hr />
             <TitleSettings :title="tit_mod_chs" />
-            <Models class="settings-panel models" />
-            <Chains class="settings-panel chains" />
+            <Models class="settings-panel models" :stage="stage" />
+            <Chains class="settings-panel chains" :stage="stage" />
             <hr class="subsection" />
             <TitleSettings :title="tit_mols" />
-            <Residues class="settings-panel residues" />
-            <Heteroatoms class="settings-panel hetero" />
-            <Ions class="settings-panel ions" />
-            <Waters class="settings-panel water" />
-            <CustomSelection class="settings-panel custom" />
+            <Residues class="settings-panel residues" :stage="stage" />
+            <Heteroatoms class="settings-panel hetero" :stage="stage" />
+            <Ions class="settings-panel ions" :stage="stage" />
+            <Waters class="settings-panel water" :stage="stage" />
+            <CustomSelection class="settings-panel custom" :stage="stage" />
             <hr class="subsection" />
             <TitleSettings :title="tit_traj" />
             <Trajectory />
@@ -49,6 +50,7 @@
 <script>
 import { ref, reactive, computed, toRefs } from 'vue'
 import useFlags from '@/modules/common/useFlags'
+import useStage from '@/modules/ngl/useStage'
 import useRepresentations from '@/modules/representations/useRepresentations'
 import TitleSettings from '@/components/representation/settings/TitleSettings'
 import SelectFile from '@/components/representation/settings/SelectFile'
@@ -65,10 +67,18 @@ import Trajectory from '@/components/representation/settings/Trajectory'
 export default {
     components: { TitleSettings, SelectFile, UploadFile, MenuFile, Models, Chains, Heteroatoms, Ions, Residues, Waters, CustomSelection, Trajectory },
     setup() {
-        const visibleRight = ref(false)
-        const { setFlagStatus } = useFlags()
+        
+        const { flags, setFlagStatus } = useFlags()
         const { currentRepresentation, defaultRepresentation, getRepresentationNames } = useRepresentations()
+        const { getStage } = useStage()
 
+        //const visibleRight = ref(false)
+        //console.log(flags.sidebarEnabled)
+        const visibleRight = computed({
+            get: () => flags.sidebarEnabled,
+            set: val => setFlagStatus('sidebarEnabled', val)
+        })
+        const stage = getStage()
         const reprList = computed(() => getRepresentationNames())
         const currReprVal = computed(() => currentRepresentation.value)
 
@@ -80,18 +90,19 @@ export default {
             ttst: "Open representation settings"
         })
 
-        const onSidebarShown = () => {
+        /*const onSidebarShown = () => {
             setFlagStatus('sidebarEnabled', true)
         }
 
         const onSidebarHidden = () => {
             setFlagStatus('sidebarEnabled', false)
-        }
+        }*/
 
         return { 
             visibleRight, 
-            onSidebarShown, 
-            onSidebarHidden, 
+            stage,
+            /*onSidebarShown, 
+            onSidebarHidden, */
             ...toRefs(page),
             reprList, currReprVal, defaultRepresentation
         }

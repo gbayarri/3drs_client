@@ -59,7 +59,8 @@ export default function processStructure() {
             arraux.push({
                 label: rp.resname.toUpperCase(),
                 num: rp.resno,
-                chain: rp.chainname
+                chain: rp.chainname,
+                model: rp.modelIndex
             })
           }
           if(!rp.isHelix() && prev) {
@@ -84,7 +85,8 @@ export default function processStructure() {
             arraux.push({
                 label: rp.resname.toUpperCase(),
                 num: rp.resno,
-                chain: rp.chainname
+                chain: rp.chainname,
+                model: rp.modelIndex
             })
           }
           if(!rp.isSheet() && prev) {
@@ -145,6 +147,7 @@ export default function processStructure() {
                 num: rp.resno,
                 label: rp.resname.toUpperCase(),
                 chain: rp.chainname,
+                model: rp.modelIndex,
                 last_sheet: false,
                 sheet: sheet,
                 helix: helix,
@@ -168,6 +171,7 @@ export default function processStructure() {
                 num: rp.resno,
                 name: rp.resname.toUpperCase(),
                 chain: rp.chainname,
+                model: rp.modelIndex,
                 description: rp.entity.description
             }
             heteros.push(res)
@@ -185,7 +189,8 @@ export default function processStructure() {
             let res = {
                 num: rp.resno,
                 name: rp.resname.toUpperCase(),
-                chain: rp.chainname
+                chain: rp.chainname,
+                model: rp.modelIndex
             }
             ions.push(res)
         })
@@ -215,7 +220,8 @@ export default function processStructure() {
             let res = {
                 num: rp.resno,
                 name: rp.resname.toUpperCase(),
-                chain: rp.chainname
+                chain: rp.chainname,
+                model: rp.modelIndex
             }
             waters.push(res)
             prev_wat = rp.resno
