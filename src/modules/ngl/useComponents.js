@@ -73,11 +73,6 @@ export default function useComponents() {
                 }
             }
 
-            // add empty annotation
-            var elm = document.createElement("div")
-            component.addAnnotation(component.structure.getAtomProxy(), elm)
-            //component.addAnnotation(component.structure.center, elm)
-
             return component
         })
     }

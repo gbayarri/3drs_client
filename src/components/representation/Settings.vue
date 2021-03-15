@@ -205,6 +205,8 @@ export default {
 
     /* dowpdown */ 
     .settings-panel .p-dropdown { width:100%; margin:0; }
+    #sidebar .p-dropdown ul.p-dropdown-items li.p-dropdown-item {  padding:0 }
+    #sidebar .p-dropdown ul.p-dropdown-items li.p-dropdown-item div { padding: 0.5rem 1rem; }
 
     /* chips */
     .settings-panel .p-chip { margin-right: 0.2rem; font-size:12px; font-weight: 600; background-color: #6f96a9; color:#fff; }
@@ -213,8 +215,9 @@ export default {
     /* listbox */
     .settings-panel .p-listbox { border:none; }
     .settings-panel .p-listbox .p-listbox-list { padding:0; }
-    .settings-panel .p-listbox .p-listbox-list .p-listbox-item { justify-content:space-between; display:flex; }
-    .settings-panel .p-listbox .p-listbox-list .p-listbox-item i { font-size:14px; color:#88939c; margin-top:3px; }
+    .settings-panel .p-listbox .p-listbox-list .p-listbox-item { justify-content:space-between; display:flex; padding:0; }
+    .settings-panel .p-listbox .p-listbox-list .p-listbox-item div { padding: 0.5rem 1rem; width:100%; }
+    .settings-panel .p-listbox .p-listbox-list .p-listbox-item div button { position:absolute;right:.5rem;top:.25rem;z-index:100; }
 
     /* slider */
     .settings-panel .p-slider.p-slider-horizontal { width: 95%; margin: 0 2.5%; }

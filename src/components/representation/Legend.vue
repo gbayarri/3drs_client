@@ -1,23 +1,26 @@
 <template>
   <div id="legend" :class="{ 'open-settings': sidebarEnabled }" v-if="legendEnabled">
-      <span>{{ legendContent.name }}</span>  | Model <span>1</span> | Chain <span>{{ legendContent.chainname }}</span> | <span>{{ legendContent.resname }} {{ legendContent.resno }}</span>  {{ legendContent.atomname }}
+      <span>{{ legendContent.name }}</span>  | Model <span>{{ currModel }}</span> | Chain <span>{{ legendContent.chainname }}</span> | <span v-html="legendContent.resname"></span> <span>{{ legendContent.resno }}</span>  {{ legendContent.atomname }}
   </div>
 </template>
 
 <script>
 import useFlags from '@/modules/common/useFlags'
 import useLegend from '@/modules/viewport/useLegend'
+import structureSettings from '@/modules/structure/structureSettings'
 import { computed } from 'vue'
 export default {
     setup() {
         const { flags } = useFlags()
         const { legend } = useLegend()
+        const { getCurrentModel } = structureSettings()
 
         const sidebarEnabled = computed(() => flags.sidebarEnabled)
         const legendEnabled = computed(() => flags.legendEnabled)
         const legendContent = computed(() => legend.value )
+        const currModel = computed(() => getCurrentModel() + 1)
         
-        return { sidebarEnabled, legendEnabled, legendContent }
+        return { sidebarEnabled, legendEnabled, legendContent, currModel }
     }
 }
 </script>
@@ -54,4 +57,5 @@ export default {
     transition-timing-function: ease-in;
 }
 #legend span { text-transform: uppercase; font-weight: 600;}
+#legend span.greek-char { text-transform: lowercase!important;}
 </style>

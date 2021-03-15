@@ -15,17 +15,15 @@
             </span>
         </template>
         <template #option="slotProps">
-            <div>
                 <div 
                 @mouseover="onHover(slotProps.option.id)"
                 @mouseleave="onLeave(slotProps.option.id)">{{slotProps.option.name}}</div>
-            </div>
         </template>
     </Dropdown>
 </template>
 
 <script>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import structureSettings from '@/modules/structure/structureSettings'
 import structureStorage from '@/modules/structure/structureStorage'
 import useAPI from '@/modules/api/useAPI'
@@ -43,8 +41,8 @@ export default {
         const dataProject = computed(() => projectData.value)
         const filesList = computed(() => getFileNames())
         const currStr = computed(() => currentStructure.value)
-        
-        let doHover = true
+
+        const doHover = ref(true)
 
         const selectedFile = computed({
             get: () => filesList.value.filter(item => item.id === currStr.value)[0],
@@ -52,50 +50,40 @@ export default {
         })
 
         const change = (value) => {
-            doHover = false
+            doHover.value = false
             setCurrentStructure(value.id)
             updateProjectData(dataProject.value._id, { currentStructure: value.id })
                 .then((r) => {
                     if(r.code != 404) console.log(r.message)
                     else console.error(r.message)
                 })
-            stage.getComponentsByName(value.id).list[0].annotationList[0].setVisibility(false)
+            const re = value + '-all'
+            for(const item of stage.getRepresentationsByName(re).list) {
+                item.dispose()
+            }
         }
 
-        const onShow = () => doHover = true
+        const onShow = () => doHover.value = true
 
         const onHover = (value) => {
-            if(doHover) {
-                /*const comp = stage.getComponentsByName(value).list[0]
-                const elm = document.createElement("div")
-                elm.innerText = filesList.value.filter(item => item.id === comp.parameters.name)[0].name
-                elm.style.fontSize = "25px"
-                elm.style.color = "#fff"
-                elm.style.background = "rgba(0, 0, 0, .8)"
-                elm.style.padding = "15px 20px"
-                const an = comp.addAnnotation(comp.structure.getAtomProxy(), elm)
-                an.setVisibility(true)
-                an.updateVisibility()
-                console.log(an)*/
-
-                // TRY TO CREATE AND REMOVE EVERY TIME???
+            if(doHover.value) {
                 const comp = stage.getComponentsByName(value).list[0]
-                const an = comp.annotationList[0]
-                const elm = an.element
-                // fill annotation here because of the issues with setVisibility 
-                elm.innerText = filesList.value.filter(item => item.id === comp.parameters.name)[0].name
-                elm.style.fontSize = "25px"
-                elm.style.color = "#fff"
-                elm.style.background = "rgba(0, 0, 0, .8)"
-                elm.style.padding = "15px 20px"
-                an.setVisibility(true)
+                const new_name = value + '-all'
+                comp.addRepresentation( "spacefill", { 
+                    name: new_name,
+                    sele: '*', 
+                    opacity:.15, 
+                    radius:1,
+                    color:'#5E738B'
+                })
             }
         }
 
         const onLeave = (value) => {
-            //console.log(stage.getComponentsByName(value).list[0].annotationList[0])
-            stage.getComponentsByName(value).list[0].annotationList[0].setVisibility(false)
-            //stage.getComponentsByName(value).list[0].annotationList[0].dispose()
+            const re = value + '-all'
+            for(const item of stage.getRepresentationsByName(re).list) {
+                item.dispose()
+            }
         }
 
         return { placeholder, selectedFile, filesList, onShow, onHover, onLeave }

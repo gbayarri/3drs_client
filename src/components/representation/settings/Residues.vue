@@ -167,7 +167,7 @@ export default {
         padding-left: .5rem;
         line-height: 25px;
     }
-    #sequence-text .sequence-item { position:relative; z-index:1; padding:0 0.5px; cursor:default; }
+    #sequence-text .sequence-item { position:relative; z-index:1; padding:0 0.5px; cursor:default; user-select: none; }
     #sequence-text .sequence-item:not(.disabled) { cursor: pointer; }    
     #sequence-text .sequence-item:not(.disabled):hover,
     .sequence-item-hover {
@@ -188,6 +188,7 @@ export default {
         padding: 0px;
         margin-left: -3em;
         font-size: 80%;
+        user-select: none;
     }
     #sequence-text .sheet {
         background: rgb(104, 158, 153);
@@ -199,6 +200,7 @@ export default {
         padding: 0px;
         margin-left: -1.2em;
         font-size: 8px;
+        user-select: none;
     }
     #sequence-text .sheet-arrow {
         color: rgb(104, 158, 153);
@@ -210,6 +212,7 @@ export default {
         padding: 0px;
         margin-left: -1.2em;
         font-size: 22px;
+        user-select: none;
     }
     #sequence-text .helix {
         background-repeat: no-repeat; 
@@ -223,5 +226,6 @@ export default {
         padding: 0px;
         margin-left: -1.2em;
         font-size: 10px;
+        user-select: none;
     }
 </style>

@@ -81,41 +81,6 @@ export default function mouseObserver() {
             myTimeOut = setTimeout(() => autoSaveOrientation(stage.viewerControls.getOrientation().elements), timeOut)
         })
 
-        /*stage.signals.hovered.add( function(pickingProxy){ 
-            if (pickingProxy && pickingProxy.atom) {
-                if(typeof repr_res !== 'undefined') component.removeRepresentation(repr_res);
-                chain = pickingProxy.atom.chainname;
-                num = pickingProxy.atom.resno;
-                name = pickingProxy.atom.resname;
-                Widgets.showLegend(str, chain, name, num);
-                repr_res = component.addRepresentation( "backbone", { sele: '(' + num + ':' + chain + ')', aspectRatio: 10, opacity:.5, color:'#5E738B' });
-
-                //var s = sequence.find(e => e.num === num);
-                if(chain == current_chain) {
-                    cleanSequence();
-                    var seq_item = $('.sequence-item[data-chain="' + current_chain + '"][data-resnum="' + num + '"]');
-                    seq_item.css('background', '#5E738B');
-                    seq_item.css('color', '#fff');
-                }
-            }
-            if (!pickingProxy) {
-                Widgets.hideLegend();
-                if(typeof repr_res !== 'undefined') component.removeRepresentation(repr_res);
-                cleanSequence();
-            }
-        });
-
-        stage.signals.clicked.add( function(pickingProxy){ 
-            if (pickingProxy && pickingProxy.atom) {
-                if(typeof repr_res !== 'undefined') component.removeRepresentation(repr_res);
-                if(typeof repr_res_detail !== 'undefined') component.removeRepresentation(repr_res_detail);
-                chain = pickingProxy.atom.chainname;
-                num = pickingProxy.atom.resno;
-                name = pickingProxy.atom.resname;
-                Widgets.showLegend(str, chain, name, num);
-                repr_res_detail = component.addRepresentation( "ball+stick", { sele: '(' + num + ':' + chain + ')', aspectRatio: 1 });
-                component.autoView('(' + num + ':' + chain + ')', 500);
-            */
     }
 
   return { 

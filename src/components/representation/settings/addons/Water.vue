@@ -10,7 +10,6 @@
     :data-chain="water.chain" 
     :data-resnum="water.num" 
     :data-resname="water.name" 
-    v-tooltip.left="'Water<br>' + water.chain + ': ' + water.name + ' ' + water.num"
     @click="onClick"
     @mouseover="onMouseOver"
     @mouseleave="onMouseLeave">W</span>
@@ -23,6 +22,8 @@ import { computed } from 'vue'
 //import useZoomWindow from '@/modules/representations/useZoomWindow'
 import structureSettings from '@/modules/structure/structureSettings'
 import structureStorage from '@/modules/structure/structureStorage'
+import useLegend from '@/modules/viewport/useLegend'
+import useFlags from '@/modules/common/useFlags'
 import useAPI from '@/modules/api/useAPI'
 export default {
     props: ['water', 'window', 'index', 'item', 'stage'],
@@ -34,10 +35,13 @@ export default {
 
         const stage = props.stage
 
-        const { currentStructure } = structureSettings()
+        const { updateLegend } = useLegend()
+        const { setFlagStatus } = useFlags()
+        const { currentStructure, getFileNames } = structureSettings()
         const { projectData } = structureStorage()
         const { updateProjectData } = useAPI()
 
+        const filesList = computed(() => getFileNames())
         const dataProject = computed(() => projectData.value)
         const currStr = computed(() => currentStructure.value)
         const component = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0])
@@ -46,6 +50,7 @@ export default {
         const window =  computed(() => props.window)
 
         const onMouseOver = (e) => {
+            // NGL representation
             const sele = e.target.dataset.resnum + ':' + e.target.dataset.chain + '/' + e.target.dataset.model
             const new_name = currStr.value + '-' + sele + '-hover'
             component.value.addRepresentation( "spacefill", { 
@@ -55,24 +60,39 @@ export default {
                 radius:2,
                 color:'#5E738B' 
             })
-            // console.log(e.type) // mouseover / mouseleave 
+            // residue respresentation
             const residues = document.querySelectorAll('[data-model="' + e.target.dataset.model + '"][data-chain="' + e.target.dataset.chain + '"][data-resnum="' + e.target.dataset.resnum + '"][data-resname="' + e.target.dataset.resname + '"]')
             for(const res of residues) {
                 res.classList.add('water-item-hover')
             }
+            // legend
+            const name = filesList.value.filter(item => item.id === currStr.value)[0].name
+            updateLegend({
+                name: name,
+                chainname: e.target.dataset.chain,
+                resname: e.target.dataset.resname,
+                resno: e.target.dataset.resnum,
+                atomname: null
+            })
+            setFlagStatus('legendEnabled', true)
+            // old tooltip format
+            //v-tooltip.left="'Water<br>' + water.chain + ': ' + water.name + ' ' + water.num"
         }
 
         const onMouseLeave = (e) => {
+            // NGL representation
             const sele = e.target.dataset.resnum + ':' + e.target.dataset.chain + '/' + e.target.dataset.model
             const re = currStr.value + '-' + sele + '-hover'
             for(const item of stage.getRepresentationsByName(re).list) {
                 item.dispose()
             }
-            // console.log(e.type) // mouseover / mouseleave 
+            // residue respresentation
             const residues = document.querySelectorAll('[data-model="' + e.target.dataset.model + '"][data-chain="' + e.target.dataset.chain + '"][data-resnum="' + e.target.dataset.resnum + '"][data-resname="' + e.target.dataset.resname + '"]')
             for(const res of residues) {
                 res.classList.remove('water-item-hover')
             }
+            // legend
+            setFlagStatus('legendEnabled', false)
         }
 
         const onClick = (e) => {

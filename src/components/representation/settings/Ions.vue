@@ -25,11 +25,16 @@
         style="width:100%"
         @change="onChange">
             <template #option="slotProps">
-                <div 
-                    @mouseover="onHover(slotProps.option.id)"
-                    @mouseleave="onLeave(slotProps.option.id)">{{slotProps.option.name}}</div>
-                <!--TODO: CENTER BUTTON ON EACH ION 
-                <i class="fab fas fa-eye"></i>-->
+                <div
+                    @mouseover="onHover(slotProps.option.res)"
+                    @mouseleave="onLeave(slotProps.option.res)" >
+                        <Button 
+                        icon="fas fa-bullseye" 
+                        class="p-button-rounded p-button-text" 
+                        v-tooltip.left="ttpcv"
+                        @click="centerIon(slotProps.option.res)"/>
+                        <span>{{slotProps.option.name}}</span>
+                </div>
             </template>
         </Listbox>
 
@@ -39,33 +44,32 @@
 <script>
 import { ref, reactive, computed, watch, toRefs } from 'vue'
 import structureSettings from '@/modules/structure/structureSettings'
+import useLegend from '@/modules/viewport/useLegend'
+import useFlags from '@/modules/common/useFlags'
 export default {
-    setup() {
+    props: ['stage'],
+    setup(props) {
 
-        const { getCurrentChains, getChainContent } = structureSettings()
+        const stage = props.stage
 
+        const { updateLegend } = useLegend()
+        const { setFlagStatus } = useFlags()
+        const { currentStructure, getCurrentChains, getChainContent, getFileNames } = structureSettings()
+
+        const filesList = computed(() => getFileNames())
+        const currStr = computed(() => currentStructure.value)
+        const component = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0])
         const isCollapsed = ref(true)
         const allSelected = ref(false)
 
         const page = reactive({
             header: "Ions",
             filterPlaceholder: "Search ion",
-            ttpsa: "Select all ions"
+            ttpsa: "Select all ions",
+            ttpcv: "Center view on this ion"
         })
 
         let selectedIons = ref(null)
-
-        /*const isCollapsed = ref(true)
-        const header = "Ions"
-
-        const filterPlaceholder = "Search ion"
-
-        const selectedIons = ref(null)
-        const ions =  [
-            {name: 'K', code: 'K'},
-            {name: 'Na', code: 'Na'},
-            {name: 'Mn', code: 'Mn'}
-        ]*/
 
         // trick for creating reactivity with computed property
         const watchedChains = computed(() => getCurrentChains())
@@ -84,8 +88,13 @@ export default {
                 for(const ion of chain.ions) {
                     ions.push({
                         name: chain.id.toUpperCase() + ': ' + ion.name + ' ' + ion.num,
-                        //id: chain.id.toUpperCase() + ':' + ion.num
-                        id: ion.num + ':' + chain.id.toUpperCase() + '/' + ion.model
+                        id: ion.num + ':' + chain.id.toUpperCase() + '/' + ion.model,
+                        res: {
+                            num: ion.num,
+                            name: ion.name,
+                            chain: chain.id.toUpperCase(),
+                            model: ion.model
+                        }
                     })
                 }
             }
@@ -113,12 +122,45 @@ export default {
             //if(sins.length < modelIons.value.length) allSelected.value = false
         })
 
-        const onHover = (v) => {
+        const centerIon = (v) => {
+            // TODO: SYNC WITH STAGE (IONS AS WELL!!!)
             console.log(v)
         }
 
+        const onHover = (v) => {
+            // NGL representation
+            const sele = v.num + ':' + v.chain + '/' + v.model
+            const new_name = currStr.value + '-' + sele + '-hover'
+            if(stage.getRepresentationsByName(new_name).list.length === 0) {
+                component.value.addRepresentation( "spacefill", { 
+                    name: new_name,
+                    sele: '(' + sele + ')', 
+                    opacity:.5, 
+                    radius:2,
+                    color:'#5E738B' 
+                })
+            }
+            // legend
+            const name = filesList.value.filter(item => item.id === currStr.value)[0].name
+            updateLegend({
+                name: name,
+                chainname: v.chain,
+                resname: v.name,
+                resno: v.num,
+                atomname: null
+            })
+            setFlagStatus('legendEnabled', true)
+        }
+
         const onLeave = (v) => {
-            console.log(v)
+            // NGL representation
+            const sele = v.num + ':' + v.chain + '/' + v.model
+            const re = currStr.value + '-' + sele + '-hover'
+            for(const item of stage.getRepresentationsByName(re).list) {
+                item.dispose()
+            }
+            // legend
+            setFlagStatus('legendEnabled', false)
         }
 
         const onChange = (e) => {
@@ -130,7 +172,7 @@ export default {
         return { 
             ...toRefs(page), isCollapsed, 
             modelIons,
-            selectedIons, onChange, onHover, onLeave,
+            selectedIons, onChange, onHover, onLeave, centerIon,
             allSelected, selectAll
          }
     }

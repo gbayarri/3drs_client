@@ -25,21 +25,15 @@
         style="width:100%"
         @change="onChange">
             <template #option="slotProps">
-                <!-- TODO: FIX STYLES FOR MOUSE / LEAVE ACTIONS (IN IONS AS WELL) -->
-                <div style="width:100%;padding:.5rem 1rem"
-                    @mouseover="onHover(slotProps.option.id)"
-                    @mouseleave="onLeave(slotProps.option.id)" >
-                    <!-- TODO: MOVE TO STYLES (SETTINGS.VUE) -->
-                    <div style="position:absolute;right:.5rem;z-index:100">
+                <div
+                    @mouseover="onHover(slotProps.option.res)"
+                    @mouseleave="onLeave(slotProps.option.res)" >
                         <Button 
                         icon="fas fa-bullseye" 
                         class="p-button-rounded p-button-text" 
-                        v-tooltip.top="'asdasdasdasdasdasd'"
-                        @click="centerHetero(slotProps.option.id)"  />
-                    </div>
-                    <div>{{slotProps.option.name}}</div>
-                <!--TODO: CENTER BUTTON ON EACH HETERO 
-                <i class="fab fas fa-eye"></i>-->
+                        v-tooltip.left="ttpcv"
+                        @click="centerHetero(slotProps.option.res)"/>
+                        <span>{{slotProps.option.name}}</span>
                 </div>
             </template>
         </Listbox>
@@ -50,18 +44,29 @@
 <script>
 import { ref, reactive, computed, watch, toRefs } from 'vue'
 import structureSettings from '@/modules/structure/structureSettings'
+import useLegend from '@/modules/viewport/useLegend'
+import useFlags from '@/modules/common/useFlags'
 export default {
-    setup() {
+    props: ['stage'],
+    setup(props) {
 
-        const { getCurrentChains, getChainContent } = structureSettings()
+        const stage = props.stage
 
+        const { updateLegend } = useLegend()
+        const { setFlagStatus } = useFlags()
+        const { currentStructure, getCurrentChains, getChainContent, getFileNames } = structureSettings()
+
+        const filesList = computed(() => getFileNames())
+        const currStr = computed(() => currentStructure.value)
+        const component = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0])
         const isCollapsed = ref(true)
         const allSelected = ref(false)
 
         const page = reactive({
             header: "Heteroatoms",
             filterPlaceholder: "Search heteroatom",
-            ttpsa: "Select all heteroatoms"
+            ttpsa: "Select all heteroatoms",
+            ttpcv: "Center view on this heteroatom"
         })
 
         let selectedHets = ref(null)
@@ -83,7 +88,13 @@ export default {
                 for(const het of chain.heteroatoms) {
                     hets.push({
                         name: chain.id.toUpperCase() + ': ' + het.name + ' ' + het.num,
-                        id: het.num + ':' + chain.id.toUpperCase() + '/' + het.model
+                        id: het.num + ':' + chain.id.toUpperCase() + '/' + het.model,
+                        res: {
+                            num: het.num,
+                            name: het.name,
+                            chain: chain.id.toUpperCase(),
+                            model: het.model
+                        }
                     })
                 }
             }
@@ -116,13 +127,39 @@ export default {
         }
 
         const onHover = (v) => {
-            // TODO: SYNC WITH STAGE (IONS AS WELL!!!)
-            console.log(v)
+            // NGL representation
+            const sele = v.num + ':' + v.chain + '/' + v.model
+            const new_name = currStr.value + '-' + sele + '-hover'
+            if(stage.getRepresentationsByName(new_name).list.length === 0) {
+                component.value.addRepresentation( "spacefill", { 
+                    name: new_name,
+                    sele: '(' + sele + ')', 
+                    opacity:.5, 
+                    radius:2,
+                    color:'#5E738B' 
+                })
+            }
+            // legend
+            const name = filesList.value.filter(item => item.id === currStr.value)[0].name
+            updateLegend({
+                name: name,
+                chainname: v.chain,
+                resname: v.name,
+                resno: v.num,
+                atomname: null
+            })
+            setFlagStatus('legendEnabled', true)
         }
 
         const onLeave = (v) => {
-            // TODO: SYNC WITH STAGE (IONS AS WELL!!!)
-            console.log(v)
+            // NGL representation
+            const sele = v.num + ':' + v.chain + '/' + v.model
+            const re = currStr.value + '-' + sele + '-hover'
+            for(const item of stage.getRepresentationsByName(re).list) {
+                item.dispose()
+            }
+            // legend
+            setFlagStatus('legendEnabled', false)
         }
 
         const onChange = (e) => {

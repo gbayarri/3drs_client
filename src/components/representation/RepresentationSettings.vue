@@ -221,6 +221,7 @@ export default {
             set: val => {
                 // if Default, close settings menu
                 if(val.id === defaultRepresentation) setFlagStatus('sidebarEnabled', false)
+                else  setFlagStatus('sidebarEnabled', true)
                 setCurrentRepresentation(val.id, true)
                 .then((r) => {
                     if(r.code != 404) console.log(r.message)
@@ -270,6 +271,8 @@ export default {
                         addRepresentation(stage, r.representation)
                         // TOAST
                         toast.add({ severity:'info', summary: 'New representation', detail:'The new representation ' + r.representation.name + ' has been successfully created. Now you have to integrate components to it from the right Settings menu.', life: 10000 });
+                        // open settings
+                        setFlagStatus('sidebarEnabled', true)
                         console.log(r.message)
                     } else {
                         console.error(r.message)

@@ -10,38 +10,43 @@
     :data-chain="residue.chain" 
     :data-resnum="residue.num" 
     :data-resname="residue.label" 
-    :data-sheet="(residue.sheet !== null) ? residue.chain + ':' + residue.sheet : null" 
-    :data-helix="(residue.helix !== null) ? residue.chain + ':' + residue.helix : null" 
-    v-tooltip.left="residue.longname[0].toUpperCase() + residue.longname.substring(1) + ' (' +  residue.label + ')<br>' + residue.chain + ': ' + residue.id + ' ' + residue.num"
-    @mouseover="onMouseOver"
-    @mouseleave="onMouseLeave"
-    @click="onClick">
+    :data-sheet="(residue.sheet !== null) ? residue.chain + ':' + residue.sheet + '/' + residue.model : null" 
+    :data-helix="(residue.helix !== null) ? residue.chain + ':' + residue.helix + '/' + residue.model : null" 
+    @mouseover="onMouseOver(residue.model, residue.chain, residue.num, residue.label, residue.longname)"
+    @mouseleave="onMouseLeave(residue.model, residue.chain, residue.num, residue.label)"
+    @click.exact="onClick(residue.model, residue.chain, residue.num, residue.label, residue.longname)"
+    @click.shift.exact="onSelectMultiple(residue.model, residue.chain, residue.num, residue.label)"
+    @dblclick="onDoubleClick(residue.model, residue.chain, residue.num, residue.label)">
         {{ residue.id }}
     </span>
     <span v-else class="sequence-item disabled">&nbsp;</span>
 
     <span :class="residue.last_sheet ? 'sheet-arrow' : 'sheet'" 
     v-if="(residue.sheet !== null) && window" 
-    @mouseover="sheetOver(residue.sheet, residue.chain)" 
-    @mouseleave="sheetLeave(residue.sheet, residue.chain)" 
-    @click="sheetClick(residue.sheet, residue.chain)"
-    :data-sheet="residue.chain + ':' + residue.sheet" 
-    v-tooltip.bottom="labelSheet"><span v-if="!residue.last_sheet">&nbsp;&nbsp;</span><span v-else>&#9654;&nbsp;</span></span>
+    @mouseover="sheetOver(residue.sheet, residue.chain, residue.model)" 
+    @mouseleave="sheetLeave(residue.sheet, residue.chain, residue.model)" 
+    @click="sheetClick(residue.sheet, residue.chain, residue.model)"
+    @dblclick="sheetDoubleClick(residue.sheet, residue.chain, residue.model)"
+    :data-sheet="residue.chain + ':' + residue.sheet + '/' + residue.model" >
+    <span v-if="!residue.last_sheet">&nbsp;&nbsp;</span><span v-else>&#9654;&nbsp;</span></span>
 
     <span class="helix" 
     v-if="(residue.helix !== null) && window" 
-    @mouseover="helixOver(residue.helix, residue.chain)" 
-    @mouseleave="helixLeave(residue.helix, residue.chain)" 
-    @click="helixClick(residue.helix, residue.chain)"
-    :data-helix="residue.chain + ':' + residue.helix" 
-    v-tooltip.bottom="labelHelix">&nbsp;&nbsp;</span>
+    @mouseover="helixOver(residue.helix, residue.chain, residue.model)" 
+    @mouseleave="helixLeave(residue.helix, residue.chain, residue.model)" 
+    @click="helixClick(residue.helix, residue.chain, residue.model)"
+    @dblclick="helixDoubleClick(residue.helix, residue.chain, residue.model)"
+    :data-helix="residue.chain + ':' + residue.helix + '/' + residue.model" >&nbsp;&nbsp;</span>
 </template>
 
 <script>
 import { computed } from 'vue'
 import structureSettings from '@/modules/structure/structureSettings'
 import structureStorage from '@/modules/structure/structureStorage'
+import useLegend from '@/modules/viewport/useLegend'
+import useFlags from '@/modules/common/useFlags'
 import useAPI from '@/modules/api/useAPI'
+import useSelections from '@/modules/representations/useSelections'
 //import useZoomWindow from '@/modules/representations/useZoomWindow'
 export default {
     props: ['residue', 'sheets', 'helixes', 'window', 'index', 'stage'],
@@ -56,10 +61,14 @@ export default {
 
         const stage = props.stage
 
-        const { currentStructure } = structureSettings()
+        const { updateLegend } = useLegend()
+        const { setFlagStatus } = useFlags()
+        const { currentStructure, getFileNames } = structureSettings()
         const { projectData } = structureStorage()
         const { updateProjectData } = useAPI()
+        const { addMultipleResidues } = useSelections()
         
+        const filesList = computed(() => getFileNames())
         const dataProject = computed(() => projectData.value)
         const currStr = computed(() => currentStructure.value)
         const component = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0])
@@ -69,50 +78,84 @@ export default {
         const helixes =  computed(() => props.helixes)
         const window =  computed(() => props.window)
 
-        const onMouseOver = (e) => {
-            const sele = e.target.dataset.resnum + ':' + e.target.dataset.chain + '/' + e.target.dataset.model
+        const onMouseOver = (model, chain, resnum, resname, longname) => {
+            // NGL representation
+            const sele = resnum + ':' + chain + '/' + model
             const new_name = currStr.value + '-' + sele + '-hover'
-            component.value.addRepresentation( "licorice", { 
+            component.value.addRepresentation( "spacefill", { 
                 name: new_name,
                 sele: '(' + sele + ')', 
                 opacity:.5, 
-                radius:.5,
-                color:'#5E738B' 
+                radius:1,
+                color:'#5E738B'
             })
-            // console.log(e.type) // mouseover / mouseleave 
-            const residues = document.querySelectorAll('[data-model="' + e.target.dataset.model + '"][data-chain="' + e.target.dataset.chain + '"][data-resnum="' + e.target.dataset.resnum + '"][data-resname="' + e.target.dataset.resname + '"]')
+            // residue respresentation
+            const residues = document.querySelectorAll('[data-model="' + model + '"][data-chain="' + chain + '"][data-resnum="' + resnum + '"][data-resname="' + resname + '"]')
             for(const res of residues) {
                 res.classList.add('sequence-item-hover')
             }
+            // legend
+            const name = filesList.value.filter(item => item.id === currStr.value)[0].name
+            updateLegend({
+                name: name,
+                chainname:chain,
+                resname: resname + ' (' + longname + ')',
+                resno: resnum,
+                atomname: null
+            })
+            setFlagStatus('legendEnabled', true)
+            // old tooltip format
+            // v-tooltip.left="residue.longname[0].toUpperCase() + residue.longname.substring(1) + ' (' +  residue.label + ')<br>' + residue.chain + ': ' + residue.id + ' ' + residue.num"
         }
 
-        const onMouseLeave = (e) => {
-            const sele = e.target.dataset.resnum + ':' + e.target.dataset.chain + '/' + e.target.dataset.model
+        const onMouseLeave = (model, chain, resnum, resname) => {
+            // NGL representation
+            const sele = resnum + ':' + chain + '/' + model
             const re = currStr.value + '-' + sele + '-hover'
             for(const item of stage.getRepresentationsByName(re).list) {
                 item.dispose()
             }
-            // console.log(e.type) // mouseover / mouseleave 
-            const residues = document.querySelectorAll('[data-model="' + e.target.dataset.model + '"][data-chain="' + e.target.dataset.chain + '"][data-resnum="' + e.target.dataset.resnum + '"][data-resname="' + e.target.dataset.resname + '"]')
+            // residue respresentation
+            const residues = document.querySelectorAll('[data-model="' + model + '"][data-chain="' + chain + '"][data-resnum="' + resnum + '"][data-resname="' + resname + '"]')
             for(const res of residues) {
                 res.classList.remove('sequence-item-hover')
             }
+            // legend
+            setFlagStatus('legendEnabled', false)
         }
 
-        const onClick = (e) => {
-            const residues = document.querySelectorAll('[data-model="' + e.target.dataset.model + '"][data-chain="' + e.target.dataset.chain + '"][data-resnum="' + e.target.dataset.resnum + '"][data-resname="' + e.target.dataset.resname + '"]')
+        const onClick = (model, chain, resnum, resname, longname) => {
+            // *********************************************
+            // TODO: TOAST WHEN SELECT / DESELECT ITEM (ALL ITEMS): DIFFERENT COLORS IF SELECT / DESELECT
+            // *********************************************
+            const residues = document.querySelectorAll('[data-model="' + model + '"][data-chain="' + chain + '"][data-resnum="' + resnum + '"][data-resname="' + resname + '"]')
             for(const res of residues) {
                 if(res.className.indexOf('sequence-item-selected') === -1) res.classList.add('sequence-item-selected')
                 else res.classList.remove('sequence-item-selected', 'sequence-item-hover')
             }
         }
 
-        const labelSheet = computed(() => {
+        const onDoubleClick = (model, chain, resnum, resname) => {
+            console.log('center on: ',model,chain,resnum, resname)
+            /*const residues = document.querySelectorAll('[data-model="' + e.target.dataset.model + '"][data-chain="' + e.target.dataset.chain + '"][data-resnum="' + e.target.dataset.resnum + '"][data-resname="' + e.target.dataset.resname + '"]')
+            for(const res of residues) {
+                if(res.className.indexOf('sequence-item-selected') === -1) res.classList.add('sequence-item-selected')
+                else res.classList.remove('sequence-item-selected', 'sequence-item-hover')
+            }*/
+        }
+
+        const onSelectMultiple = (model, chain, resnum, resname) => {
+            // GET OUTPUT FOR TOAST WARNING!!!!
+            addMultipleResidues(resnum)
+            //console.log('multiple on: ',e.target.dataset.model,e.target.dataset.chain,e.target.dataset.resnum, e.target.dataset.resname)
+        }
+
+        /*const labelSheet = computed(() => {
             if(sheets && residue.value.id) {
                 const resSheet = sheets.value.filter(item => item.id === residue.value.chain)[0].sheets[residue.value.sheet]
                 if(resSheet) {
-                    const firstItem = resSheet[0];
-                    const lastItem = resSheet[resSheet.length-1];
+                    const firstItem = resSheet[0]
+                    const lastItem = resSheet[resSheet.length-1]
                     return "β-sheet<br>" + firstItem.label + firstItem.num + "~" + lastItem.label + lastItem.num
                 }
             }
@@ -127,69 +170,161 @@ export default {
                     return "α-helix<br>" + firstItem.label + firstItem.num + "~" + lastItem.label + lastItem.num
                 }
             }
-        })
+        })*/
 
-        const sheetOver = (sheet, chain) => {
-            const sheets = document.querySelectorAll('[data-sheet="' + chain + ':' + sheet + '"]')
+        const sheetOver = (sheet, chain, model) => {
+            // NGL representation
+            const resSheet = props.sheets.filter(item => item.id === chain)[0].sheets[sheet]
+            const firstItem = resSheet[0]
+            const lastItem = resSheet[resSheet.length-1]
+            const sele = firstItem.num + '-' + lastItem.num + ':' + chain + '/' + model
+            //const sele = '(724-731:A/0)'
+            const repr = resSheet.length > 3 ? 'cartoon' : 'licorice'
+            const new_name = currStr.value + '-' + sele + '-hover'
+            component.value.addRepresentation( repr, { 
+                name: new_name,
+                sele: '(' + sele + ')', 
+                opacity:.5, 
+                radius:.5,
+                color:'#5E738B',
+                side: 'front'
+            })
+            // sheet representation
+            const sheets = document.querySelectorAll('[data-sheet="' + chain + ':' + sheet + '/' + model + '"]')
             for(const s of sheets) {
                 if(s.className == 'sheet') s.style.backgroundColor = 'rgb(46, 199, 150)'
                 if(s.className == 'sheet-arrow') s.style.color = 'rgb(46, 199, 150)'
                 if(s.className == 'sequence-item')  s.classList.add('sequence-item-hover')
             }
+            // legend
+            const name = filesList.value.filter(item => item.id === currStr.value)[0].name
+            const labelSh = firstItem.label + firstItem.num + "~" + lastItem.label + lastItem.num
+            updateLegend({
+                name: name,
+                chainname: chain,
+                resname: '<span class="greek-char">β</span>-sheet',
+                resno: labelSh,
+                atomname: null
+            })
+            setFlagStatus('legendEnabled', true)
         }
 
-        const sheetLeave = (sheet, chain) => {
-            const sheets = document.querySelectorAll('[data-sheet="' + chain + ':' + sheet + '"]')
+        const sheetLeave = (sheet, chain, model) => {
+            // NGL representation
+            const resSheet = props.sheets.filter(item => item.id === chain)[0].sheets[sheet]
+            const firstItem = resSheet[0]
+            const lastItem = resSheet[resSheet.length-1]
+            const sele = firstItem.num + '-' + lastItem.num + ':' + chain + '/' + model
+            const re = currStr.value + '-' + sele + '-hover'
+            for(const item of stage.getRepresentationsByName(re).list) {
+                item.dispose()
+            }
+            // sheet representation
+            const sheets = document.querySelectorAll('[data-sheet="' + chain + ':' + sheet + '/' + model + '"]')
             for(const s of sheets) {
                 if(s.className == 'sheet') s.style.backgroundColor = 'rgb(104, 158, 153)'
                 if(s.className == 'sheet-arrow') s.style.color = 'rgb(104, 158, 153)'
                 if(s.className == 'sequence-item sequence-item-hover')  s.classList.remove('sequence-item-hover')
             }
+            // legend
+            setFlagStatus('legendEnabled', false)
         }
 
-        const sheetClick = (sheet, chain) => {
-            const residues = document.querySelectorAll('[data-sheet="' + chain + ':' + sheet + '"]')
+        const sheetClick = (sheet, chain, model) => {
+            const residues = document.querySelectorAll('[data-sheet="' + chain + ':' + sheet + '/' + model + '"]')
             for(const res of residues) {
                 if(res.className.indexOf('sequence-item-selected') === -1 && res.className.indexOf('sequence-item') !== -1) res.classList.add('sequence-item-selected')
                 else res.classList.remove('sequence-item-selected', 'sequence-item-hover')
             }
         }
 
-        const helixOver = (helix, chain) => {
-            const helixes = document.querySelectorAll('[data-helix="' + chain + ':' + helix + '"]')
+        const sheetDoubleClick = (sheet, chain, model) => {
+            console.log('center on: ',model,chain,sheet)
+            /*const residues = document.querySelectorAll('[data-model="' + e.target.dataset.model + '"][data-chain="' + e.target.dataset.chain + '"][data-resnum="' + e.target.dataset.resnum + '"][data-resname="' + e.target.dataset.resname + '"]')
+            for(const res of residues) {
+                if(res.className.indexOf('sequence-item-selected') === -1) res.classList.add('sequence-item-selected')
+                else res.classList.remove('sequence-item-selected', 'sequence-item-hover')
+            }*/
+        }
+
+        const helixOver = (helix, chain, model) => {
+            // NGL representation
+            const resHelix = props.helixes.filter(item => item.id === chain)[0].helixes[helix]
+            const firstItem = resHelix[0]
+            const lastItem = resHelix[resHelix.length-1]
+            const sele = firstItem.num + '-' + lastItem.num + ':' + chain + '/' + model
+            const repr = resHelix.length > 3 ? 'cartoon' : 'licorice'
+            const new_name = currStr.value + '-' + sele + '-hover'
+            component.value.addRepresentation( repr, { 
+                name: new_name,
+                sele: '(' + sele + ')', 
+                opacity:.5, 
+                radius:.5,
+                color:'#5E738B',
+                side: 'front'
+            })
+            // helix representation
+            const helixes = document.querySelectorAll('[data-helix="' + chain + ':' + helix + '/' + model + '"]')
             for(const s of helixes) {
                 if(s.className == 'helix') s.style.backgroundPosition = 'center top'
                 if(s.className == 'sequence-item')  s.classList.add('sequence-item-hover')
             }
-
-            // DON'T REMOVE
-            //component.addRepresentation( "cartoon", {  sele: "helix", color: "#f00", opacity:.4, aspectRatio:10 } )
-            //component.addRepresentation( "cartoon", {  sele: "sheet", color: "#0f0", opacity:.4, aspectRatio:10 } )
-            // DON'T REMOVE
+            // legend
+            const name = filesList.value.filter(item => item.id === currStr.value)[0].name
+            const labelHx = firstItem.label + firstItem.num + "~" + lastItem.label + lastItem.num
+            updateLegend({
+                name: name,
+                chainname: chain,
+                resname: '<span class="greek-char">α</span>-helix',
+                resno: labelHx,
+                atomname: null
+            })
+            setFlagStatus('legendEnabled', true)
         }
 
-        const helixLeave = (helix, chain) => {
-            const helixes = document.querySelectorAll('[data-helix="' + chain + ':' + helix + '"]')
+        const helixLeave = (helix, chain, model) => {
+            // NGL representation
+            const resHelix = props.helixes.filter(item => item.id === chain)[0].helixes[helix]
+            const firstItem = resHelix[0]
+            const lastItem = resHelix[resHelix.length-1]
+            const sele = firstItem.num + '-' + lastItem.num + ':' + chain + '/' + model
+            const re = currStr.value + '-' + sele + '-hover'
+            for(const item of stage.getRepresentationsByName(re).list) {
+                item.dispose()
+            }
+            // helix representation
+            const helixes = document.querySelectorAll('[data-helix="' + chain + ':' + helix + '/' + model + '"]')
             for(const s of helixes) {
                 if(s.className == 'helix') s.style.backgroundPosition = 'center bottom'
                 if(s.className == 'sequence-item sequence-item-hover')  s.classList.remove('sequence-item-hover')
             }
+            // legend
+            setFlagStatus('legendEnabled', false)
         }
 
-        const helixClick = (helix, chain) => {
-            const residues = document.querySelectorAll('[data-helix="' + chain + ':' + helix + '"]')
+        const helixClick = (helix, chain, model) => {
+            const residues = document.querySelectorAll('[data-helix="' + chain + ':' + helix + '/' + model + '"]')
             for(const res of residues) {
                 if(res.className.indexOf('sequence-item-selected') === -1 && res.className.indexOf('sequence-item') !== -1) res.classList.add('sequence-item-selected')
                 else res.classList.remove('sequence-item-selected', 'sequence-item-hover')
             }
         }
 
+        const helixDoubleClick = (helix, chain, model) => {
+            console.log('center on: ',model,chain,helix)
+            /*const residues = document.querySelectorAll('[data-model="' + e.target.dataset.model + '"][data-chain="' + e.target.dataset.chain + '"][data-resnum="' + e.target.dataset.resnum + '"][data-resname="' + e.target.dataset.resname + '"]')
+            for(const res of residues) {
+                if(res.className.indexOf('sequence-item-selected') === -1) res.classList.add('sequence-item-selected')
+                else res.classList.remove('sequence-item-selected', 'sequence-item-hover')
+            }*/
+        }
+
         return { 
             residue, window,
-            onClick, onMouseOver, onMouseLeave,
-            labelSheet, labelHelix,
-            sheetOver, sheetLeave, sheetClick,
-            helixOver, helixLeave, helixClick
+            onClick, onDoubleClick, onSelectMultiple, onMouseOver, onMouseLeave,
+            /*labelSheet, labelHelix,*/
+            sheetOver, sheetLeave, sheetClick, sheetDoubleClick,
+            helixOver, helixLeave, helixClick, helixDoubleClick
         }
     }
 }
