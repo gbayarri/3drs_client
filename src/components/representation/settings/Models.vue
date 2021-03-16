@@ -25,10 +25,14 @@
 <script>
 import { ref, computed, watch } from 'vue'
 import structureSettings from '@/modules/structure/structureSettings'
+import useRepresentations from '@/modules/representations/useRepresentations'
 export default {
     setup() {
 
         const { updateCurrentModel, getCurrentModel, getModels } = structureSettings()
+        const { currentRepresentation } = useRepresentations()
+
+        const currReprVal = computed(() => currentRepresentation.value)
 
         const page = {
             header: "Models",
@@ -39,11 +43,12 @@ export default {
         //const watchedModel = computed(() => (getCurrentModel() + 1))
         //const selectedModel = ref(getCurrentModel() + 1)
         const selectedModel = computed({
-            get: () => getCurrentModel() + 1,
-            set: val => updateCurrentModel( val - 1 )
+            get: () => getCurrentModel(currReprVal.value) + 1,
+            // save with timeout (many calls at the same time)
+            set: val => updateCurrentModel((val - 1), currReprVal.value)
         })
 
-        const models = computed(() => getModels())
+        const models = computed(() => getModels(currReprVal.value))
 
         const isCollapsed = ref(true)
         //const isCollapsed = computed(() => (getModels().length <= 1))

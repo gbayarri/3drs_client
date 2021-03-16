@@ -67,7 +67,7 @@ export default {
         const checkAllSelected = computed(() => allSelected['waters'] )
 
         // trick for creating reactivity with computed property
-        const watchedChains = computed(() => getCurrentChains())
+        //const watchedChains = computed(() => getCurrentChains())
 
         const getModelContent = (wch, label) => {
             const chains = []
@@ -76,7 +76,8 @@ export default {
             return allContent.filter(item => chains.includes(item.id))
         }
 
-        let modelWater = computed(() => getModelContent(watchedChains.value, 'waters'))
+        //let modelWater = computed(() => getModelContent(watchedChains.value, 'waters'))
+        const modelWater = computed(() => getModelContent(getCurrentChains(), 'waters'))
         //console.log(modelWater.value)
 
         const openOut = () => {
@@ -110,11 +111,12 @@ export default {
         // FUNCTION onClick OR SIMILAR
 
         // TODO: REPLACE BY COMPUTED GETTER / SETTER
-        watch([watchedChains], (newValues, prevValues) => {
-            const wch = newValues[0]
-            modelWater  =  computed(() => getModelContent(wch, 'waters'))
+        watch([modelWater], (newValues, prevValues) => {
+            //const wch = newValues[0]
+            //modelWater  =  computed(() => getModelContent(wch, 'waters'))
             //console.log(modelWater.value)
-            if(modelWater.value.length < 1) isCollapsed.value = true
+            const mwt = newValues[0]
+            if(mwt.length < 1) isCollapsed.value = true
         })
 
         return { 

@@ -7,7 +7,7 @@ import drawRepresentation from '@/modules/ngl/drawRepresentation'
 export default function useComponents() {
 
     const { getStructure } = processStructure()
-    const { projectData, updateStructure } = structureStorage()
+    const { projectData, updateStructure, updateStructureFirst } = structureStorage()
     const { 
         setVisibilityRepresentation,
         setOpacityRepresentation
@@ -33,14 +33,17 @@ export default function useComponents() {
             let structure = null
             if(dataProject.value.structure.length === 0 && dataProject.value.settings.length === 0) {
                 structure = getStructure(component, name)
+                updateStructureFirst(structure, id)
             } else {
                 structure = {
                     name: dataProject.value.files.filter(item => item.id === id)[0].name,
                     type: dataProject.value.files.filter(item => item.id === id)[0].type,
                     models: dataProject.value.structure.filter(item => item.id === id)[0].models 
                 }
+                //console.log(dataProject.value.settings)
+                updateStructure(structure, id)
             }
-            updateStructure(structure, id)
+            
 
             // add default representation
             if(def_repr.value) {

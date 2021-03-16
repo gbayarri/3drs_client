@@ -34,10 +34,13 @@
 <script>
 import { ref, computed, watch } from 'vue'
 import structureSettings from '@/modules/structure/structureSettings'
+import useRepresentations from '@/modules/representations/useRepresentations'
 export default {
     setup() {
 
         const { updateCurrentChains, getCurrentChains, getChains } = structureSettings()
+        const { currentRepresentation } = useRepresentations()
+        const currReprVal = computed(() => currentRepresentation.value)
 
         const isCollapsed = ref(true)
 
@@ -50,18 +53,19 @@ export default {
         //const watchedChains = computed(() => getCurrentChains())
         //const selectedChains = ref(getCurrentChains())
         const selectedChains = computed({
-            get: () => getCurrentChains(),
+            get: () => getCurrentChains(currReprVal.value),
             set: val => updateNav(val)
         })
 
-        const chains = computed(() => getChains())
+        const chains = computed(() => getChains(currReprVal.value))
+        //console.log(selectedChains.value)
 
         const updateNav = (value) => {
             const chs = []
             for(const chain of value){
                 chs.push(chain)
             }
-            updateCurrentChains(chs )
+            updateCurrentChains(chs, currReprVal.value)
         }
 
         /*const onChange = () => {

@@ -161,6 +161,7 @@ import useStage from '@/modules/ngl/useStage'
 import useComponents from '@/modules/ngl/useComponents'
 import useFlags from '@/modules/common/useFlags'
 import useRepresentations from '@/modules/representations/useRepresentations'
+import structureSettings from '@/modules/structure/structureSettings'
 import structureStorage from '@/modules/structure/structureStorage'
 export default {
     setup() {
@@ -186,6 +187,7 @@ export default {
             createNewRepresentation,
             deleteRepresentation
         } = useRepresentations()
+        const { addNewRepresentationSettings, removeRepresentationSettings } = structureSettings()
 
         let isCollapsed = ref(true)
         const currReprSettings = computed(() => getCurrentRepresentationSettings())
@@ -274,6 +276,10 @@ export default {
                         // open settings
                         setFlagStatus('sidebarEnabled', true)
                         console.log(r.message)
+                        // *********************************
+                        // TO ADD NEW CONTENT TO SETTINGS!!!!!??? !!!!!
+                        // *********************************
+                        // addNewRepresentationSettings()
                     } else {
                         console.error(r.message)
                     }
@@ -461,7 +467,13 @@ export default {
                                 if(r.code != 404) console.log(r.message)
                                 else console.error(r.message)
                             })
+                        if(r.newCurrentRepresentation === defaultRepresentation) setFlagStatus('sidebarEnabled', false)
+                        else  setFlagStatus('sidebarEnabled', true)
                         console.log(r.message)
+                        // *********************************
+                        // TO REMOVE CONTENT FROM SETTINGS!!!!!??? !!!!!
+                        // *********************************
+                        // removeRepresentationSettings()
                     } else {
                         console.error(r.message)
                     }

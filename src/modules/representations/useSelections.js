@@ -21,15 +21,16 @@ export default function useSelections() {
   }
 
   // TODO: FUNCTION FOR CREATE A NGL SELECTION, AND RETURN IT
+  const createSelection = function (settings) {
+    
 
-  /*const statusMultipleResidues = function (status) {
-    multipleResidues.status = status
-  }*/
+
+  }
 
   return { 
     multipleResidues,
     addMultipleResidues, 
-    //statusMultipleResidues 
+    createSelection 
   }
 
 }

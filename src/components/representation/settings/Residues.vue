@@ -76,7 +76,7 @@ export default {
         const checkAllSelected = computed(() => allSelected['residues'] )
         
         // trick for creating reactivity with computed property
-        const watchedChains = computed(() => getCurrentChains())
+        //const watchedChains = computed(() => getCurrentChains())
 
         const getModelContent = (wch, label) => {
             const chains = []
@@ -85,9 +85,12 @@ export default {
             return allContent.filter(item => chains.includes(item.id))
         }
 
-        let modelResidues = computed(() => getModelContent(watchedChains.value, 'residues'))
-        let modelSheets = computed(() => getModelContent(watchedChains.value, 'sheets'))
-        let modelHelixes = computed(() => getModelContent(watchedChains.value, 'helixes'))
+        /*const modelResidues = computed(() => getModelContent(watchedChains.value, 'residues'))
+        const modelSheets = computed(() => getModelContent(watchedChains.value, 'sheets'))
+        const modelHelixes = computed(() => getModelContent(watchedChains.value, 'helixes'))*/
+        const modelResidues = computed(() => getModelContent(getCurrentChains(), 'residues'))
+        const modelSheets = computed(() => getModelContent(getCurrentChains(), 'sheets'))
+        const modelHelixes = computed(() => getModelContent(getCurrentChains(), 'helixes'))
         /*console.log(modelResidues.value)
         console.log(modelSheets.value)
         console.log(modelHelixes.value)*/
@@ -129,15 +132,16 @@ export default {
 
         // TODO: REPLACE BY COMPUTED GETTER / SETTER
         // modifying isCollapsed & selectedChains v-model properties without computed()
-        watch([watchedChains], (newValues, prevValues) => {
-            const wch = newValues[0]
-            modelResidues  =  computed(() => getModelContent(wch, 'residues'))
+        watch([modelResidues], (newValues, prevValues) => {
+            //const wch = newValues[0]
+            /*modelResidues  =  computed(() => getModelContent(wch, 'residues'))
             modelSheets = computed(() => getModelContent(wch, 'sheets'))
-            modelHelixes = computed(() => getModelContent(wch, 'helixes'))
+            modelHelixes = computed(() => getModelContent(wch, 'helixes'))*/
             //console.log(modelResidues.value)
             /*console.log(modelSheets.value)
             console.log(modelHelixes.value)*/
-            if(modelResidues.value.length < 1) isCollapsed.value = true
+            const mdrs = newValues[0]
+            if(mdrs.length < 1) isCollapsed.value = true
         })
 
         return { 

@@ -8,17 +8,20 @@
 import useFlags from '@/modules/common/useFlags'
 import useLegend from '@/modules/viewport/useLegend'
 import structureSettings from '@/modules/structure/structureSettings'
+import useRepresentations from '@/modules/representations/useRepresentations'
 import { computed } from 'vue'
 export default {
     setup() {
         const { flags } = useFlags()
         const { legend } = useLegend()
         const { getCurrentModel } = structureSettings()
+        const { currentRepresentation } = useRepresentations()
 
+        const currReprVal = computed(() => currentRepresentation.value)
         const sidebarEnabled = computed(() => flags.sidebarEnabled)
         const legendEnabled = computed(() => flags.legendEnabled)
         const legendContent = computed(() => legend.value )
-        const currModel = computed(() => getCurrentModel() + 1)
+        const currModel = computed(() => getCurrentModel(currReprVal.value) + 1)
         
         return { sidebarEnabled, legendEnabled, legendContent, currModel }
     }

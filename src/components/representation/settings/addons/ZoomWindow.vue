@@ -54,6 +54,7 @@ import { computed, watch, reactive, toRefs } from 'vue'
 import useFlags from '@/modules/common/useFlags'
 import useStage from '@/modules/ngl/useStage'
 import useZoomWindow from '@/modules/representations/useZoomWindow'
+import useRepresentations from '@/modules/representations/useRepresentations'
 import structureSettings from '@/modules/structure/structureSettings'
 import Residue from '@/components/representation/settings/addons/Residue'
 import Water from '@/components/representation/settings/addons/Water'
@@ -63,10 +64,11 @@ export default {
         
         const { getStage } = useStage()
         const { flags, setFlagStatus } = useFlags()
+        const { currentRepresentation } = useRepresentations()
         const { windowType, allSelected, setWindowType, toggleAllSelected  } = useZoomWindow()
-        
         const { getCurrentChains, getChainContent } = structureSettings()
-
+        
+        const currReprVal = computed(() => currentRepresentation.value)
         const stage = getStage()
         const isActive = computed(() => flags.zoomWindowEnabled)
         const sidebarEnabled = computed(() => flags.sidebarEnabled)
@@ -104,12 +106,12 @@ export default {
         }
 
         // trick for creating reactivity with computed property
-        const watchedChains = computed(() => getCurrentChains())
+        //const watchedChains = computed(() => getCurrentChains())
 
         const getModelContent = (wch, label) => {
             const chains = []
             for(const c of wch) chains.push(c.id)
-            const allContent = getChainContent(label)
+            const allContent = getChainContent(label, currReprVal.value)
             return allContent.filter(item => chains.includes(item.id))
         }
 
@@ -117,27 +119,34 @@ export default {
         // RESIDUES
         // **********************
 
-        let modelResidues = computed(() => getModelContent(watchedChains.value, 'residues'))
+        /*let modelResidues = computed(() => getModelContent(watchedChains.value, 'residues'))
         let modelSheets = computed(() => getModelContent(watchedChains.value, 'sheets'))
-        let modelHelixes = computed(() => getModelContent(watchedChains.value, 'helixes'))
+        let modelHelixes = computed(() => getModelContent(watchedChains.value, 'helixes'))*/
+        const modelResidues = computed(() => getModelContent(getCurrentChains(currReprVal.value), 'residues'))
+        const modelSheets = computed(() => getModelContent(getCurrentChains(currReprVal.value), 'sheets'))
+        const modelHelixes = computed(() => getModelContent(getCurrentChains(currReprVal.value), 'helixes'))
 
         // **********************
         // WATERS
         // **********************
 
-        let modelWater = computed(() => getModelContent(watchedChains.value, 'waters'))
+        //let modelWater = computed(() => getModelContent(watchedChains.value, 'waters'))
+        const modelWater = computed(() => getModelContent(getCurrentChains(currReprVal.value), 'waters'))
 
         // TODO: REPLACE BY COMPUTED GETTER / SETTER
-        watch([watchedChains], (newValues, prevValues) => {
+        watch([modelResidues, modelWater], (newValues, prevValues) => {
             const wch = newValues[0]
             // residues
-            modelResidues  =  computed(() => getModelContent(wch, 'residues'))
+            /*modelResidues  =  computed(() => getModelContent(wch, 'residues'))
             modelSheets = computed(() => getModelContent(wch, 'sheets'))
-            modelHelixes = computed(() => getModelContent(wch, 'helixes'))
-            if(windowType.value === 'residues' && modelResidues.value.length < 1) setFlagStatus('zoomWindowEnabled', false)
+            modelHelixes = computed(() => getModelContent(wch, 'helixes'))*/
+            const mdrs = newValues[0]
+            //if(mdrs.length < 1) isCollapsed.value = true
+            if(windowType.value === 'residues' && mdrs.length < 1) setFlagStatus('zoomWindowEnabled', false)
             // waters
-            modelWater  =  computed(() => getModelContent(wch, 'waters'))
-            if(windowType.value === 'waters' && modelWater.value.length < 1) setFlagStatus('zoomWindowEnabled', false)
+            const mwt = newValues[1]
+            //modelWater  =  computed(() => getModelContent(wch, 'waters'))
+            if(windowType.value === 'waters' && mwt.length < 1) setFlagStatus('zoomWindowEnabled', false)
         })
 
         return { 
