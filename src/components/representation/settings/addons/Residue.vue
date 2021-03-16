@@ -78,6 +78,16 @@ export default {
         const helixes =  computed(() => props.helixes)
         const window =  computed(() => props.window)
 
+        // ************************************
+        // ************************************
+        // CREATE COMPUTED FLAG FOR CHECKING IF SELECTED OR NOT FROM THE structureSettings / settings.value
+        // ADD SOMEHOW THIS LOGIN INTO THIS COMPUTED VAR:
+        // if(res.className.indexOf('sequence-item-selected') === -1) res.classList.add('sequence-item-selected')
+        // else res.classList.remove('sequence-item-selected', 'sequence-item-hover')
+        // OR BETTER AN IF INSIDE THE CLASS IN THE TEMPLATE????????
+        // ************************************
+        // ************************************
+
         const onMouseOver = (model, chain, resnum, resname, longname) => {
             // NGL representation
             const sele = resnum + ':' + chain + '/' + model
@@ -129,10 +139,16 @@ export default {
             // TODO: TOAST WHEN SELECT / DESELECT ITEM (ALL ITEMS): DIFFERENT COLORS IF SELECT / DESELECT
             // *********************************************
             const residues = document.querySelectorAll('[data-model="' + model + '"][data-chain="' + chain + '"][data-resnum="' + resnum + '"][data-resname="' + resname + '"]')
+            // MODIFY THAT BY A CALL TO updateResidues
             for(const res of residues) {
                 if(res.className.indexOf('sequence-item-selected') === -1) res.classList.add('sequence-item-selected')
                 else res.classList.remove('sequence-item-selected', 'sequence-item-hover')
             }
+            // CREATE UPDATE RESIDUES IN STRUCTURE SETTINGS
+
+            // CREATE NGL SELECTION IN USE SELECTIONS
+
+            // GET SELECTION AND SAVE IT INTO settings.value AND MONGO. SAVE NAVIGATION IN MONGO AS WELL
         }
 
         const onDoubleClick = (model, chain, resnum, resname) => {
@@ -142,6 +158,7 @@ export default {
                 if(res.className.indexOf('sequence-item-selected') === -1) res.classList.add('sequence-item-selected')
                 else res.classList.remove('sequence-item-selected', 'sequence-item-hover')
             }*/
+            // OF DOUBLE CLICK, SELECT AS WELL
         }
 
         const onSelectMultiple = (model, chain, resnum, resname) => {

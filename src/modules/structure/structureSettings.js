@@ -82,13 +82,17 @@ export default function structureSettings() {
         settings.value.filter(item => item.id === currentStructure.value)[0].navigation.curr_model = value
     }
 
-    const updateCurrentChains= function (value) {
+    const updateCurrentChains = function (value) {
         //settings.value.filter(item => item.id === currentStructure.value)[0].navigation.curr_model = value
         const cm = getCurrentModel()
         let models = settings.value.filter(item => item.id === currentStructure.value)[0].navigation.models
         models.filter(item => item.id === cm)[0].chains = value
         settings.value.filter(item => item.id === currentStructure.value)[0].navigation.models = models
         //console.log(settings.value)
+    }
+
+    const updateResidues = function (value) {
+        // TODO
     }
 
     const getCurrentModel = function () {

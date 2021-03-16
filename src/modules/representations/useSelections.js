@@ -20,6 +20,8 @@ export default function useSelections() {
     // TODO: RETURN VALUE IF SELECT / DESELECT
   }
 
+  // TODO: FUNCTION FOR CREATE A NGL SELECTION, AND RETURN IT
+
   /*const statusMultipleResidues = function (status) {
     multipleResidues.status = status
   }*/
