@@ -18,8 +18,12 @@ export default function structureStorage() {
         settings.value = []
     }
 
-    const updateProject = function (data) {
+    const updateStructureProject = function (data) {
         projectData.value = data
+    }
+
+    const removeRepresentationFromStructure = (value) => {
+        projectData.value.representations = projectData.value.representations.filter(item => item.id !== value)
     }
 
     const updateStructureFirst = function (str, id) {
@@ -168,21 +172,50 @@ export default function structureStorage() {
         return data
     }
 
-    // TO ADD REPRESENTATIONS HERE???
-    const setSettings = function () {
+    // SETTINGS SETTERS
 
-        const setngs = []
-        for(const item of settings.value) {
-            setngs.push({
-                id: item.id,
-                curr_model: item.navigation.curr_model,
-                visible: item.navigation.visible,
-                models: item.navigation.models
-            })
-        }
+    // update current model to projectData and return representation settings 
+    const setDataModel = function (model, structure, representation) {
+        projectData.value.representations
+            .filter(item => item.id == representation)[0].settings
+            .filter(item => item.id == structure)[0].curr_model = model
 
         const data = {
-            settings: setngs
+            settings: projectData.value.representations.filter(item => item.id == representation)[0].settings
+        }
+
+        return data
+    }
+
+    // update current model > chains to projectData and return representation settings 
+    // TODO: CLEAN chains, model, structure
+    const setDataChains = function (chains, model, structure, representation) {
+        /*projectData.value.representations
+            .filter(item => item.id == representation)[0].settings
+            .filter(item => item.id == structure)[0].models
+            .filter(item => item.id == model)[0].chains = chains*/
+
+        const data = {
+            settings: projectData.value.representations.filter(item => item.id == representation)[0].settings
+        }
+
+        return data
+    }
+
+    // update current model > residues to projectData and return representation settings 
+    // TODO: CLEAN residue, structure
+    const setDataMolecules = function (residue, structure, representation) {
+        /*console.log(projectData.value.representations
+            .filter(item => item.id == representation)[0].settings
+            .filter(item => item.id == structure)[0].models
+            .filter(item => item.id == residue.model)[0].residues)*/
+        /*projectData.value.representations
+            .filter(item => item.id == representation)[0].settings
+            .filter(item => item.id == structure)[0].models
+            .filter(item => item.id == residue.model)[0].residues = chains*/
+
+        const data = {
+            settings: projectData.value.representations.filter(item => item.id == representation)[0].settings
         }
 
         return data
@@ -191,12 +224,15 @@ export default function structureStorage() {
     return { 
         //processedStructure, 
         projectData,
-        updateProject,
+        updateStructureProject,
+        removeRepresentationFromStructure,
         updateStructureFirst, 
         updateStructure,
         resetStructure,
         getFirstProjectData,
-        setSettings
+        setDataModel,
+        setDataChains,
+        setDataMolecules
     }
 
 }

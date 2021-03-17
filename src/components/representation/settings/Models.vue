@@ -26,13 +26,16 @@
 import { ref, computed, watch } from 'vue'
 import structureSettings from '@/modules/structure/structureSettings'
 import useRepresentations from '@/modules/representations/useRepresentations'
+import useSettings from '@/modules/settings/useSettings'
 export default {
     setup() {
 
-        const { updateCurrentModel, getCurrentModel, getModels } = structureSettings()
+        const { currentStructure, updateCurrentModel, getCurrentModel, getModels } = structureSettings()
         const { currentRepresentation } = useRepresentations()
+        const { setModelsSettings } = useSettings()
 
         const currReprVal = computed(() => currentRepresentation.value)
+        const currStr = computed(() => currentStructure.value)
 
         const page = {
             header: "Models",
@@ -45,7 +48,14 @@ export default {
         const selectedModel = computed({
             get: () => getCurrentModel(currReprVal.value) + 1,
             // save with timeout (many calls at the same time)
-            set: val => updateCurrentModel((val - 1), currReprVal.value)
+            set: val => {
+                updateCurrentModel((val - 1), currReprVal.value)
+                setModelsSettings((val - 1), currStr.value, currReprVal.value)
+                    .then((r) => {
+                        if(r.code != 404) console.log(r.message)
+                        else console.error(r.message)
+                    })
+            }
         })
 
         const models = computed(() => getModels(currReprVal.value))

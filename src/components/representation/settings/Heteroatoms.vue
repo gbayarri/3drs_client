@@ -42,25 +42,43 @@
 </template>
 
 <script>
-import { ref, reactive, computed, watch, toRefs } from 'vue'
+import { ref, reactive, computed, watch, toRefs, onUpdated } from 'vue'
 import structureSettings from '@/modules/structure/structureSettings'
+import useRepresentations from '@/modules/representations/useRepresentations'
+import useSettings from '@/modules/settings/useSettings'
 import useLegend from '@/modules/viewport/useLegend'
 import useFlags from '@/modules/common/useFlags'
 export default {
     props: ['stage'],
     setup(props) {
 
+        
+
         const stage = props.stage
 
         const { updateLegend } = useLegend()
         const { setFlagStatus } = useFlags()
-        const { currentStructure, getCurrentChains, getChainContent, getFileNames } = structureSettings()
+        const { currentStructure, getCurrentChains, getChainContent, getFileNames, checkIfMoleculeExists, updateMolecules } = structureSettings()
+        const { currentRepresentation } = useRepresentations()
+        const { setHeteroatomsSettings } = useSettings()
 
         const filesList = computed(() => getFileNames())
+        const currReprVal = computed(() => currentRepresentation.value)
         const currStr = computed(() => currentStructure.value)
         const component = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0])
+
         const isCollapsed = ref(true)
         const allSelected = ref(false)
+
+        // ****************************
+        //const isSelected = computed(() => checkIfMoleculeExists(residue.value, 'residues', currReprVal.value))
+        // ****************************
+
+        // trick for catch which is the last selected / unselected
+        let prevSelection = null
+        onUpdated(() => {
+            prevSelection = null
+        })
 
         const page = reactive({
             header: "Heteroatoms",
@@ -69,15 +87,19 @@ export default {
             ttpcv: "Center view on this heteroatom"
         })
 
+        // ****************************
+        // MODIFY BY COMPUTED VALUE!!!!
+        // ****************************
+        //const chains = computed(() => getChains(currReprVal.value))
         let selectedHets = ref(null)
 
         // trick for creating reactivity with computed property
-        const watchedChains = computed(() => getCurrentChains())
+        const watchedChains = computed(() => getCurrentChains(currReprVal.value))
 
         const getModelContent = (wch, label) => {
             const chains = []
             for(const c of wch) chains.push(c.id)
-            const allContent = getChainContent(label)
+            const allContent = getChainContent(label, currReprVal.value)
             return allContent.filter(item => chains.includes(item.id))
         }
 
@@ -89,6 +111,7 @@ export default {
                     hets.push({
                         name: chain.id.toUpperCase() + ': ' + het.name + ' ' + het.num,
                         id: het.num + ':' + chain.id.toUpperCase() + '/' + het.model,
+                        model: het.model,
                         res: {
                             num: het.num,
                             name: het.name,
@@ -163,9 +186,49 @@ export default {
         }
 
         const onChange = (e) => {
+            console.log(prevSelection)
             //console.log(e.value)
-            // TODO!!!! ADD TO NAVIGATION
+            //console.log(selectedHets.value[selectedHets.value.length - 1])
+
+            // 
             console.log(selectedHets.value)
+
+            prevSelection = selectedHets.value
+
+            // I DON'T KNOW HOW TO GET THE SELECTED / UNSELECTED ITEM!!!
+
+            /*const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
+
+            for(const hetero of selectedHets.value) {
+                const [settings, msg] = updateMolecules(hetero, 'heteroatoms', currReprVal.value)
+                
+            }*/
+
+            /*setMoleculesSettings(selectedHets.value, currStr.value, currReprVal.value)
+                .then((r) => {
+                    if(r.code != 404) {
+                        toast.add({ 
+                            severity: msg.status, 
+                            summary: msg.tit, 
+                            detail: 'The heteroatom [ Model ' 
+                                    + residue.value.model 
+                                    + ' | Chain ' 
+                                    + residue.value.chain 
+                                    + ' | ' 
+                                    + residue.value.id 
+                                    + ' ' 
+                                    + residue.value.num 
+                                    + ' ] of ' 
+                                    + strName 
+                                    + ' structure has been ' 
+                                    + msg.txt 
+                                    + currReprSettings.value.name 
+                                    + ' representation',
+                            life: 10000
+                        })
+                        console.log(r.message)
+                    } else  console.error(r.message)
+                })*/
         }
 
         return { 

@@ -41,11 +41,12 @@
 
 <script>
 import { computed } from 'vue'
+import { useToast } from 'primevue/usetoast'
 import structureSettings from '@/modules/structure/structureSettings'
 import structureStorage from '@/modules/structure/structureStorage'
 import useLegend from '@/modules/viewport/useLegend'
 import useFlags from '@/modules/common/useFlags'
-import useAPI from '@/modules/api/useAPI'
+import useSettings from '@/modules/settings/useSettings'
 import useSelections from '@/modules/representations/useSelections'
 import useRepresentations from '@/modules/representations/useRepresentations'
 //import useZoomWindow from '@/modules/representations/useZoomWindow'
@@ -62,23 +63,26 @@ export default {
         const { updateLegend } = useLegend()
         const { setFlagStatus } = useFlags()
         const { currentStructure, getFileNames, checkIfMoleculeExists, updateMolecules } = structureSettings()
-        const { projectData, setSettings } = structureStorage()
-        const { updateProjectData } = useAPI()
+        const { projectData } = structureStorage()
         const { addMultipleResidues, createSelection } = useSelections()
-        const { currentRepresentation } = useRepresentations()
+        const { currentRepresentation, getCurrentRepresentationSettings } = useRepresentations()
+        const { setMoleculesSettings } = useSettings()
         
         const filesList = computed(() => getFileNames())
         const dataProject = computed(() => projectData.value)
         const currStr = computed(() => currentStructure.value)
         const component = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0])
         const currReprVal = computed(() => currentRepresentation.value)
+        const currReprSettings = computed(() => getCurrentRepresentationSettings())
 
         const residue =  computed(() => props.residue)
         const sheets =  computed(() => props.sheets)
         const helixes =  computed(() => props.helixes)
         const window =  computed(() => props.window)
 
-        const isSelected = computed(() => checkIfMoleculeExists(residue.value, 'residues'))
+        const isSelected = computed(() => checkIfMoleculeExists(residue.value, 'residues', currReprVal.value))
+
+        const toast = useToast()
 
         const onMouseOver = (model, chain, resnum, resname, longname) => {
             // NGL representation
@@ -127,37 +131,41 @@ export default {
         }
 
         const onClick = (model, chain, resnum, resname, longname) => {
-            // *********************************************
-            // TODO: TOAST WHEN SELECT / DESELECT ITEM (ALL ITEMS): DIFFERENT COLORS IF SELECT / DESELECT
-            // *********************************************
+
             //const residues = document.querySelectorAll('[data-model="' + model + '"][data-chain="' + chain + '"][data-resnum="' + resnum + '"][data-resname="' + resname + '"]')
-            
-            // update navigation settings
-            // TODO: 
-            // const [settings, status] = updateMolecules(residue.value, 'residues')
-            // if status: 'add' launch toast.info with molecule info
-            // if status: 'remove' launch toast.warning with molecule info 
-            // https://www.javascripttutorial.net/javascript-return-multiple-values/
-            // ADD NEW LEVEL RESPRESENTATIONS IN settings.value.navigation
-            // MODIFY ALL RELATED WITH settings.value BY representations[current].settings 
-            const settings = updateMolecules(residue.value, 'residues')
+   
+            const [settings, msg] = updateMolecules(residue.value, 'residues', currReprVal.value)
+            const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
             // update representations selections
             //console.log(currReprVal.value)
-            const selection = createSelection(settings)
+            //const selection = createSelection(settings)
+            // TODO: CLEAN residue, structure
+            setMoleculesSettings(residue.value, currStr.value, currReprVal.value)
+                .then((r) => {
+                    if(r.code != 404) {
+                        toast.add({ 
+                            severity: msg.status, 
+                            summary: msg.tit, 
+                            detail: 'The residue [ Model ' 
+                                    + residue.value.model 
+                                    + ' | Chain ' 
+                                    + residue.value.chain 
+                                    + ' | ' 
+                                    + residue.value.id 
+                                    + ' ' 
+                                    + residue.value.num 
+                                    + ' ] of ' 
+                                    + strName 
+                                    + ' structure has been ' 
+                                    + msg.txt 
+                                    + currReprSettings.value.name 
+                                    + ' representation',
+                            life: 10000
+                        })
+                        console.log(r.message)
+                    } else  console.error(r.message)
+                })
 
-            // update TO REPRESENTATIONS[CURR_REPR].STRUCTURES project data
-            /*const data = setSettings()
-            updateProjectData(dataProject.value._id, data)
-              .then((r) => {
-                if(r.code != 404) console.log(r.message)
-                else console.error(r.message)
-              })*/
-
-
-
-
-
-            // TODO: UPDATE settings TO API / settings (SEE getFirstProjectData)
 
             // MODIFY THAT BY A CALL TO updateMolecules
             /*for(const res of residues) {

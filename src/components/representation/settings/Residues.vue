@@ -37,8 +37,7 @@
                 :sheets="modelSheets" 
                 :helixes="modelHelixes" 
                 :window="false"
-                :stage="stage"
-                />
+                :stage="stage" />
             </div>
         </div>
         
@@ -50,6 +49,7 @@ import { ref, reactive, computed, watch, toRefs } from 'vue'
 import useFlags from '@/modules/common/useFlags'
 import useZoomWindow from '@/modules/representations/useZoomWindow'
 import structureSettings from '@/modules/structure/structureSettings'
+import useRepresentations from '@/modules/representations/useRepresentations'
 import Residue from '@/components/representation/settings/addons/Residue'
 export default {
     props: ['stage'],
@@ -60,9 +60,11 @@ export default {
         const { flags, setFlagStatus } = useFlags()
         const { windowType, allSelected, setWindowType } = useZoomWindow()
         const { getCurrentChains, getChainContent } = structureSettings()
+        const { currentRepresentation } = useRepresentations()
 
         const isCollapsed = ref(true)
         //const allSelected = ref(false)
+        const currReprVal = computed(() => currentRepresentation.value)
         const externalWindow = computed(() => (flags.zoomWindowEnabled && windowType.value === 'residues'))
         //const allVisible = ref(false)
 
@@ -81,16 +83,16 @@ export default {
         const getModelContent = (wch, label) => {
             const chains = []
             for(const c of wch) chains.push(c.id)
-            const allContent = getChainContent(label)
+            const allContent = getChainContent(label, currReprVal.value)
             return allContent.filter(item => chains.includes(item.id))
         }
 
         /*const modelResidues = computed(() => getModelContent(watchedChains.value, 'residues'))
         const modelSheets = computed(() => getModelContent(watchedChains.value, 'sheets'))
         const modelHelixes = computed(() => getModelContent(watchedChains.value, 'helixes'))*/
-        const modelResidues = computed(() => getModelContent(getCurrentChains(), 'residues'))
-        const modelSheets = computed(() => getModelContent(getCurrentChains(), 'sheets'))
-        const modelHelixes = computed(() => getModelContent(getCurrentChains(), 'helixes'))
+        const modelResidues = computed(() => getModelContent(getCurrentChains(currReprVal.value), 'residues'))
+        const modelSheets = computed(() => getModelContent(getCurrentChains(currReprVal.value), 'sheets'))
+        const modelHelixes = computed(() => getModelContent(getCurrentChains(currReprVal.value), 'helixes'))
         /*console.log(modelResidues.value)
         console.log(modelSheets.value)
         console.log(modelHelixes.value)*/

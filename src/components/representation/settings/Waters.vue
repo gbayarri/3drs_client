@@ -42,6 +42,7 @@ import { ref, reactive, computed, watch, toRefs } from 'vue'
 import useFlags from '@/modules/common/useFlags'
 import useZoomWindow from '@/modules/representations/useZoomWindow'
 import structureSettings from '@/modules/structure/structureSettings'
+import useRepresentations from '@/modules/representations/useRepresentations'
 import Water from '@/components/representation/settings/addons/Water'
 export default {
     props: ['stage'],
@@ -52,9 +53,11 @@ export default {
         const { flags, setFlagStatus } = useFlags()
         const { windowType, allSelected, setWindowType } = useZoomWindow()
         const { getCurrentChains, getChainContent } = structureSettings()
+        const { currentRepresentation } = useRepresentations()
 
         const isCollapsed = ref(true)
         //const allSelected = ref(false)
+        const currReprVal = computed(() => currentRepresentation.value)
         const externalWindow = computed(() => (flags.zoomWindowEnabled && windowType.value === 'waters'))
         
         const page = reactive({
@@ -72,12 +75,12 @@ export default {
         const getModelContent = (wch, label) => {
             const chains = []
             for(const c of wch) chains.push(c.id)
-            const allContent = getChainContent(label)
+            const allContent = getChainContent(label, currReprVal.value)
             return allContent.filter(item => chains.includes(item.id))
         }
 
         //let modelWater = computed(() => getModelContent(watchedChains.value, 'waters'))
-        const modelWater = computed(() => getModelContent(getCurrentChains(), 'waters'))
+        const modelWater = computed(() => getModelContent(getCurrentChains(currReprVal.value), 'waters'))
         //console.log(modelWater.value)
 
         const openOut = () => {

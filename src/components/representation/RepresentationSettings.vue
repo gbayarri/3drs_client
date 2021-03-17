@@ -168,7 +168,7 @@ export default {
 
         const { stage } = useStage()
         const { addRepresentation, delRepresentation } = useComponents()
-        const { projectData, updateProject } = structureStorage()
+        const { projectData, updateStructureProject, removeRepresentationFromStructure } = structureStorage()
         const { setFlagStatus } = useFlags()
         const { 
             defaultRepresentation, 
@@ -176,7 +176,6 @@ export default {
             getRepresentationNames, 
             getCurrentRepresentationSettings,
             updateRepresentationProperty,
-            removeRepresentationFromStructure,
             setCurrentRepresentation,
             setMolecularRepresentation,
             setVisibilityRepresentation,
@@ -263,23 +262,30 @@ export default {
                         // insert new representation to projectData
                         let dp = projectData.value
                         dp.representations.push(r.representation)
-                        updateProject(dp)
+                        // update dataProject
+                        updateStructureProject(dp)
+                        // update settings
+                        addNewRepresentationSettings(r.representation)
+                        // update current representation
                         setCurrentRepresentation(r.representation.id, true)
                             .then((r) => {
                                 if(r.code != 404) console.log(r.message)
                                 else console.error(r.message)
                             })
-                        // DRAW REPRESENTATION!!!!!!
+                        // draw new representation
                         addRepresentation(stage, r.representation)
-                        // TOAST
-                        toast.add({ severity:'info', summary: 'New representation', detail:'The new representation ' + r.representation.name + ' has been successfully created. Now you have to integrate components to it from the right Settings menu.', life: 10000 });
-                        // open settings
+                        // show toast with new representation info
+                        toast.add({ 
+                            severity:'info', 
+                            summary: 'New representation', 
+                            detail:'The new representation ' 
+                                    + r.representation.name 
+                                    + ' has been successfully created. Now you have to integrate components to it from the right Settings menu.', 
+                            life: 10000
+                        });
+                        // open settings if closed
                         setFlagStatus('sidebarEnabled', true)
                         console.log(r.message)
-                        // *********************************
-                        // TO ADD NEW CONTENT TO SETTINGS!!!!!??? !!!!!
-                        // *********************************
-                        // addNewRepresentationSettings()
                     } else {
                         console.error(r.message)
                     }
@@ -453,27 +459,36 @@ export default {
         //const ttprr = "Remove representation (double click)"
         //const ttpvs = "View representation structure"
         const removeRepresentation = () => {
+            const remRepr = representationSelected.value.id
+            const reprName = representationSelected.value.name
             //delRepresentation(stage, representationSelected.value.id)
-            deleteRepresentation(representationSelected.value.id)
+            deleteRepresentation(remRepr)
                 .then((r) => {
                     if(r.code != 404) {
                         // remove representation from components
-                        delRepresentation(stage, representationSelected.value.id)
-                        // update in-memory structure
-                        removeRepresentationFromStructure(representationSelected.value.id)
-                        // set current representation in memory and REST API
+                        delRepresentation(stage, remRepr)
+                        // update dataProject
+                        removeRepresentationFromStructure(remRepr)
+                        // update settings
+                        removeRepresentationSettings(remRepr)
+                        // update current representation
                         setCurrentRepresentation(r.newCurrentRepresentation, true)
                             .then((r) => {
                                 if(r.code != 404) console.log(r.message)
                                 else console.error(r.message)
                             })
+                        toast.add({ 
+                            severity: 'warn', 
+                            summary: 'Representation removed', 
+                            detail:'The representation ' 
+                                    + reprName 
+                                    + ' has been removed from your workspace.', 
+                            life: 5000
+                        });
+                        // update settings status (closed if default, open otherwise)
                         if(r.newCurrentRepresentation === defaultRepresentation) setFlagStatus('sidebarEnabled', false)
-                        else  setFlagStatus('sidebarEnabled', true)
+                        else setFlagStatus('sidebarEnabled', true)
                         console.log(r.message)
-                        // *********************************
-                        // TO REMOVE CONTENT FROM SETTINGS!!!!!??? !!!!!
-                        // *********************************
-                        // removeRepresentationSettings()
                     } else {
                         console.error(r.message)
                     }

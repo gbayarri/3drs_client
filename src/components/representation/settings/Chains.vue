@@ -22,7 +22,9 @@
                 </template>
             </template>
             <template #option="slotProps">
-                <div class="">
+                <div class="p-content"
+                    @mouseover="onHover(slotProps.option.id)"
+                    @mouseleave="onLeave(slotProps.option.id)">
                     <div>{{slotProps.option.name}}</div>
                 </div>
             </template>
@@ -35,12 +37,21 @@
 import { ref, computed, watch } from 'vue'
 import structureSettings from '@/modules/structure/structureSettings'
 import useRepresentations from '@/modules/representations/useRepresentations'
+import useSettings from '@/modules/settings/useSettings'
 export default {
-    setup() {
+    props: ['stage'],
+    setup(props) {
 
-        const { updateCurrentChains, getCurrentChains, getChains } = structureSettings()
+        const stage = props.stage
+
+        const { currentStructure, updateCurrentChains, getCurrentChains, getCurrentModel, getChains } = structureSettings()
         const { currentRepresentation } = useRepresentations()
+        const { setChainsSettings } = useSettings()
+
         const currReprVal = computed(() => currentRepresentation.value)
+        const currStr = computed(() => currentStructure.value)
+        const currModel = computed(() => getCurrentModel(currReprVal.value))
+        const component = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0])
 
         const isCollapsed = ref(true)
 
@@ -66,6 +77,12 @@ export default {
                 chs.push(chain)
             }
             updateCurrentChains(chs, currReprVal.value)
+            // TODO: CLEAN chains, model, structure
+            setChainsSettings(selectedChains.value, currModel.value, currStr.value, currReprVal.value)
+                    .then((r) => {
+                        if(r.code != 404) console.log(r.message)
+                        else console.error(r.message)
+                    })
         }
 
         /*const onChange = () => {
@@ -78,13 +95,37 @@ export default {
             updateNav(selectedChains.value.filter(item => item.id !== e.path[1].innerText))
         }
 
+        const onHover = (v) => {
+            //console.log(currStr.value, currReprVal.value, v)
+            const sele = ':' + v + '/' + currModel.value
+            //console.log(sele)
+            const new_name = currStr.value + '-' + sele + '-hover'
+            if(stage.getRepresentationsByName(new_name).list.length === 0) {
+                component.value.addRepresentation( "spacefill", { 
+                    name: new_name,
+                    sele: '(' + sele + ')', 
+                    opacity:.25, 
+                    radius:2,
+                    color:'#5E738B' 
+                })
+            }
+        }
+
+        const onLeave = (v) => {
+            const sele = ':' + v + '/' + currModel.value
+            const re = currStr.value + '-' + sele + '-hover'
+            for(const item of stage.getRepresentationsByName(re).list) {
+                item.dispose()
+            }
+        }
+
         // TODO: REPLACE BY COMPUTED GETTER / SETTER
         // modifying isCollapsed & selectedChains v-model properties without computed()
         watch(chains, (chs, prevChs) => {
             if(chs.length <= 1) isCollapsed.value = true
         })
 
-        return { page, isCollapsed, selectedChains, chains, /*onChange,*/ removeChip }
+        return { page, isCollapsed, selectedChains, chains, /*onChange,*/ removeChip, onHover, onLeave }
     }
 }
 </script>
@@ -94,4 +135,7 @@ export default {
     .settings-panel.chains .p-multiselect .p-multiselect-label:not(.p-placeholder) {
         padding-top: .25rem!important;
     }
+    .settings-panel.chains .p-multiselect .p-multiselect-panel .p-multiselect-items .p-multiselect-item { padding: 0; }
+    .settings-panel.chains .p-multiselect .p-multiselect-panel .p-multiselect-items .p-multiselect-item .p-checkbox { margin-left:1rem; }
+    .settings-panel.chains .p-multiselect .p-multiselect-panel .p-multiselect-items .p-multiselect-item .p-content { width:100%;padding: .5rem 1rem; }    
 </style>

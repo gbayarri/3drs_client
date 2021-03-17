@@ -30,7 +30,7 @@ export default {
     const { apiData, fetchProject, updateProjectData } = useAPI()
     const { loadFileToStage } = useComponents()
     const { setInitOrientation, checkMouseSignals } = mouseObserver()
-    const { /*processedStructure,*/ projectData, updateProject, resetStructure, getFirstProjectData } = structureStorage()
+    const { /*processedStructure,*/ projectData, updateStructureProject, resetStructure, getFirstProjectData } = structureStorage()
     const { settings, setCurrentStructure } = structureSettings()
     const { setCurrentRepresentation/*, getCurrentRepresentationSettings*/ } = useRepresentations()
     const project_id = props.project_id
@@ -181,7 +181,7 @@ export default {
           document.getElementById("viewport").style.background = apiData.value.background
 
           // save apiData to structureStorage.projectData
-          updateProject(apiData.value)
+          updateStructureProject(apiData.value)
 
           // create viewport
           createViewport()

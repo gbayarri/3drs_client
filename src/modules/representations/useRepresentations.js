@@ -7,7 +7,7 @@ let currentRepresentation = ref(null)
 
 export default function useRepresentations() {
 
-    const { projectData, updateProject } = structureStorage()
+    const { projectData/*, updateStructureProject*/ } = structureStorage()
     const { 
         updateProjectData, 
         createRepresentation, 
@@ -52,10 +52,6 @@ export default function useRepresentations() {
             dataProject.value.representations.filter(item => item.id === currentRepresentation.value)[0][property[0]][property[1]][property[2]] = value
         else
             dataProject.value.representations.filter(item => item.id === currentRepresentation.value)[0][property] = value
-    }
-
-    const removeRepresentationFromStructure = (value) => {
-        projectData.value.representations = projectData.value.representations.filter(item => item.id !== value)
     }
 
     // NGL / REST API
@@ -178,7 +174,6 @@ export default function useRepresentations() {
         setCurrentRepresentation,
         getCurrentRepresentationSettings,
         updateRepresentationProperty,
-        removeRepresentationFromStructure,
         setVisibilityRepresentation,
         setMolecularRepresentation,
         setOpacityRepresentation,

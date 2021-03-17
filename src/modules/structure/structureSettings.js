@@ -28,7 +28,7 @@ export default function structureSettings() {
         if(settings.value.length === 0) return false
         const nav = settings.value.filter(item => item.id === currentStructure.value)[0].navigation
         //const allModels = settings.value.filter(item => item.id === currentStructure.value)[0].navigation.models
-        console.log(settings.value, currReprVal)
+        //console.log(settings.value, currReprVal)
         if(nav.filter(item => item.id === currReprVal)[0] === undefined) return []
 
         const allModels = nav.filter(item => item.id === currReprVal)[0].models
@@ -43,7 +43,22 @@ export default function structureSettings() {
     const getChains = function (currReprVal) {
         // avoid check settings before its creation
         if(settings.value.length === 0) return false
-        const currStr = settings.value.filter(item => item.id === currentStructure.value)[0].original
+        const currMod =  getCurrentModel(currReprVal)
+        if(currMod === null) return []
+        const allChains = settings.value
+                            .filter(item => item.id === currentStructure.value)[0].original.models
+                            .filter(item => item.id === currMod)[0].chains
+
+        const chains = []
+
+        for(const chain of allChains) {
+            chains.push({
+                name: "Chain " + chain.id,
+                id: chain.id
+            })
+        }
+
+        /*const currStr = settings.value.filter(item => item.id === currentStructure.value)[0].original
         //const currMod = settings.value.filter(item => item.id === currentStructure.value)[0].navigation.curr_model
         //const currMod = nav.filter(item => item.id === currReprVal)[0].curr_model
         const currMod =  getCurrentModel(currReprVal)
@@ -56,14 +71,34 @@ export default function structureSettings() {
                 name: "Chain " + chain.id,
                 id: chain.id
             })
-        }
+        }*/
+
+        
         return chains
     }
 
     const getChainContent = function (content, currReprVal) {
         // avoid check settings before its creation
         if(settings.value.length === 0) return false
-        const currStr = settings.value.filter(item => item.id === currentStructure.value)[0].original
+        const currMod =  getCurrentModel(currReprVal)
+        if(currMod === null) return []
+        const allChains = settings.value
+                            .filter(item => item.id === currentStructure.value)[0].original.models
+                            .filter(item => item.id === currMod)[0].chains
+
+        const chains = []
+
+        for(const chain of allChains) {
+            if(chain[content].length > 0) {
+                chains.push({
+                    id: chain.id,
+                    [content]: chain[content]
+                })
+            }
+        }
+        
+        
+        /*const currStr = settings.value.filter(item => item.id === currentStructure.value)[0].original
         //const currMod = settings.value.filter(item => item.id === currentStructure.value)[0].navigation.curr_model
         const currMod =  getCurrentModel(currReprVal)
         if(currMod === null) return []
@@ -77,7 +112,7 @@ export default function structureSettings() {
                     [content]: chain[content]
                 })
             }
-        }
+        }*/
 
         return chains
     }
@@ -88,12 +123,25 @@ export default function structureSettings() {
     // TODO
     // **************
 
-    const addNewRepresentationSettings = function(value) {
-        // add new representation -value- to all file.navigation
+    const addNewRepresentationSettings = function(representation) {
+        // add new representation -representation- to all file.navigation
+        for(const structure of settings.value) {
+            structure.navigation.push({
+                id: representation.id,
+                curr_model: 0,
+                visible: true,
+                models: representation.settings.filter(item => item.id === structure.id)[0].models,
+            })
+        }
+       // console.log(settings.value/*, representation*/)
     }
 
-    const removeRepresentationSettings = function(value) {
+    const removeRepresentationSettings = function(representation) {
         // remove representation -value- from all file.navigation
+        for(const structure of settings.value) {
+            structure.navigation = structure.navigation.filter(item => item.id !== representation)
+        }
+        console.log(settings.value/*, representation*/)
     }
 
     // **************
@@ -104,16 +152,39 @@ export default function structureSettings() {
     }
 
     const updateCurrentModel = function (value, currReprVal) {
-        const nav = settings.value.filter(item => item.id === currentStructure.value)[0].navigation
-        nav.filter(item => item.id === currReprVal)[0].curr_model = value
+        settings.value
+            .filter(item => item.id === currentStructure.value)[0].navigation
+            .filter(item => item.id === currReprVal)[0].curr_model = value
+        
+        
+        /*const nav = settings.value.filter(item => item.id === currentStructure.value)[0].navigation
+        nav.filter(item => item.id === currReprVal)[0].curr_model = value*/
         //settings.value.filter(item => item.id === currentStructure.value)[0].navigation.curr_model = value
 
         //console.log(settings.value)
     }
 
     const updateCurrentChains = function (value, currReprVal) {
-        //settings.value.filter(item => item.id === currentStructure.value)[0].navigation.curr_model = value
         const cm = getCurrentModel(currReprVal)
+        const models = settings.value
+                            .filter(item => item.id === currentStructure.value)[0].navigation
+                            .filter(item => item.id === currReprVal)[0].models
+        
+        settings.value
+            .filter(item => item.id === currentStructure.value)[0].navigation
+            .filter(item => item.id === currReprVal)[0].models
+            .filter(item => item.id === cm)[0].chains = value
+        
+        /*
+        ????????????????????????
+        Not sure why I did that
+        settings.value
+            .filter(item => item.id === currentStructure.value)[0].navigation
+            .filter(item => item.id === currReprVal)[0].models = models*/
+
+
+        //settings.value.filter(item => item.id === currentStructure.value)[0].navigation.curr_model = value
+        /*const cm = getCurrentModel(currReprVal)
         //let models = settings.value.filter(item => item.id === currentStructure.value)[0].navigation.models
         const nav = settings.value.filter(item => item.id === currentStructure.value)[0].navigation
         let models = nav.filter(item => item.id === currReprVal)[0].models
@@ -121,21 +192,56 @@ export default function structureSettings() {
         //settings.value.filter(item => item.id === currentStructure.value)[0].navigation.models = models
         // ????????????????????????
         // PROBABLY NOT WORKING
-        nav.filter(item => item.id === currReprVal)[0].models = models
-        console.log(settings.value)
+        nav.filter(item => item.id === currReprVal)[0].models = models*/
+        //console.log(settings.value)
     }
 
-    // TODO currReprVal
     const checkIfMoleculeExists = function (molecule, type, currReprVal) {
-        const molecules = settings.value.filter(item => item.id === currentStructure.value)[0].navigation.models[molecule.model][type]
-        const molExists = molecules.filter(item => (item.num === molecule.num && item.chain === molecule.chain)).length > 0
+        const molExists = settings.value
+                            .filter(item => item.id === currentStructure.value)[0].navigation
+                            .filter(item => item.id === currReprVal)[0].models
+                            .filter(item => item.id === molecule.model)[0][type]
+                            .filter(item => (item.num === molecule.num && item.chain === molecule.chain)).length > 0
 
         return molExists
+
+        /*const molecules = settings.value.filter(item => item.id === currentStructure.value)[0].navigation.models[molecule.model][type]
+        const molExists = molecules.filter(item => (item.num === molecule.num && item.chain === molecule.chain)).length > 0
+
+        return molExists*/
     }
 
-    // TODO currReprVal
     const updateMolecules = function (molecule, type, currReprVal) {
-        const molecules = settings.value.filter(item => item.id === currentStructure.value)[0].navigation.models[molecule.model][type]
+        const molecules = settings.value
+                            .filter(item => item.id === currentStructure.value)[0].navigation
+                            .filter(item => item.id === currReprVal)[0].models
+                            .filter(item => item.id === molecule.model)[0][type]
+
+        let msg = null
+        if(!checkIfMoleculeExists(molecule, type, currReprVal)) {
+            // add
+            molecules.push(molecule)
+            msg = {
+                status: 'info',
+                tit: 'Added new molecule ',
+                txt: 'added to '
+            }
+        } else {
+            //remove
+            settings.value
+                .filter(item => item.id === currentStructure.value)[0].navigation
+                .filter(item => item.id === currReprVal)[0].models
+                .filter(item => item.id === molecule.model)[0][type] = molecules.filter(item => !(item.chain === molecule.chain && item.num === molecule.num))
+            msg = {
+                status: 'warn',
+                tit: 'Molecule removed',
+                txt: 'removed from '
+            }
+        }
+
+        return [settings.value, msg]
+
+        /*const molecules = settings.value.filter(item => item.id === currentStructure.value)[0].navigation.models[molecule.model][type]
         if(!checkIfMoleculeExists(molecule, type)) {
             // add
             molecules.push(molecule)
@@ -146,22 +252,33 @@ export default function structureSettings() {
 
         console.log(settings.value)
         
-        return settings.value
+        return settings.value*/
     }
 
     const getCurrentModel = function (currReprVal) {
         // avoid check settings before its creation
         if(settings.value.length === 0) return false
+        const repr = settings.value
+                        .filter(item => item.id === currentStructure.value)[0].navigation
+                        .filter(item => item.id === currReprVal)[0]
+
+        if(repr !== undefined)
+            return repr.curr_model
+        else
+            return null
+
+        //const nav = settings.value.filter(item => item.id === currentStructure.value)[0].navigation
+        /*if(nav.filter(item => item.id === currReprVal)[0] !== undefined)
+            return nav.filter(item => item.id === currReprVal)[0].curr_model
+        else
+            return null*/
+
         //console.log(settings.value.filter(item => item.id === currentStructure.value))
-        const nav = settings.value.filter(item => item.id === currentStructure.value)[0].navigation
         //console.log(nav, currReprVal)
         //console.log(nav.filter(item => item.id === currReprVal)[0])
         //return settings.value.filter(item => item.id === currentStructure.value)[0].navigation.curr_model
         //console.log(nav.filter(item => item.id === currReprVal)[0])
-        if(nav.filter(item => item.id === currReprVal)[0] !== undefined)
-            return nav.filter(item => item.id === currReprVal)[0].curr_model
-        else
-            return null
+        
     }
 
     const getCurrentChains = function (currReprVal) {
@@ -169,11 +286,17 @@ export default function structureSettings() {
         if(settings.value.length === 0) return false
         const cm = getCurrentModel(currReprVal)
         if(cm === null) return []
-        const nav = settings.value.filter(item => item.id === currentStructure.value)[0].navigation
+        
+        return settings.value
+            .filter(item => item.id === currentStructure.value)[0].navigation
+            .filter(item => item.id === currReprVal)[0].models
+            .filter(item => item.id === cm)[0].chains
+        
+        /*const nav = settings.value.filter(item => item.id === currentStructure.value)[0].navigation
         //const models = settings.value.filter(item => item.id === currentStructure.value)[0].navigation.models
         const models = nav.filter(item => item.id === currReprVal)[0].models
         //console.log(models.filter(item => item.id === cm)[0].chains)
-        return models.filter(item => item.id === cm)[0].chains
+        return models.filter(item => item.id === cm)[0].chains*/
     }
 
     return { 

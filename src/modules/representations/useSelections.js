@@ -23,8 +23,6 @@ export default function useSelections() {
   // TODO: FUNCTION FOR CREATE A NGL SELECTION, AND RETURN IT
   const createSelection = function (settings) {
     
-
-
   }
 
   return { 
