@@ -14,7 +14,7 @@
     @mouseleave="onMouseLeave(water.model, water.chain, water.num, water.name)"
     @click.exact="onClick(water.model, water.chain, water.num, water.name)"
     @click.shift.exact="onSelectMultiple(water.model, water.chain, water.num, water.name)"
-    @dblclick="onDoubleClick(water.model, water.chain, water.num, water.name)">W</span>
+    @click.alt.exact="centerWater(water.model, water.chain, water.num, water.name)">W</span>
     <span v-else class="water-item disabled">&nbsp;</span>
 
 </template>
@@ -33,10 +33,6 @@ export default {
     props: ['water', 'window', 'index', 'item', 'stage'],
     setup(props) {
 
-        // TODO: ADD TO NAVIGATION ALL THE SELECTEDS (FUNCTION ONCLICK()) AND COMPUTE HERE IF 
-        // class="sequence-item" OR class="sequence-item-selected" WHEN CREATED
-        //const { allSelected } = useZoomWindow()
-
         const stage = props.stage
 
         const { updateLegend } = useLegend()
@@ -45,7 +41,7 @@ export default {
         const { projectData } = structureStorage()
         const { addMultipleResidues, createSelection } = useSelections()
         const { currentRepresentation, getCurrentRepresentationSettings } = useRepresentations()
-        const { setMoleculesSettings } = useSettings()
+        const { setMoleculesSettings, setPositionSettings } = useSettings()
 
         const filesList = computed(() => getFileNames())
         const dataProject = computed(() => projectData.value)
@@ -126,7 +122,7 @@ export default {
                             severity: msg.status, 
                             summary: msg.tit, 
                             detail: 'The water [ Model ' 
-                                    + water.value.model 
+                                    + (water.value.model + 1)
                                     + ' | Chain ' 
                                     + water.value.chain 
                                     + ' | ' 
@@ -146,9 +142,17 @@ export default {
                 })
         }
 
-        const onDoubleClick = (model, chain, resnum, resname) => {
-            console.log('center on: ',model,chain,resnum, resname)
+        // CENTER STRUCTURE
+
+        const centerWater = (model, chain, resnum, resname) => {
+            component.value.autoView(resnum + ':' + chain + '/' + model, 500)
+            setPositionSettings(stage)
+                .then((r) => {
+                    if(r.code != 404) console.log(r.message)
+                    else console.error(r.message)
+                })
         }
+
 
         const onSelectMultiple = (model, chain, resnum, resname) => {
             //addMultipleResidues(resnum)
@@ -158,7 +162,7 @@ export default {
         return { 
             isSelected,
             water, window,
-            onClick, onMouseOver, onMouseLeave, onDoubleClick, onSelectMultiple
+            onClick, onMouseOver, onMouseLeave, centerWater, onSelectMultiple
         }
 
     }

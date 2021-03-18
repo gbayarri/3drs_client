@@ -16,7 +16,7 @@
     @mouseleave="onMouseLeave(residue.model, residue.chain, residue.num, residue.label)"
     @click.exact="onClick(residue.model, residue.chain, residue.num, residue.label, residue.longname)"
     @click.shift.exact="onSelectMultiple(residue.model, residue.chain, residue.num, residue.label)"
-    @dblclick="onDoubleClick(residue.model, residue.chain, residue.num, residue.label)">
+    @click.alt.exact="centerResidue(residue.model, residue.chain, residue.num, residue.label)">
         {{ residue.id }}
     </span>
     <span v-else class="sequence-item disabled">&nbsp;</span>
@@ -66,7 +66,7 @@ export default {
         const { projectData } = structureStorage()
         const { addMultipleResidues, createSelection } = useSelections()
         const { currentRepresentation, getCurrentRepresentationSettings } = useRepresentations()
-        const { setMoleculesSettings } = useSettings()
+        const { setMoleculesSettings, setPositionSettings } = useSettings()
         
         const filesList = computed(() => getFileNames())
         const dataProject = computed(() => projectData.value)
@@ -147,7 +147,7 @@ export default {
                             severity: msg.status, 
                             summary: msg.tit, 
                             detail: 'The residue [ Model ' 
-                                    + residue.value.model 
+                                    + (residue.value.model + 1)
                                     + ' | Chain ' 
                                     + residue.value.chain 
                                     + ' | ' 
@@ -179,14 +179,15 @@ export default {
             // GET SELECTION AND SAVE IT INTO settings.value AND MONGO. SAVE NAVIGATION IN MONGO AS WELL
         }
 
-        const onDoubleClick = (model, chain, resnum, resname) => {
-            console.log('center on: ',model,chain,resnum, resname)
-            /*const residues = document.querySelectorAll('[data-model="' + e.target.dataset.model + '"][data-chain="' + e.target.dataset.chain + '"][data-resnum="' + e.target.dataset.resnum + '"][data-resname="' + e.target.dataset.resname + '"]')
-            for(const res of residues) {
-                if(res.className.indexOf('sequence-item-selected') === -1) res.classList.add('sequence-item-selected')
-                else res.classList.remove('sequence-item-selected', 'sequence-item-hover')
-            }*/
-            // OF DOUBLE CLICK, SELECT AS WELL
+        // CENTER STRUCTURE
+
+        const centerResidue = (model, chain, resnum, resname) => {
+            component.value.autoView(resnum + ':' + chain + '/' + model, 500)
+            setPositionSettings(stage)
+                .then((r) => {
+                    if(r.code != 404) console.log(r.message)
+                    else console.error(r.message)
+                })
         }
 
         const onSelectMultiple = (model, chain, resnum, resname) => {
@@ -194,28 +195,6 @@ export default {
             addMultipleResidues(resnum)
             //console.log('multiple on: ',e.target.dataset.model,e.target.dataset.chain,e.target.dataset.resnum, e.target.dataset.resname)
         }
-
-        /*const labelSheet = computed(() => {
-            if(sheets && residue.value.id) {
-                const resSheet = sheets.value.filter(item => item.id === residue.value.chain)[0].sheets[residue.value.sheet]
-                if(resSheet) {
-                    const firstItem = resSheet[0]
-                    const lastItem = resSheet[resSheet.length-1]
-                    return "β-sheet<br>" + firstItem.label + firstItem.num + "~" + lastItem.label + lastItem.num
-                }
-            }
-        })
-
-        const labelHelix = computed(() => {
-            if(helixes && residue.value.id) {
-                const resHelix = helixes.value.filter(item => item.id === residue.value.chain)[0].helixes[residue.value.helix]
-                if(resHelix) {
-                    const firstItem = resHelix[0]
-                    const lastItem = resHelix[resHelix.length-1]
-                    return "α-helix<br>" + firstItem.label + firstItem.num + "~" + lastItem.label + lastItem.num
-                }
-            }
-        })*/
 
         const sheetOver = (sheet, chain, model) => {
             // NGL representation
@@ -367,8 +346,7 @@ export default {
         return { 
             isSelected,
             residue, window,
-            onClick, onDoubleClick, onSelectMultiple, onMouseOver, onMouseLeave,
-            /*labelSheet, labelHelix,*/
+            onClick, centerResidue, onSelectMultiple, onMouseOver, onMouseLeave,
             sheetOver, sheetLeave, sheetClick, sheetDoubleClick,
             helixOver, helixLeave, helixClick, helixDoubleClick
         }

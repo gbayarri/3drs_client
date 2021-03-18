@@ -7,7 +7,7 @@ let currentRepresentation = ref(null)*/
 export default function useSettings() {
 
     const { projectData, setDataModel, setDataChains, setDataMolecules } = structureStorage()
-    const { updateRepresentationData } = useAPI()
+    const { updateRepresentationData, updateProjectData } = useAPI()
 
     const dataProject = computed(() => projectData.value)
 
@@ -37,17 +37,30 @@ export default function useSettings() {
         return await updateRepresentationData(prjID, representation, data)
     }
 
-    // RESIDUES
+    // MOLECULES
     // TODO: CLEAN residue, structure
     const setMoleculesSettings = async (residue, structure, representation) => {
         const data = setDataMolecules(residue, structure, representation)
         return await updateRepresentationData(prjID, representation, data)
     }
 
+    // ORIENTATION
+
+    const setPositionSettings = async (stage) => {
+        return await new Promise((resolve) => {
+            const myTimeOutOrientation = setTimeout(() => {
+                const orientation = stage.viewerControls.getOrientation().elements
+                const response = updateProjectData(prjID, { orientation: orientation })
+                resolve(response)
+            }, shortTimeOut)
+        })
+    }
+
     return { 
         setModelsSettings,
         setChainsSettings,
-        setMoleculesSettings
+        setMoleculesSettings,
+        setPositionSettings
     }
 
 }

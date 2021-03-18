@@ -6,12 +6,6 @@
         v-on:dblclick="removeFile"
         v-tooltip.top="page.ttprf" 
         v-if="numStructures > 1" />
-        <!-- NOT SURE ABOUT THIS BUTTON -->
-        <!--<Button 
-        icon="fas fa-eye" 
-        class="p-button-rounded p-button-text" 
-        v-tooltip.top="ttphf"
-        @click="hideFile"  />-->
         <Button 
         icon="fas fa-bullseye" 
         class="p-button-rounded p-button-text" 
@@ -22,19 +16,19 @@
 
 <script>
 import { computed } from 'vue'
-import structureStorage from '@/modules/structure/structureStorage'
+//import structureStorage from '@/modules/structure/structureStorage'
 import structureSettings from '@/modules/structure/structureSettings'
-import useAPI from '@/modules/api/useAPI'
+import useSettings from '@/modules/settings/useSettings'
 export default {
     props: ['stage'],
     setup(props) {
 
         const stage = props.stage
-        const { projectData } = structureStorage()
+        //const { projectData } = structureStorage()
         const { currentStructure, getNumStructures } = structureSettings()
-        const { updateProjectData } = useAPI()
+        const { setPositionSettings } = useSettings()
 
-        const dataProject = computed(() => projectData.value)
+        //const dataProject = computed(() => projectData.value)
         const currStr = computed(() => currentStructure.value)
 
         const page = {
@@ -49,31 +43,19 @@ export default {
             console.log("removing file " + currStr.value)
         }
 
-        // HIDE STRUCTURE
-        /*let ttphf = ref("Hide structure")
-        const hideFile = () => {
-            console.log("hiding file " + currStr.value)
-        }*/
-
-        // CENTER STRUCTURE
-        const autoSaveOrientation = function(orientation) {
-            updateProjectData(dataProject.value._id, { orientation: orientation })
+        const centerFile = () => {
+            const component = stage.compList.filter(item => item.parameters.name === currStr.value)[0]
+            component.autoView(500)
+            setPositionSettings(stage)
                 .then((r) => {
                     if(r.code != 404) console.log(r.message)
                     else console.error(r.message)
                 })
         }
 
-        const centerFile = () => {
-            const component = stage.compList.filter(item => item.parameters.name === currStr.value)[0]
-            component.autoView(500)
-            setTimeout(() => autoSaveOrientation(stage.viewerControls.getOrientation().elements), 1000)
-        }
-
         return { 
             page,
             numStructures, removeFile,
-            //ttphf, hideFile,
             centerFile
         }
     }

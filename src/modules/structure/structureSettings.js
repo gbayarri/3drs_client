@@ -119,10 +119,6 @@ export default function structureSettings() {
 
     // NAVIGATION SETTINGS DATA
 
-    // **************
-    // TODO
-    // **************
-
     const addNewRepresentationSettings = function(representation) {
         // add new representation -representation- to all file.navigation
         for(const structure of settings.value) {
@@ -143,8 +139,6 @@ export default function structureSettings() {
         }
         console.log(settings.value/*, representation*/)
     }
-
-    // **************
 
     const setCurrentStructure = function (value) {
         currentStructure.value = value
@@ -212,6 +206,7 @@ export default function structureSettings() {
     }
 
     const updateMolecules = function (molecule, type, currReprVal) {
+
         const molecules = settings.value
                             .filter(item => item.id === currentStructure.value)[0].navigation
                             .filter(item => item.id === currReprVal)[0].models
@@ -241,18 +236,38 @@ export default function structureSettings() {
 
         return [settings.value, msg]
 
-        /*const molecules = settings.value.filter(item => item.id === currentStructure.value)[0].navigation.models[molecule.model][type]
-        if(!checkIfMoleculeExists(molecule, type)) {
-            // add
-            molecules.push(molecule)
+    }
+
+    const updateAllMolecules = function (type, currReprVal, operation, allMolecules = null) {
+
+        const cm = getCurrentModel(currReprVal)
+        if(cm === null) return []
+
+        let molecules = null
+        let msg = null
+        if(operation == 'select') {
+            molecules = allMolecules
+            msg = {
+                status: 'info',
+                tit: 'Select all',
+                txt: 'added to '
+            }
         } else {
-            //remove
-            settings.value.filter(item => item.id === currentStructure.value)[0].navigation.models[molecule.model][type] = molecules.filter(item => !(item.chain === molecule.chain && item.num === molecule.num))
+            molecules = []
+            msg = {
+                status: 'warn',
+                tit: 'Unselect all',
+                txt: 'removed from '
+            }
         }
 
-        console.log(settings.value)
-        
-        return settings.value*/
+        settings.value
+            .filter(item => item.id === currentStructure.value)[0].navigation
+            .filter(item => item.id === currReprVal)[0].models
+            .filter(item => item.id === cm)[0][type] = molecules
+
+        return [settings.value, msg]
+
     }
 
     const getCurrentModel = function (currReprVal) {
@@ -299,6 +314,18 @@ export default function structureSettings() {
         return models.filter(item => item.id === cm)[0].chains*/
     }
 
+    const getCurrentMolecules = function (currReprVal, type) {
+        // avoid check settings before its creation
+        if(settings.value.length === 0) return false
+        const cm = getCurrentModel(currReprVal)
+        if(cm === null) return []
+
+        return settings.value
+            .filter(item => item.id === currentStructure.value)[0].navigation
+            .filter(item => item.id === currReprVal)[0].models
+            .filter(item => item.id === cm)[0][type]
+    }
+
     return { 
         settings,
         currentStructure,
@@ -306,12 +333,14 @@ export default function structureSettings() {
         getNumStructures,
         getModels,
         getChains,
-        getChainContent,    
+        getChainContent,
+        getCurrentMolecules,    
         setCurrentStructure,
         updateCurrentModel,
         updateCurrentChains,
         checkIfMoleculeExists,
         updateMolecules,
+        updateAllMolecules,
         getCurrentModel,
         getCurrentChains,
         addNewRepresentationSettings,

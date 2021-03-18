@@ -1,7 +1,7 @@
 <template>
     <Panel :toggleable="modelResidues.length >= 1" v-model:collapsed="isCollapsed">
         <template #header>
-            <i class="fas fa-share-alt"></i> <div class="p-panel-title">{{ header }}</div>
+            <i class="fas fa-ellipsis-h"></i> <div class="p-panel-title">{{ header }}</div>
         </template>
         <template #icons>
             <Button 
@@ -69,7 +69,7 @@ export default {
         //const allVisible = ref(false)
 
         const page = reactive({
-            header: "Residues",
+            header: "Sequence",
             //ttpha: "Hide all residues",
             ttpsa: "Select all residues",
             ttpoo: computed(() => (flags.zoomWindowEnabled && windowType.value === 'residues') ? 'Close external window' : 'View in external window')
