@@ -588,14 +588,4 @@ export default {
     }
     #minisettings .repr-button:hover { background: #546974;}
 
-    .p-toast-top-right { left:calc(2% + 38px);  top:1.5%;}
-    .p-toast .p-toast-message.p-toast-message-info { 
-        background: #d7e6ec!important; 
-        border: solid #5e738b!important; 
-        border-width: 0 0 0 6px!important;
-        color: #48596d!important; 
-    }
-    .p-toast .p-toast-message.p-toast-message-info .p-toast-message-icon, 
-    .p-toast .p-toast-message.p-toast-message-info .p-toast-icon-close { color: #48596d!important; }
-
 </style>

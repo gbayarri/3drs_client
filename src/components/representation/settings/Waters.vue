@@ -19,7 +19,13 @@
             @click="selectAll" 
             v-tooltip.left="ttpsa"
             :disabled="modelWater.length == 0" />
-            <!--<Button icon="fas fa-eye" class="p-button-rounded p-button-text" />-->
+            <Button 
+            icon="far fa-lightbulb" 
+            @click="showTips" 
+            style="font-size:16px;"
+            class="p-button-rounded p-button-text" 
+            v-tooltip.left="ttpst" 
+            />
         </template>
         <div id="water-text">
             <div class="chain-water margin-bottom-10" v-for="(chain, index) in modelWater" :key="index">
@@ -61,10 +67,11 @@ export default {
         const externalWindow = computed(() => (flags.zoomWindowEnabled && windowType.value === 'waters'))
         
         const page = reactive({
-            header: "Water",
+            header: "Waters",
             //ttpha: "Hide all waters",
             ttpsa: "Select all waters",
-            ttpoo: computed(() => (flags.zoomWindowEnabled && windowType.value === 'waters') ? 'Close external window' : 'View in external window')
+            ttpoo: computed(() => (flags.zoomWindowEnabled && windowType.value === 'waters') ? 'Close external window' : 'View in external window'),
+            ttpst: "Show tips for Waters"
         })
 
         const checkAllSelected = computed(() => allSelected['waters'] )
@@ -122,11 +129,16 @@ export default {
             if(mwt.length < 1) isCollapsed.value = true
         })
 
+        const showTips = () => {
+            console.log("show tips")
+        }
+
         return { 
             ...toRefs(page), isCollapsed, stage,
             modelWater,
             openOut, externalWindow,
-            allSelected, selectAll, checkAllSelected
+            allSelected, selectAll, checkAllSelected,
+            showTips
         }
     }
 }
@@ -148,7 +160,7 @@ export default {
         padding-left: .5rem;
         line-height: 25px;
     }
-    #water-text .water-item { position:relative; z-index:1; padding:0 1.5px; cursor:default; }
+    #water-text .water-item { position:relative; z-index:1; padding:0 1.5px; cursor:default; user-select: none; }
     #water-text .water-item:not(.disabled) { cursor: pointer; }    
     #water-text .water-item:not(.disabled):hover,
     .water-item-hover {
@@ -169,5 +181,6 @@ export default {
         padding: 0;
         margin-left: -3em;
         font-size: 80%;
+        user-select: none;
     }
 </style>

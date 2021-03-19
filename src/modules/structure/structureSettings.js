@@ -205,7 +205,7 @@ export default function structureSettings() {
         return molExists*/
     }
 
-    const updateMolecules = function (molecule, type, currReprVal) {
+    const updateMolecule = function (molecule, type, currReprVal) {
 
         const molecules = settings.value
                             .filter(item => item.id === currentStructure.value)[0].navigation
@@ -233,6 +233,89 @@ export default function structureSettings() {
                 txt: 'removed from '
             }
         }
+
+        return [settings.value, msg]
+
+    }
+
+    const checkIfSetOfMoleculeExists = function (setOfMolecules, type, currReprVal, model) {
+
+        // TODO (NOT WORKING)
+
+        const molecules = settings.value
+                            .filter(item => item.id === currentStructure.value)[0].navigation
+                            .filter(item => item.id === currReprVal)[0].models
+                            .filter(item => item.id === model)[0][type]
+
+        //const newFruits = [...fruits]
+
+        //const { ['id', 'last_sheet', 'longname', 'helix', 'sheet']: remove, ...new_molecules } = molecules
+
+        const clean = ['id', 'last_sheet', 'longname','helix', 'sheet']
+        const new_molecules = Object.keys(molecules).reduce((object, key) => {
+            if (clean.indexOf(key) === -1) {
+              object[key] = molecules[key]
+            }
+            return object
+          }, {})
+
+        console.log(new_molecules)
+
+
+
+        // clean molecules and leave only label / num / chain / model
+        /*new_molecules.forEach((v) => { 
+            delete v.id 
+            delete v.last_sheet
+            delete v.longname
+            delete v.helix
+            delete v.sheet  
+        })*/
+
+        console.log(settings.value)
+
+        let molExists = true
+        for(const m of setOfMolecules) {
+            if(!new_molecules.some(elem => JSON.stringify(elem) == JSON.stringify(m))) {
+                molExists = false
+                break
+            }
+        }
+
+        return molExists
+    }
+
+    const updateSetOfMolecules = function (type, currReprVal, setOfMolecules, chain ) {
+
+        const cm = getCurrentModel(currReprVal)
+        if(cm === null) return []
+        // get currently selected molecules
+        const molecules = settings.value
+                            .filter(item => item.id === currentStructure.value)[0].navigation
+                            .filter(item => item.id === currReprVal)[0].models
+                            .filter(item => item.id === cm)[0][type]
+        // get all molecules of the current representation / model / chain
+        const all_molecules = getChainContent(type, currReprVal)
+                                .filter(item => item.id === chain)[0][type]
+        // set setOfMolecules to the correct residue format
+        let new_molecules = []
+        for(const m of all_molecules) {
+            if(setOfMolecules.some(item => (item.num === m.num && item.chain === m.chain))) new_molecules.push(m)
+        }
+        // push new molecules
+        molecules.push(...new_molecules)
+        // set array unique removing repeated items
+        const array_unique = Array.from(new Set(molecules.map(a => a.num)))
+            .map((num) => {
+                return molecules.find(a => a.num === num)
+            })
+        // update settings.value
+        settings.value
+            .filter(item => item.id === currentStructure.value)[0].navigation
+            .filter(item => item.id === currReprVal)[0].models
+            .filter(item => item.id === cm)[0][type] = array_unique
+
+        const msg = setOfMolecules[0].num + ' - ' + setOfMolecules[setOfMolecules.length - 1].num
 
         return [settings.value, msg]
 
@@ -267,6 +350,20 @@ export default function structureSettings() {
             .filter(item => item.id === cm)[0][type] = molecules
 
         return [settings.value, msg]
+
+    }
+
+    const getSetOfMolecules = function (type, currReprVal, chain, first, last) {
+
+        const all_molecules = getChainContent(type, currReprVal)
+                                .filter(item => item.id === chain)[0][type]
+
+        let range = []
+        for(const m of all_molecules) {
+            if(m.num >= first.num && m.num <= last.num && m.chain === first.chain) range.push(m)
+        }
+
+        return range
 
     }
 
@@ -339,8 +436,10 @@ export default function structureSettings() {
         updateCurrentModel,
         updateCurrentChains,
         checkIfMoleculeExists,
-        updateMolecules,
+        updateMolecule,
+        updateSetOfMolecules,
         updateAllMolecules,
+        getSetOfMolecules,
         getCurrentModel,
         getCurrentChains,
         addNewRepresentationSettings,

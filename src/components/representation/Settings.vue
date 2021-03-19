@@ -76,7 +76,14 @@ export default {
         //console.log(flags.sidebarEnabled)
         const visibleRight = computed({
             get: () => flags.sidebarEnabled,
-            set: val => setFlagStatus('sidebarEnabled', val)
+            set: val => {
+                // adapt toast position to settings state
+                /*if(val) document.getElementsByClassName("p-toast-top-right")[0].style.right = '26%'
+                else document.getElementsByClassName("p-toast-top-right")[0].style.right = '1%'*/
+                //console.log(document.getElementsByClassName("p-toast-top-right"))
+                //.p-toast-top-right { left:calc(2% + 38px);  top:1.5%;}
+                setFlagStatus('sidebarEnabled', val)
+            }
         })
         const stage = getStage()
         const reprList = computed(() => getRepresentationNames())

@@ -60,5 +60,5 @@ export default {
     transition-timing-function: ease-in;
 }
 #legend span { text-transform: uppercase; font-weight: 600;}
-#legend span.greek-char { text-transform: lowercase!important;}
+#legend span.lowercase-legend { text-transform: lowercase!important;}
 </style>

@@ -11,6 +11,13 @@
             @click="selectAll" 
             v-tooltip.left="ttpsa"
             :disabled="modelHeteroatoms.length == 0" />
+            <Button 
+            icon="far fa-lightbulb" 
+            @click="showTips" 
+            style="font-size:16px;"
+            class="p-button-rounded p-button-text" 
+            v-tooltip.left="ttpst" 
+            />
         </template>
 
         <Listbox 
@@ -62,7 +69,7 @@ export default {
             getFileNames, 
             getCurrentModel, 
             getCurrentMolecules, 
-            updateMolecules, 
+            updateMolecule, 
             updateAllMolecules 
         } = structureSettings()
         const { currentRepresentation, getCurrentRepresentationSettings } = useRepresentations()
@@ -94,7 +101,8 @@ export default {
             header: "Heteroatoms",
             filterPlaceholder: "Search heteroatom",
             ttpsa: computed(() => !allSelected.value ? 'Select all heteroatoms' : 'Unselect all heteroatoms'),
-            ttpcv: "Center view on this heteroatom"
+            ttpcv: "Center view on this heteroatom",
+            ttpst: "Show tips for Heteroatoms"
         })
 
         const selectedHets = computed({
@@ -142,7 +150,7 @@ export default {
 
                 //console.log(status, lastItem)
 
-                const [settings, msg] = updateMolecules(lastItem, 'heteroatoms', currReprVal.value)
+                const [settings, msg] = updateMolecule(lastItem, 'heteroatoms', currReprVal.value)
                 const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
                 // TODO: CLEAN residue, structure
                 setMoleculesSettings(lastItem, currStr.value, currReprVal.value)
@@ -316,11 +324,16 @@ export default {
             setFlagStatus('legendEnabled', false)
         }
 
+        const showTips = () => {
+            console.log("show tips")
+        }
+
         return { 
             ...toRefs(page), isCollapsed, 
             modelHeteroatoms,
             selectedHets, centerHetero, onHover, onLeave, 
-            allSelected, selectAll
+            allSelected, selectAll,
+            showTips
         }
     }
 }

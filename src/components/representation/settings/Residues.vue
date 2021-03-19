@@ -19,12 +19,13 @@
             @click="selectAll" 
             v-tooltip.left="ttpsa"
             :disabled="modelResidues.length == 0" />
-            <!--<Button 
-            :icon="allVisible ? 'fas fa-eye-slash' : 'fas fa-eye'" 
-            @click="hideAll" 
+            <Button 
+            icon="far fa-lightbulb" 
+            @click="showTips" 
+            style="font-size:16px;"
             class="p-button-rounded p-button-text" 
-            v-tooltip.left="ttpha" 
-            />-->
+            v-tooltip.left="ttpst" 
+            />
         </template>
         <div id="sequence-text">
             <div class="chain-sequence margin-bottom-10" v-for="(chain, index) in modelResidues" :key="index">
@@ -72,7 +73,8 @@ export default {
             header: "Sequence",
             //ttpha: "Hide all residues",
             ttpsa: "Select all residues",
-            ttpoo: computed(() => (flags.zoomWindowEnabled && windowType.value === 'residues') ? 'Close external window' : 'View in external window')
+            ttpoo: computed(() => (flags.zoomWindowEnabled && windowType.value === 'residues') ? 'Close external window' : 'View in external window'),
+            ttpst: "Show tips for Sequence residues"
         })
 
         const checkAllSelected = computed(() => allSelected['residues'] )
@@ -132,6 +134,10 @@ export default {
             allVisible.value = !allVisible.value
         }*/
 
+        const showTips = () => {
+            console.log("show tips")
+        }
+
         // TODO: REPLACE BY COMPUTED GETTER / SETTER
         // modifying isCollapsed & selectedChains v-model properties without computed()
         watch([modelResidues], (newValues, prevValues) => {
@@ -150,7 +156,8 @@ export default {
             ...toRefs(page), isCollapsed, stage,
             modelResidues, modelSheets, modelHelixes,
             openOut, externalWindow,
-            allSelected, selectAll, checkAllSelected
+            allSelected, selectAll, checkAllSelected,
+            showTips
             /*hideAll, allVisible */
         }
     }

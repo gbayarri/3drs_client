@@ -57,8 +57,8 @@ export default function processStructure() {
         structureView.eachResidue(function (rp) {
           if(rp.isHelix()) {
             arraux.push({
-                label: rp.resname.toUpperCase(),
                 num: rp.resno,
+                label: rp.resname.toUpperCase(),
                 chain: rp.chainname,
                 model: rp.modelIndex
             })
@@ -83,8 +83,8 @@ export default function processStructure() {
         structureView.eachResidue(function (rp) {
           if(rp.isSheet()) {
             arraux.push({
-                label: rp.resname.toUpperCase(),
                 num: rp.resno,
+                label: rp.resname.toUpperCase(),
                 chain: rp.chainname,
                 model: rp.modelIndex
             })

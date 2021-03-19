@@ -15,8 +15,8 @@
     @mouseover="onMouseOver(residue.model, residue.chain, residue.num, residue.label, residue.longname)"
     @mouseleave="onMouseLeave(residue.model, residue.chain, residue.num, residue.label)"
     @click.exact="onClick(residue.model, residue.chain, residue.num, residue.label, residue.longname)"
-    @click.shift.exact="onSelectMultiple(residue.model, residue.chain, residue.num, residue.label)"
-    @click.alt.exact="centerResidue(residue.model, residue.chain, residue.num, residue.label)">
+    @click.shift.exact="onSelectMultiple(residue.model, residue.chain, residue.num)"
+    @click.alt.exact="onCenterResidue(residue.model, residue.chain, residue.num, residue.label)">
         {{ residue.id }}
     </span>
     <span v-else class="sequence-item disabled">&nbsp;</span>
@@ -25,8 +25,8 @@
     v-if="(residue.sheet !== null) && window" 
     @mouseover="sheetOver(residue.sheet, residue.chain, residue.model)" 
     @mouseleave="sheetLeave(residue.sheet, residue.chain, residue.model)" 
-    @click="sheetClick(residue.sheet, residue.chain, residue.model)"
-    @dblclick="sheetDoubleClick(residue.sheet, residue.chain, residue.model)"
+    @click.exact="sheetClick(residue.sheet, residue.chain)"
+    @click.alt.exact="sheetCenter(residue.sheet, residue.chain, residue.model)"
     :data-sheet="residue.chain + ':' + residue.sheet + '/' + residue.model" >
     <span v-if="!residue.last_sheet">&nbsp;&nbsp;</span><span v-else>&#9654;&nbsp;</span></span>
 
@@ -34,8 +34,8 @@
     v-if="(residue.helix !== null) && window" 
     @mouseover="helixOver(residue.helix, residue.chain, residue.model)" 
     @mouseleave="helixLeave(residue.helix, residue.chain, residue.model)" 
-    @click="helixClick(residue.helix, residue.chain, residue.model)"
-    @dblclick="helixDoubleClick(residue.helix, residue.chain, residue.model)"
+    @click.exact="helixClick(residue.helix, residue.chain)"
+    @click.alt.exact="helixCenter(residue.helix, residue.chain, residue.model)"
     :data-helix="residue.chain + ':' + residue.helix + '/' + residue.model" >&nbsp;&nbsp;</span>
 </template>
 
@@ -62,7 +62,7 @@ export default {
 
         const { updateLegend } = useLegend()
         const { setFlagStatus } = useFlags()
-        const { currentStructure, getFileNames, checkIfMoleculeExists, updateMolecules } = structureSettings()
+        const { currentStructure, getFileNames, checkIfMoleculeExists, updateMolecule, updateSetOfMolecules, getSetOfMolecules } = structureSettings()
         const { projectData } = structureStorage()
         const { addMultipleResidues, createSelection } = useSelections()
         const { currentRepresentation, getCurrentRepresentationSettings } = useRepresentations()
@@ -105,7 +105,7 @@ export default {
             updateLegend({
                 name: name,
                 chainname:chain,
-                resname: resname + ' (' + longname + ')',
+                resname: resname + ' (<span class="lowercase-legend">' + longname + '</span>)',
                 resno: resnum,
                 atomname: null
             })
@@ -134,7 +134,7 @@ export default {
 
             //const residues = document.querySelectorAll('[data-model="' + model + '"][data-chain="' + chain + '"][data-resnum="' + resnum + '"][data-resname="' + resname + '"]')
    
-            const [settings, msg] = updateMolecules(residue.value, 'residues', currReprVal.value)
+            const [settings, msg] = updateMolecule(residue.value, 'residues', currReprVal.value)
             const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
             // update representations selections
             //console.log(currReprVal.value)
@@ -181,7 +181,7 @@ export default {
 
         // CENTER STRUCTURE
 
-        const centerResidue = (model, chain, resnum, resname) => {
+        const onCenterResidue = (model, chain, resnum, resname) => {
             component.value.autoView(resnum + ':' + chain + '/' + model, 500)
             setPositionSettings(stage)
                 .then((r) => {
@@ -190,9 +190,47 @@ export default {
                 })
         }
 
-        const onSelectMultiple = (model, chain, resnum, resname) => {
-            // GET OUTPUT FOR TOAST WARNING!!!!
-            addMultipleResidues(resnum)
+        const onSelectMultiple = (model, chain, resnum) => {
+            const mr = addMultipleResidues({ model: model, num: resnum, chain, chain})
+            // on second click
+            if(!mr.status) {
+                let first, last
+                // sort first last properly
+                if(mr.firstRes.num > mr.lastRes.num) {
+                    first = mr.lastRes
+                    last = mr.firstRes
+                } else {
+                    first = mr.firstRes
+                    last = mr.lastRes
+                }
+                // get set of molecules
+                const setOfMolecules = getSetOfMolecules('residues', currReprVal.value, residue.value.chain, first, last)
+                const [settings, msg] = updateSetOfMolecules('residues', currReprVal.value, setOfMolecules, residue.value.chain)
+                const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
+                // TODO: CLEAN residue, structure
+                setMoleculesSettings(residue.value, currStr.value, currReprVal.value)
+                    .then((r) => {
+                        if(r.code != 404) {
+                            toast.add({ 
+                                severity: 'info', 
+                                summary: 'Added set of residues', 
+                                detail: 'The range [ Model ' 
+                                        + (residue.value.model + 1)
+                                        + ' | Chain ' 
+                                        + residue.value.chain 
+                                        + ' | ' 
+                                        + msg 
+                                        + ' ] of ' 
+                                        + strName 
+                                        + ' structure has been added to ' 
+                                        + currReprSettings.value.name 
+                                        + ' representation',
+                                life: 10000
+                            })
+                            console.log(r.message)
+                        } else  console.error(r.message)
+                    })
+            }
             //console.log('multiple on: ',e.target.dataset.model,e.target.dataset.chain,e.target.dataset.resnum, e.target.dataset.resname)
         }
 
@@ -202,7 +240,9 @@ export default {
             const firstItem = resSheet[0]
             const lastItem = resSheet[resSheet.length-1]
             const sele = firstItem.num + '-' + lastItem.num + ':' + chain + '/' + model
-            //const sele = '(724-731:A/0)'
+            //***************************************************************** */
+            //const sele = '724:A/0, 725:A/0, 726:A/0, 727:A/0, 728:A/0, 729:A/0'
+            //***************************************************************** */
             const repr = resSheet.length > 3 ? 'cartoon' : 'licorice'
             const new_name = currStr.value + '-' + sele + '-hover'
             component.value.addRepresentation( repr, { 
@@ -222,11 +262,11 @@ export default {
             }
             // legend
             const name = filesList.value.filter(item => item.id === currStr.value)[0].name
-            const labelSh = firstItem.label + firstItem.num + "~" + lastItem.label + lastItem.num
+            const labelSh = firstItem.label + ' ' + firstItem.num + ' - ' + lastItem.label + ' ' + lastItem.num
             updateLegend({
                 name: name,
                 chainname: chain,
-                resname: '<span class="greek-char">β</span>-sheet',
+                resname: '<span class="lowercase-legend">β-sheet</span>',
                 resno: labelSh,
                 atomname: null
             })
@@ -254,21 +294,47 @@ export default {
             setFlagStatus('legendEnabled', false)
         }
 
-        const sheetClick = (sheet, chain, model) => {
-            const residues = document.querySelectorAll('[data-sheet="' + chain + ':' + sheet + '/' + model + '"]')
-            for(const res of residues) {
-                if(res.className.indexOf('sequence-item-selected') === -1 && res.className.indexOf('sequence-item') !== -1) res.classList.add('sequence-item-selected')
-                else res.classList.remove('sequence-item-selected', 'sequence-item-hover')
-            }
+        const sheetClick = (sheet, chain) => {
+            const resSheet = props.sheets.filter(item => item.id === chain)[0].sheets[sheet]
+            const [settings, msg] = updateSetOfMolecules('residues', currReprVal.value, resSheet, residue.value.chain)
+
+            const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
+            // TODO: CLEAN residue, structure
+            setMoleculesSettings(residue.value, currStr.value, currReprVal.value)
+                .then((r) => {
+                    if(r.code != 404) {
+                        toast.add({ 
+                            severity: 'info', 
+                            summary: 'Added set of molecules', 
+                            detail: 'The sheet [ Model ' 
+                                    + (residue.value.model + 1)
+                                    + ' | Chain ' 
+                                    + residue.value.chain 
+                                    + ' | ' 
+                                    + msg 
+                                    + ' ] of ' 
+                                    + strName 
+                                    + ' structure has been added to ' 
+                                    + currReprSettings.value.name 
+                                    + ' representation',
+                            life: 10000
+                        })
+                        console.log(r.message)
+                    } else  console.error(r.message)
+                })
         }
 
-        const sheetDoubleClick = (sheet, chain, model) => {
-            console.log('center on: ',model,chain,sheet)
-            /*const residues = document.querySelectorAll('[data-model="' + e.target.dataset.model + '"][data-chain="' + e.target.dataset.chain + '"][data-resnum="' + e.target.dataset.resnum + '"][data-resname="' + e.target.dataset.resname + '"]')
-            for(const res of residues) {
-                if(res.className.indexOf('sequence-item-selected') === -1) res.classList.add('sequence-item-selected')
-                else res.classList.remove('sequence-item-selected', 'sequence-item-hover')
-            }*/
+        const sheetCenter = (sheet, chain, model) => {
+            const resSheet = props.sheets.filter(item => item.id === chain)[0].sheets[sheet]
+            const firstItem = resSheet[0]
+            const lastItem = resSheet[resSheet.length-1]
+            const sele = firstItem.num + '-' + lastItem.num + ':' + chain + '/' + model
+            component.value.autoView(sele, 500)
+            setPositionSettings(stage)
+                .then((r) => {
+                    if(r.code != 404) console.log(r.message)
+                    else console.error(r.message)
+                })
         }
 
         const helixOver = (helix, chain, model) => {
@@ -295,11 +361,11 @@ export default {
             }
             // legend
             const name = filesList.value.filter(item => item.id === currStr.value)[0].name
-            const labelHx = firstItem.label + firstItem.num + "~" + lastItem.label + lastItem.num
+            const labelHx = firstItem.label + ' ' + firstItem.num + ' - ' + lastItem.label + ' ' + lastItem.num
             updateLegend({
                 name: name,
                 chainname: chain,
-                resname: '<span class="greek-char">α</span>-helix',
+                resname: '<span class="lowercase-legend">α-helix</span>',
                 resno: labelHx,
                 atomname: null
             })
@@ -326,29 +392,55 @@ export default {
             setFlagStatus('legendEnabled', false)
         }
 
-        const helixClick = (helix, chain, model) => {
-            const residues = document.querySelectorAll('[data-helix="' + chain + ':' + helix + '/' + model + '"]')
-            for(const res of residues) {
-                if(res.className.indexOf('sequence-item-selected') === -1 && res.className.indexOf('sequence-item') !== -1) res.classList.add('sequence-item-selected')
-                else res.classList.remove('sequence-item-selected', 'sequence-item-hover')
-            }
+        const helixClick = (helix, chain) => {
+            const resHelix = props.helixes.filter(item => item.id === chain)[0].helixes[helix]
+            const [settings, msg] = updateSetOfMolecules('residues', currReprVal.value, resHelix, residue.value.chain)
+
+            const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
+            // TODO: CLEAN residue, structure
+            setMoleculesSettings(residue.value, currStr.value, currReprVal.value)
+                .then((r) => {
+                    if(r.code != 404) {
+                        toast.add({ 
+                            severity: 'info', 
+                            summary: 'Added set of molecules', 
+                            detail: 'The helix [ Model ' 
+                                    + (residue.value.model + 1)
+                                    + ' | Chain ' 
+                                    + residue.value.chain 
+                                    + ' | ' 
+                                    + msg 
+                                    + ' ] of ' 
+                                    + strName 
+                                    + ' structure has been added to ' 
+                                    + currReprSettings.value.name 
+                                    + ' representation',
+                            life: 10000
+                        })
+                        console.log(r.message)
+                    } else  console.error(r.message)
+                })
         }
 
-        const helixDoubleClick = (helix, chain, model) => {
-            console.log('center on: ',model,chain,helix)
-            /*const residues = document.querySelectorAll('[data-model="' + e.target.dataset.model + '"][data-chain="' + e.target.dataset.chain + '"][data-resnum="' + e.target.dataset.resnum + '"][data-resname="' + e.target.dataset.resname + '"]')
-            for(const res of residues) {
-                if(res.className.indexOf('sequence-item-selected') === -1) res.classList.add('sequence-item-selected')
-                else res.classList.remove('sequence-item-selected', 'sequence-item-hover')
-            }*/
+        const helixCenter = (helix, chain, model) => {
+            const resHelix = props.helixes.filter(item => item.id === chain)[0].helixes[helix]
+            const firstItem = resHelix[0]
+            const lastItem = resHelix[resHelix.length-1]
+            const sele = firstItem.num + '-' + lastItem.num + ':' + chain + '/' + model
+            component.value.autoView(sele, 500)
+            setPositionSettings(stage)
+                .then((r) => {
+                    if(r.code != 404) console.log(r.message)
+                    else console.error(r.message)
+                })
         }
 
         return { 
             isSelected,
             residue, window,
-            onClick, centerResidue, onSelectMultiple, onMouseOver, onMouseLeave,
-            sheetOver, sheetLeave, sheetClick, sheetDoubleClick,
-            helixOver, helixLeave, helixClick, helixDoubleClick
+            onClick, onCenterResidue, onSelectMultiple, onMouseOver, onMouseLeave,
+            sheetOver, sheetLeave, sheetClick, sheetCenter,
+            helixOver, helixLeave, helixClick, helixCenter
         }
     }
 }
