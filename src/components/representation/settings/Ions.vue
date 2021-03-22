@@ -17,7 +17,7 @@
             style="font-size:16px;"
             class="p-button-rounded p-button-text" 
             v-tooltip.left="ttpst" 
-            />
+            :disabled="modelIons.length == 0" />
         </template>
         
         <Listbox 
@@ -95,6 +95,8 @@ export default {
             prevSelection = getCurrentMolecules(currReprVal.value, 'ions')
             centering = false
             //console.log(prevSelection)
+
+            if(modelIons.value.length < 1) isCollapsed.value = true
         })
 
         const page = reactive({
@@ -255,17 +257,17 @@ export default {
         }
 
         // TODO: REPLACE BY COMPUTED GETTER / SETTER
-        watch([/*watchedChains,*/ modelIons/*, selectedIons*/], (newValues, prevValues) => {
+        //watch([/*watchedChains,*/ modelIons/*, selectedIons*/], (newValues, prevValues) => {
             //const wch = newValues[0]
-            const mdis = newValues[0]
-            const sins = newValues[1]
+            //const mdis = newValues[0]
+            //const sins = newValues[1]
             //modelIons  =  computed(() => computeIonsList(wch, 'ions'))
             //console.log(modelIons.value)
-            if(mdis.length < 1) isCollapsed.value = true
+            //if(mdis.length < 1) isCollapsed.value = true
             //if(!sins || sins.length === 0) allSelected.value = false
             //if(sins && (sins.length === mdis.length)) allSelected.value = true
             //if(sins.length < modelIons.value.length) allSelected.value = false
-        })
+        //})
 
         // CENTER STRUCTURE
 

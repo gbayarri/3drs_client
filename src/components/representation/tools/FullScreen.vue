@@ -29,7 +29,8 @@ export default {
       //isFullScreen.value = !isFullScreen.value
 
       //console.log(e)
-      stage.toggleFullscreen( document.getElementsByTagName("body")[0] )
+      //stage.toggleFullscreen( document.getElementsByTagName("body")[0] )
+      stage.toggleFullscreen( document.querySelector("body") )
       stage.handleResize();
 
       if (document.addEventListener) {

@@ -158,42 +158,51 @@ export default {
             const mr = addMultipleResidues({ model: model, num: resnum, chain, chain})
             // on second click
             if(!mr.status) {
-                let first, last
-                // sort first last properly
-                if(mr.firstRes.num > mr.lastRes.num) {
-                    first = mr.lastRes
-                    last = mr.firstRes
-                } else {
-                    first = mr.firstRes
-                    last = mr.lastRes
-                }
-                // get set of molecules
-                const setOfMolecules = getSetOfMolecules('waters', currReprVal.value, water.value.chain, first, last)
-                const [settings, msg] = updateSetOfMolecules('waters', currReprVal.value, setOfMolecules, water.value.chain)
-                const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
-                // TODO: CLEAN residue, structure
-                setMoleculesSettings(water.value, currStr.value, currReprVal.value)
-                    .then((r) => {
-                        if(r.code != 404) {
-                            toast.add({ 
-                                severity: 'info', 
-                                summary: 'Added set of waters', 
-                                detail: 'The range [ Model ' 
-                                        + (water.value.model + 1)
-                                        + ' | Chain ' 
-                                        + water.value.chain 
-                                        + ' | ' 
-                                        + msg 
-                                        + ' ] of ' 
-                                        + strName 
-                                        + ' structure has been added to ' 
-                                        + currReprSettings.value.name 
-                                        + ' representation',
-                                life: 10000
-                            })
-                            console.log(r.message)
-                        } else  console.error(r.message)
+                if(mr.error) {
+                    toast.add({ 
+                        severity: 'error', 
+                        summary: 'Error selecting set of waters', 
+                        detail: 'Unable to select set of waters from different models / chains',
+                        life: 5000
                     })
+                } else  {
+                    let first, last
+                    // sort first last properly
+                    if(mr.firstRes.num > mr.lastRes.num) {
+                        first = mr.lastRes
+                        last = mr.firstRes
+                    } else {
+                        first = mr.firstRes
+                        last = mr.lastRes
+                    }
+                    // get set of molecules
+                    const setOfMolecules = getSetOfMolecules('waters', currReprVal.value, water.value.chain, first, last)
+                    const [settings, msg] = updateSetOfMolecules('waters', currReprVal.value, setOfMolecules, water.value.chain)
+                    const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
+                    // TODO: CLEAN residue, structure
+                    setMoleculesSettings(water.value, currStr.value, currReprVal.value)
+                        .then((r) => {
+                            if(r.code != 404) {
+                                toast.add({ 
+                                    severity: 'info', 
+                                    summary: 'Added set of waters', 
+                                    detail: 'The range [ Model ' 
+                                            + (water.value.model + 1)
+                                            + ' | Chain ' 
+                                            + water.value.chain 
+                                            + ' | ' 
+                                            + msg 
+                                            + ' ] of ' 
+                                            + strName 
+                                            + ' structure has been added to ' 
+                                            + currReprSettings.value.name 
+                                            + ' representation',
+                                    life: 10000
+                                })
+                                console.log(r.message)
+                            } else  console.error(r.message)
+                        })
+                }
             }
             //console.log('multiple on: ',e.target.dataset.model,e.target.dataset.chain,e.target.dataset.resnum, e.target.dataset.resname)
         }

@@ -60,8 +60,10 @@ export default {
 
                 const rows = document.getElementsByClassName("p-fileupload-row")
                 for(var item of rows){
-                    item.getElementsByTagName("div")[0].innerHTML = '<span class="fu-ext-traj">' + ext + '</span><br><span class="fu-traj">trajectory</span>'
-                    item.getElementsByTagName("div")[0].style.lineHeight = '15px'
+                    //item.getElementsByTagName("div")[0].innerHTML = '<span class="fu-ext-traj">' + ext + '</span><br><span class="fu-traj">trajectory</span>'
+                    //item.getElementsByTagName("div")[0].style.lineHeight = '15px'
+                    item.querySelector("div").innerHTML = '<span class="fu-ext-traj">' + ext + '</span><br><span class="fu-traj">trajectory</span>'
+                    item.querySelector("div").style.lineHeight = '15px'
                 }
             }, 20);
         }

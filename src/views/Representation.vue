@@ -64,16 +64,11 @@ export default {
 
 <style>
     .p-toast-top-right { left:calc(2% + 38px);  top:1.5%;}
-    /*.p-toast-top-right { left:22%;  top:calc(98vh - 38px);}*/
-    /* TO FIX THAT !!! */
-    /*.p-toast-top-right { left:calc(99%  - 200px);  top:calc(98vh - 38px); }*/
     .p-toast .p-toast-message.p-toast-message-info { 
         background: #d7e6ec!important; 
         border: solid #5e738b!important; 
         border-width: 0 0 0 6px!important;
-        color: #48596d!important; 
-       /* position: absolute;
-        bottom:0;*/
+        color: #48596d!important;
     }
     .p-toast .p-toast-message.p-toast-message-info .p-toast-message-icon, 
     .p-toast .p-toast-message.p-toast-message-info .p-toast-icon-close { color: #48596d!important; }

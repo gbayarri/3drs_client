@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onUpdated } from 'vue'
 import structureSettings from '@/modules/structure/structureSettings'
 import useRepresentations from '@/modules/representations/useRepresentations'
 import useSettings from '@/modules/settings/useSettings'
@@ -121,8 +121,12 @@ export default {
 
         // TODO: REPLACE BY COMPUTED GETTER / SETTER
         // modifying isCollapsed & selectedChains v-model properties without computed()
-        watch(chains, (chs, prevChs) => {
+        /*watch(chains, (chs, prevChs) => {
             if(chs.length <= 1) isCollapsed.value = true
+        })*/
+
+        onUpdated(() => {
+            if(chains.value.length <= 1) isCollapsed.value = true
         })
 
         return { page, isCollapsed, selectedChains, chains, /*onChange,*/ removeChip, onHover, onLeave }

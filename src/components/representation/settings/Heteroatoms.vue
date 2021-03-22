@@ -17,7 +17,7 @@
             style="font-size:16px;"
             class="p-button-rounded p-button-text" 
             v-tooltip.left="ttpst" 
-            />
+            :disabled="modelHeteroatoms.length == 0" />
         </template>
 
         <Listbox 
@@ -95,6 +95,8 @@ export default {
             prevSelection = getCurrentMolecules(currReprVal.value, 'heteroatoms')
             centering = false
             //console.log(prevSelection)
+
+            if(modelHeteroatoms.value.length < 1) isCollapsed.value = true
         })
 
         const page = reactive({
@@ -260,16 +262,16 @@ export default {
         }
 
         // TODO: REPLACE BY COMPUTED GETTER / SETTER
-        watch([/*watchedChains,*/ modelHeteroatoms/*, selectedHets*/], (newValues, prevValues) => {
+        //watch([/*watchedChains,*/ modelHeteroatoms/*, selectedHets*/], (newValues, prevValues) => {
             //const wch = newValues[0]
-            const mdhs = newValues[0]
+            //const mdhs = newValues[0]
             //const shts = newValues[1]
             //modelHeteroatoms  =  computed(() => computeHeteroList(wch, 'heteroatoms'))
             //console.log(modelHeteroatoms.value)
-            if(mdhs.length < 1) isCollapsed.value = true
+            //if(mdhs.length < 1) isCollapsed.value = true
             //if(!shts || shts.length === 0) allSelected.value = false
             //if(shts && (shts.length === mdhs.length)) allSelected.value = true
-        })
+        //})
 
         // CENTER STRUCTURE
 

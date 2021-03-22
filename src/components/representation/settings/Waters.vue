@@ -1,5 +1,5 @@
 <template>
-    <Panel :toggleable="modelWater.length >= 1" v-model:collapsed="isCollapsed">
+    <Panel :toggleable="modelWaters.length >= 1" v-model:collapsed="isCollapsed">
         <template #header>
             <i class="fas fa-tint"></i> <div class="p-panel-title">{{ header }}</div>
         </template>
@@ -10,25 +10,24 @@
             style="font-size:16px;" 
             @click="openOut" 
             v-tooltip.left="ttpoo"
-            :disabled="modelWater.length == 0"
-            />
+            :disabled="modelWaters.length == 0" />
             <Button 
-            :icon="checkAllSelected ? 'fas fa-times-circle' : 'fas fa-check-circle'" 
+            :icon="allSelected.waters ? 'fas fa-times-circle' : 'fas fa-check-circle'" 
             class="p-button-rounded p-button-text" 
             style="font-size:16px;" 
             @click="selectAll" 
             v-tooltip.left="ttpsa"
-            :disabled="modelWater.length == 0" />
+            :disabled="modelWaters.length == 0" />
             <Button 
             icon="far fa-lightbulb" 
             @click="showTips" 
             style="font-size:16px;"
             class="p-button-rounded p-button-text" 
             v-tooltip.left="ttpst" 
-            />
+            :disabled="modelWaters.length == 0" />
         </template>
         <div id="water-text">
-            <div class="chain-water margin-bottom-10" v-for="(chain, index) in modelWater" :key="index">
+            <div class="chain-water margin-bottom-10" v-for="(chain, index) in modelWaters" :key="index">
                 <div class="chain-title margin-bottom-10" v-if="chain.waters.length > 0">Chain {{ chain.id }}</div>
                 <Water 
                 v-for="(item, index) in chain.waters" 
@@ -44,11 +43,13 @@
 </template>
 
 <script>
-import { ref, reactive, computed, watch, toRefs } from 'vue'
+import { ref, reactive, computed, watch, toRefs, onUpdated } from 'vue'
+import { useToast } from 'primevue/usetoast'
 import useFlags from '@/modules/common/useFlags'
 import useZoomWindow from '@/modules/representations/useZoomWindow'
 import structureSettings from '@/modules/structure/structureSettings'
 import useRepresentations from '@/modules/representations/useRepresentations'
+import useSettings from '@/modules/settings/useSettings'
 import Water from '@/components/representation/settings/addons/Water'
 export default {
     props: ['stage'],
@@ -58,14 +59,29 @@ export default {
         const stage = props.stage
         const { flags, setFlagStatus } = useFlags()
         const { windowType, allSelected, setWindowType } = useZoomWindow()
-        const { getCurrentChains, getChainContent } = structureSettings()
-        const { currentRepresentation } = useRepresentations()
+        //const { getCurrentChains, getChainContent } = structureSettings()
+        const { 
+            currentStructure,
+            getCurrentChains, 
+            getChainContent, 
+            updateAllMolecules, 
+            getCurrentModel, 
+            getCurrentMolecules, 
+            getFileNames 
+        } = structureSettings()
+        const { currentRepresentation, getCurrentRepresentationSettings } = useRepresentations()
+        const { setMoleculesSettings } = useSettings()
 
+        const filesList = computed(() => getFileNames())
         const isCollapsed = ref(true)
         //const allSelected = ref(false)
+        const currReprSettings = computed(() => getCurrentRepresentationSettings())
         const currReprVal = computed(() => currentRepresentation.value)
+        const currStr = computed(() => currentStructure.value)
         const externalWindow = computed(() => (flags.zoomWindowEnabled && windowType.value === 'waters'))
-        
+
+        const toast = useToast()
+
         const page = reactive({
             header: "Waters",
             //ttpha: "Hide all waters",
@@ -74,7 +90,7 @@ export default {
             ttpst: "Show tips for Waters"
         })
 
-        const checkAllSelected = computed(() => allSelected['waters'] )
+        //const checkAllSelected = computed(() => allSelected['waters'] )
 
         // trick for creating reactivity with computed property
         //const watchedChains = computed(() => getCurrentChains())
@@ -86,9 +102,17 @@ export default {
             return allContent.filter(item => chains.includes(item.id))
         }
 
-        //let modelWater = computed(() => getModelContent(watchedChains.value, 'waters'))
-        const modelWater = computed(() => getModelContent(getCurrentChains(currReprVal.value), 'waters'))
-        //console.log(modelWater.value)
+        const getTotalContent = (wch) => {
+            let waters = []
+            for(const c of wch) waters = [...waters, ...c.waters]
+            return waters
+        }
+
+        //let modelWaters = computed(() => getModelContent(watchedChains.value, 'waters'))
+        const modelWaters = computed(() => getModelContent(getCurrentChains(currReprVal.value), 'waters'))
+        //console.log(modelWaters.value)
+
+        allSelected['waters'] = computed(() => getTotalContent(modelWaters.value).length === getCurrentMolecules(currReprVal.value, 'waters').length)
 
         const openOut = () => {
             if(!externalWindow.value) {
@@ -101,43 +125,65 @@ export default {
         }
 
         const selectAll = () => {
-            /*page.ttpsa = allSelected.value ? 'Select all waters' : 'Unselect all waters'
-            const items = document.getElementsByClassName("water-item")
-            for(const it of items) {
-                if(!allSelected.value) {
-                    if(it.className.indexOf('disabled') === -1) it.classList.add('water-item-selected')
-                } else {
-                    if(it.className.indexOf('disabled') === -1) it.classList.remove('water-item-selected')
-                }
+            
+            let settings, msg
+            if(allSelected.waters) {
+                [settings, msg] = updateAllMolecules('waters', currReprVal.value, 'unselect')
+                //console.log('I want to unselect all')
+            } else {
+                [settings, msg] = updateAllMolecules('waters', currReprVal.value, 'select', getTotalContent(modelWaters.value))
+                //console.log('I want to select all')
             }
-            allSelected.value = !allSelected.value*/
 
-            // TODO!!!! ADD TO NAVIGATION
+            const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
+            // TODO: CLEAN residue, structure
+            setMoleculesSettings(null, null, currReprVal.value)
+                .then((r) => {
+                    if(r.code != 404) {
+                        toast.add({ 
+                            severity: msg.status, 
+                            summary: msg.tit, 
+                            detail: 'All the waters of Model ' 
+                                    + (getCurrentModel(currReprVal.value) + 1)
+                                    + ' in ' 
+                                    + strName 
+                                    + ' structure have been ' 
+                                    + msg.txt 
+                                    + currReprSettings.value.name 
+                                    + ' representation',
+                            life: 10000
+                        })
+                        console.log(r.message)
+                    } else  console.error(r.message)
+                })
 
-            allSelected['waters'] = !allSelected['waters']
         }
 
         // TODO!!!! ADD TO NAVIGATION
         // FUNCTION onClick OR SIMILAR
 
         // TODO: REPLACE BY COMPUTED GETTER / SETTER
-        watch([modelWater], (newValues, prevValues) => {
+        //watch([modelWaters], (newValues, prevValues) => {
             //const wch = newValues[0]
-            //modelWater  =  computed(() => getModelContent(wch, 'waters'))
-            //console.log(modelWater.value)
-            const mwt = newValues[0]
-            if(mwt.length < 1) isCollapsed.value = true
-        })
+            //modelWaters  =  computed(() => getModelContent(wch, 'waters'))
+            //console.log(modelWaters.value)
+            //const mwt = newValues[0]
+            //if(mwt.length < 1) isCollapsed.value = true
+        //})
 
         const showTips = () => {
             console.log("show tips")
         }
 
+        onUpdated(() => {
+            if(modelWaters.value.length < 1) isCollapsed.value = true
+        })
+
         return { 
             ...toRefs(page), isCollapsed, stage,
-            modelWater,
+            modelWaters,
             openOut, externalWindow,
-            allSelected, selectAll, checkAllSelected,
+            allSelected, selectAll, /*checkAllSelected,*/
             showTips
         }
     }

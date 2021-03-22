@@ -178,7 +178,7 @@ export default {
           }
 
           // set background color
-          document.getElementById("viewport").style.background = apiData.value.background
+          document.querySelector("#viewport").style.background = apiData.value.background
 
           // save apiData to structureStorage.projectData
           updateStructureProject(apiData.value)

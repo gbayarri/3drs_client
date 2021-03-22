@@ -247,17 +247,28 @@ export default function structureSettings() {
                             .filter(item => item.id === currReprVal)[0].models
                             .filter(item => item.id === model)[0][type]
 
-        //const newFruits = [...fruits]
+        const new_molecules = []
+        for(const m of molecules) {
+            new_molecules.push({
+                num: m.num,
+                label: m.label,
+                chain: m.chain,
+                model: m.model
+            })
+        }
 
         //const { ['id', 'last_sheet', 'longname', 'helix', 'sheet']: remove, ...new_molecules } = molecules
-
-        const clean = ['id', 'last_sheet', 'longname','helix', 'sheet']
+        // this clean is not working????
+        /*const clean = ['id', 'last_sheet', 'longname','helix', 'sheet']
         const new_molecules = Object.keys(molecules).reduce((object, key) => {
+            console.log(key)
             if (clean.indexOf(key) === -1) {
               object[key] = molecules[key]
             }
             return object
           }, {})
+
+        console.log(new_molecules)*/
 
         console.log(new_molecules)
 
@@ -272,6 +283,7 @@ export default function structureSettings() {
             delete v.sheet  
         })*/
 
+
         console.log(settings.value)
 
         let molExists = true
@@ -280,6 +292,10 @@ export default function structureSettings() {
                 molExists = false
                 break
             }
+            /*new_molecules.some((elem) => {
+                console.log(JSON.stringify(elem), JSON.stringify(m))
+                return JSON.stringify(elem) == JSON.stringify(m)
+            })*/
         }
 
         return molExists
@@ -289,6 +305,10 @@ export default function structureSettings() {
 
         const cm = getCurrentModel(currReprVal)
         if(cm === null) return []
+
+        // TO FINISH THAT!!!!!
+        console.log(checkIfSetOfMoleculeExists(setOfMolecules, type, currReprVal, cm))
+
         // get currently selected molecules
         const molecules = settings.value
                             .filter(item => item.id === currentStructure.value)[0].navigation

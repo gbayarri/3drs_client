@@ -10,10 +10,9 @@
             style="font-size:16px;" 
             @click="openOut" 
             v-tooltip.left="ttpoo"
-            :disabled="modelResidues.length == 0"
-            />
+            :disabled="modelResidues.length == 0" />
             <Button 
-            :icon="checkAllSelected ? 'fas fa-times-circle' : 'fas fa-check-circle'" 
+            :icon="allSelected.residues ? 'fas fa-times-circle' : 'fas fa-check-circle'" 
             class="p-button-rounded p-button-text" 
             style="font-size:16px;"
             @click="selectAll" 
@@ -25,7 +24,7 @@
             style="font-size:16px;"
             class="p-button-rounded p-button-text" 
             v-tooltip.left="ttpst" 
-            />
+            :disabled="modelResidues.length == 0" />
         </template>
         <div id="sequence-text">
             <div class="chain-sequence margin-bottom-10" v-for="(chain, index) in modelResidues" :key="index">
@@ -46,11 +45,13 @@
 </template>
 
 <script>
-import { ref, reactive, computed, watch, toRefs } from 'vue'
+import { ref, reactive, computed, watch, toRefs, onUpdated } from 'vue'
+import { useToast } from 'primevue/usetoast'
 import useFlags from '@/modules/common/useFlags'
 import useZoomWindow from '@/modules/representations/useZoomWindow'
 import structureSettings from '@/modules/structure/structureSettings'
 import useRepresentations from '@/modules/representations/useRepresentations'
+import useSettings from '@/modules/settings/useSettings'
 import Residue from '@/components/representation/settings/addons/Residue'
 export default {
     props: ['stage'],
@@ -60,14 +61,28 @@ export default {
         const stage = props.stage
         const { flags, setFlagStatus } = useFlags()
         const { windowType, allSelected, setWindowType } = useZoomWindow()
-        const { getCurrentChains, getChainContent } = structureSettings()
-        const { currentRepresentation } = useRepresentations()
+        const { 
+            currentStructure,
+            getCurrentChains, 
+            getChainContent, 
+            updateAllMolecules, 
+            getCurrentModel, 
+            getCurrentMolecules, 
+            getFileNames 
+        } = structureSettings()
+        const { currentRepresentation, getCurrentRepresentationSettings } = useRepresentations()
+        const { setMoleculesSettings } = useSettings()
 
+        const filesList = computed(() => getFileNames())
         const isCollapsed = ref(true)
         //const allSelected = ref(false)
+        const currReprSettings = computed(() => getCurrentRepresentationSettings())
         const currReprVal = computed(() => currentRepresentation.value)
+        const currStr = computed(() => currentStructure.value)
         const externalWindow = computed(() => (flags.zoomWindowEnabled && windowType.value === 'residues'))
         //const allVisible = ref(false)
+
+        const toast = useToast()
 
         const page = reactive({
             header: "Sequence",
@@ -77,8 +92,10 @@ export default {
             ttpst: "Show tips for Sequence residues"
         })
 
-        const checkAllSelected = computed(() => allSelected['residues'] )
+        //const checkAllSelected = computed(() => allSelected['residues'] )
         
+        //console.log(getCurrentMolecules(currReprVal.value, 'residues'))
+
         // trick for creating reactivity with computed property
         //const watchedChains = computed(() => getCurrentChains())
 
@@ -87,6 +104,12 @@ export default {
             for(const c of wch) chains.push(c.id)
             const allContent = getChainContent(label, currReprVal.value)
             return allContent.filter(item => chains.includes(item.id))
+        }
+
+        const getTotalContent = (wch) => {
+            let residues = []
+            for(const c of wch) residues = [...residues, ...c.residues]
+            return residues
         }
 
         /*const modelResidues = computed(() => getModelContent(watchedChains.value, 'residues'))
@@ -99,6 +122,8 @@ export default {
         console.log(modelSheets.value)
         console.log(modelHelixes.value)*/
 
+        allSelected['residues'] = computed(() => getTotalContent(modelResidues.value).length === getCurrentMolecules(currReprVal.value, 'residues').length)
+
         const openOut = () => {
             if(!externalWindow.value) {
                 setWindowType('residues')
@@ -110,29 +135,39 @@ export default {
         }
 
         const selectAll = () => {
-            /*page.ttpsa = allSelected.value ? 'Select all residues' : 'Unselect all residues'
-            const items = document.getElementsByClassName("sequence-item")
-            for(const it of items) {
-                if(!allSelected.value) {
-                    if(it.className.indexOf('disabled') === -1) it.classList.add('sequence-item-selected')
-                } else {
-                    if(it.className.indexOf('disabled') === -1) it.classList.remove('sequence-item-selected')
-                }
+
+            let settings, msg
+            if(allSelected.residues) {
+                [settings, msg] = updateAllMolecules('residues', currReprVal.value, 'unselect')
+                //console.log('I want to unselect all')
+            } else {
+                [settings, msg] = updateAllMolecules('residues', currReprVal.value, 'select', getTotalContent(modelResidues.value))
+                //console.log('I want to select all')
             }
-            allSelected.value = !allSelected.value*/
 
-            // TODO!!!! ADD TO NAVIGATION
+            const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
+            // TODO: CLEAN residue, structure
+            setMoleculesSettings(null, null, currReprVal.value)
+                .then((r) => {
+                    if(r.code != 404) {
+                        toast.add({ 
+                            severity: msg.status, 
+                            summary: msg.tit, 
+                            detail: 'All the residues of Model ' 
+                                    + (getCurrentModel(currReprVal.value) + 1)
+                                    + ' in ' 
+                                    + strName 
+                                    + ' structure have been ' 
+                                    + msg.txt 
+                                    + currReprSettings.value.name 
+                                    + ' representation',
+                            life: 10000
+                        })
+                        console.log(r.message)
+                    } else  console.error(r.message)
+                })
 
-            allSelected['residues'] = !allSelected['residues']
         }
-
-        // TODO!!!! ADD TO NAVIGATION
-        // FUNCTION onClick OR SIMILAR
-
-        /*const hideAll = () => {
-            page.ttpha = allVisible.value ? 'Hide all residues' : 'Show all residues'
-            allVisible.value = !allVisible.value
-        }*/
 
         const showTips = () => {
             console.log("show tips")
@@ -140,7 +175,7 @@ export default {
 
         // TODO: REPLACE BY COMPUTED GETTER / SETTER
         // modifying isCollapsed & selectedChains v-model properties without computed()
-        watch([modelResidues], (newValues, prevValues) => {
+        //watch([modelResidues], (newValues, prevValues) => {
             //const wch = newValues[0]
             /*modelResidues  =  computed(() => getModelContent(wch, 'residues'))
             modelSheets = computed(() => getModelContent(wch, 'sheets'))
@@ -148,15 +183,19 @@ export default {
             //console.log(modelResidues.value)
             /*console.log(modelSheets.value)
             console.log(modelHelixes.value)*/
-            const mdrs = newValues[0]
-            if(mdrs.length < 1) isCollapsed.value = true
+            //const mdrs = newValues[0]
+            //if(mdrs.length < 1) isCollapsed.value = true
+        //})
+
+        onUpdated(() => {
+            if(modelResidues.value.length < 1) isCollapsed.value = true
         })
 
         return { 
             ...toRefs(page), isCollapsed, stage,
             modelResidues, modelSheets, modelHelixes,
             openOut, externalWindow,
-            allSelected, selectAll, checkAllSelected,
+            allSelected, selectAll, /*checkAllSelected,*/
             showTips
             /*hideAll, allVisible */
         }

@@ -42,7 +42,8 @@ setup(props) {
 
     let myTimeOut = null
     watch(color, (color, prevColor) => {
-        document.getElementById("viewport").style.background = '#' + color
+        //document.getElementById("viewport").style.background = '#' + color
+        document.querySelector("#viewport").style.background = '#' + color
         clearTimeout(myTimeOut)
         myTimeOut = setTimeout(() => autoSaveBackground('#' + color), 5000)
     })

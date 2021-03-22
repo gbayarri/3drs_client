@@ -34,7 +34,7 @@
         </div>
 
         <div id="water-text" v-if="windowType === 'waters'">
-            <div class="chain-water margin-bottom-10" v-for="(chain, index) in modelWater" :key="index">
+            <div class="chain-water margin-bottom-10" v-for="(chain, index) in modelWaters" :key="index">
                 <div class="chain-title margin-bottom-10" v-if="chain.waters.length > 0">Chain {{ chain.id }}</div>
                 <Water 
                 v-for="(item, index) in chain.waters" 
@@ -50,12 +50,14 @@
 </template>
 
 <script>
-import { computed, watch, reactive, toRefs } from 'vue'
+import { computed, watch, reactive, toRefs, onUpdated } from 'vue'
+import { useToast } from 'primevue/usetoast'
 import useFlags from '@/modules/common/useFlags'
 import useStage from '@/modules/ngl/useStage'
 import useZoomWindow from '@/modules/representations/useZoomWindow'
 import useRepresentations from '@/modules/representations/useRepresentations'
 import structureSettings from '@/modules/structure/structureSettings'
+import useSettings from '@/modules/settings/useSettings'
 import Residue from '@/components/representation/settings/addons/Residue'
 import Water from '@/components/representation/settings/addons/Water'
 export default {
@@ -64,14 +66,28 @@ export default {
         
         const { getStage } = useStage()
         const { flags, setFlagStatus } = useFlags()
-        const { currentRepresentation } = useRepresentations()
+        const { 
+            currentStructure,
+            getCurrentChains, 
+            getChainContent, 
+            updateAllMolecules, 
+            getCurrentModel, 
+            //getCurrentMolecules, 
+            getFileNames 
+        } = structureSettings()
+        const { currentRepresentation, getCurrentRepresentationSettings } = useRepresentations()
         const { windowType, allSelected, setWindowType, toggleAllSelected  } = useZoomWindow()
-        const { getCurrentChains, getChainContent } = structureSettings()
+        const { setMoleculesSettings } = useSettings()
         
+        const filesList = computed(() => getFileNames())
         const currReprVal = computed(() => currentRepresentation.value)
+        const currStr = computed(() => currentStructure.value)
+        const currReprSettings = computed(() => getCurrentRepresentationSettings())
         const stage = getStage()
-        const isActive = computed(() => flags.zoomWindowEnabled)
         const sidebarEnabled = computed(() => flags.sidebarEnabled)
+        const isActive = computed(() => flags.zoomWindowEnabled)
+
+        const toast = useToast()
 
         const page = reactive({
             title: computed(() => (windowType.value === 'residues') ? 'Residues' : 'Water'),
@@ -81,39 +97,19 @@ export default {
             })
         })
 
-        const closeWindow = () => {
-            setWindowType('')
-            setFlagStatus('zoomWindowEnabled', false)
-        }
-
-        const checkAllSelected = computed(() => allSelected[windowType.value] )
-
-        // PUT THAT INSIDE WATER / RESIDUE???
-        const selectAll = () => {
-            //console.log(windowType.value)
-            /*page.ttpsa = computed(() => (allSelected.value ? 'Select all ' + windowType.value : 'Unselect all ' + windowType.value))
-            // select residues / waters
-            const items = document.getElementsByClassName("sequence-item")
-            for(const it of items) {
-                if(!allSelected.value) {
-                    if(it.className.indexOf('disabled') === -1) it.classList.add('sequence-item-selected')
-                } else {
-                    if(it.className.indexOf('disabled') === -1) it.classList.remove('sequence-item-selected')
-                }
-            }
-            allSelected.value = !allSelected.value*/
-            allSelected[windowType.value] = !allSelected[windowType.value]
-        }
-
-        // trick for creating reactivity with computed property
-        //const watchedChains = computed(() => getCurrentChains())
-
         const getModelContent = (wch, label) => {
             const chains = []
             for(const c of wch) chains.push(c.id)
             const allContent = getChainContent(label, currReprVal.value)
             return allContent.filter(item => chains.includes(item.id))
         }
+
+        const getTotalContent = (wch, type) => {
+            let molecules = []
+            for(const c of wch) molecules = [...molecules, ...c[type]]
+            return molecules
+        }
+
 
         // **********************
         // RESIDUES
@@ -130,23 +126,95 @@ export default {
         // WATERS
         // **********************
 
-        //let modelWater = computed(() => getModelContent(watchedChains.value, 'waters'))
-        const modelWater = computed(() => getModelContent(getCurrentChains(currReprVal.value), 'waters'))
+        //let modelWaters = computed(() => getModelContent(watchedChains.value, 'waters'))
+        const modelWaters = computed(() => getModelContent(getCurrentChains(currReprVal.value), 'waters'))
+
+        const closeWindow = () => {
+            setWindowType('')
+            setFlagStatus('zoomWindowEnabled', false)
+        }
+
+        const checkAllSelected = computed(() => allSelected[windowType.value] )
+
+        // PUT THAT INSIDE WATER / RESIDUE???
+        const selectAll = () => {
+
+            let settings, msg
+            if(allSelected[windowType.value]) {
+                [settings, msg] = updateAllMolecules(windowType.value, currReprVal.value, 'unselect')
+                //console.log('I want to unselect all')
+            } else {
+                if(windowType.value === 'residues') [settings, msg] = updateAllMolecules('residues', currReprVal.value, 'select', getTotalContent(modelResidues.value, 'residues'))
+                else [settings, msg] = updateAllMolecules('waters', currReprVal.value, 'select', getTotalContent(modelWaters.value, 'waters'))
+                //console.log('I want to select all')
+            }
+
+            const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
+            // TODO: CLEAN residue, structure
+            setMoleculesSettings(null, null, currReprVal.value)
+                .then((r) => {
+                    if(r.code != 404) {
+                        toast.add({ 
+                            severity: msg.status, 
+                            summary: msg.tit, 
+                            detail: 'All the ' + windowType.value + ' of Model ' 
+                                    + (getCurrentModel(currReprVal.value) + 1)
+                                    + ' in ' 
+                                    + strName 
+                                    + ' structure have been ' 
+                                    + msg.txt 
+                                    + currReprSettings.value.name 
+                                    + ' representation',
+                            life: 10000
+                        })
+                        console.log(r.message)
+                    } else  console.error(r.message)
+                })
+
+            //console.log(windowType.value)
+            /*page.ttpsa = computed(() => (allSelected.value ? 'Select all ' + windowType.value : 'Unselect all ' + windowType.value))
+            // select residues / waters
+            const items = document.getElementsByClassName("sequence-item")
+            for(const it of items) {
+                if(!allSelected.value) {
+                    if(it.className.indexOf('disabled') === -1) it.classList.add('sequence-item-selected')
+                } else {
+                    if(it.className.indexOf('disabled') === -1) it.classList.remove('sequence-item-selected')
+                }
+            }
+            allSelected.value = !allSelected.value*/
+            //allSelected[windowType.value] = !allSelected[windowType.value]
+        }
+
+        // trick for creating reactivity with computed property
+        //const watchedChains = computed(() => getCurrentChains())
 
         // TODO: REPLACE BY COMPUTED GETTER / SETTER
-        watch([modelResidues, modelWater], (newValues, prevValues) => {
+        /*watch([modelResidues, modelWaters], (newValues, prevValues) => {
             const wch = newValues[0]
             // residues
-            /*modelResidues  =  computed(() => getModelContent(wch, 'residues'))
-            modelSheets = computed(() => getModelContent(wch, 'sheets'))
-            modelHelixes = computed(() => getModelContent(wch, 'helixes'))*/
             const mdrs = newValues[0]
             //if(mdrs.length < 1) isCollapsed.value = true
             if(windowType.value === 'residues' && mdrs.length < 1) setFlagStatus('zoomWindowEnabled', false)
             // waters
             const mwt = newValues[1]
-            //modelWater  =  computed(() => getModelContent(wch, 'waters'))
+            //modelWaters  =  computed(() => getModelContent(wch, 'waters'))
             if(windowType.value === 'waters' && mwt.length < 1) setFlagStatus('zoomWindowEnabled', false)
+        })*/
+
+        onUpdated(() => {
+            //console.log(windowType.value, modelResidues.value)
+
+            // residues
+            if(windowType.value === 'residues' && modelResidues.value.length < 1) setFlagStatus('zoomWindowEnabled', false)
+            // waters
+            if(windowType.value === 'waters' && modelResidues.value.length < 1) setFlagStatus('zoomWindowEnabled', false)
+
+            if(isActive.value) {
+                document.querySelector(".p-toast-top-right").style.top= 'calc(3% + ' + document.querySelector("#zoomwindow").offsetHeight + 'px)'
+            } else  {
+                document.querySelector(".p-toast-top-right").style.top= '1.5%'
+            }
         })
 
         return { 
@@ -154,7 +222,7 @@ export default {
             isActive, sidebarEnabled,
             closeWindow,
             modelResidues, modelSheets, modelHelixes,
-            modelWater,
+            modelWaters,
             allSelected, selectAll, checkAllSelected
         }
 
@@ -169,8 +237,8 @@ export default {
         left:calc(2% + 38px); 
         top:1.5%;
         width:calc(100% - (4% + 95px + 1rem)); 
-        min-height: calc(64px + .7rem);
-        max-height:12rem; 
+        /*min-height: calc(64px + .7rem);*/
+        /*max-height:20rem; */
         background: rgba(255, 255, 255, .9); 
         z-index: 2;
         border-radius:5px;
@@ -208,12 +276,12 @@ export default {
     #zoomwindow #zoomw-header button.p-button-rounded.p-button-text { height: 1.8rem; width: 1.8rem; font-size: 13px; color:#6c757d; }
     #zoomwindow #zoomw-header button.p-button-rounded.p-button-text:hover { color:#fff; background:#849096!important; }
 
-    #zoomwindow #sequence-text { width:100%; padding:.5rem; overflow-y: auto; overflow-x: hidden; max-height:8rem; font-size:18px!important; line-height: 45px; }
+    #zoomwindow #sequence-text { width:100%; padding:.5rem; overflow-y: auto; overflow-x: hidden; max-height:14.5rem; font-size:18px!important; line-height: 45px; }
     #zoomwindow #sequence-text .chain-title { line-height:30px; font-size:16px; }
     #zoomwindow #sequence-text .sheet { font-size: 10px; }
     #zoomwindow #sequence-text .sheet-arrow { font-size: 28px; }
 
-    #zoomwindow #water-text { width:100%; padding:.5rem; overflow-y: auto; overflow-x: hidden; max-height:8rem; font-size:18px!important; line-height: 35px; }
+    #zoomwindow #water-text { width:100%; padding:.5rem; overflow-y: auto; overflow-x: hidden; max-height:14.5rem; font-size:18px!important; line-height: 35px; }
     #zoomwindow #water-text .chain-title { line-height:30px; font-size:16px; }
 
 </style>
