@@ -69,7 +69,7 @@ export default function useComponents() {
                         // representation name
                         const name_new = representation.id + "-" + component.parameters.name
                         // get selection for this structure
-                        const selection = representation.structures.filter(item => item.id === id)[0].selection
+                        const selection = representation.structures.filter(item => item.id === id)[0].selection.string
                         // add new representation to component
                         const generatedRepresentations = addRepresentationToComponent(representation, component, name_new, selection)
                     }
@@ -87,7 +87,7 @@ export default function useComponents() {
             // representation name
             const name_new = representation.id + "-" + component.parameters.name
             // get selection for this structure
-            const selection = representation.structures.filter(item => item.id === component.parameters.name)[0].selection
+            const selection = representation.structures.filter(item => item.id === component.parameters.name)[0].selection.string
             // add representation
             const generatedRepresentations = addRepresentationToComponent(representation, component, name_new, selection)
         } )

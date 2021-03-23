@@ -156,6 +156,7 @@ export default {
 
         const onSelectMultiple = (model, chain, resnum) => {
             const mr = addMultipleResidues({ model: model, num: resnum, chain, chain})
+            document.querySelectorAll('.water-item:not(.disabled)').forEach(el => el.style.cursor = 'copy')
             // on second click
             if(!mr.status) {
                 if(mr.error) {
@@ -177,13 +178,30 @@ export default {
                     }
                     // get set of molecules
                     const setOfMolecules = getSetOfMolecules('waters', currReprVal.value, water.value.chain, first, last)
-                    const [settings, msg] = updateSetOfMolecules('waters', currReprVal.value, setOfMolecules, water.value.chain)
+                    const [settings, msg] = updateSetOfMolecules('waters', currReprVal.value, setOfMolecules, water.value.chain, 'multiple')
                     const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
                     // TODO: CLEAN residue, structure
                     setMoleculesSettings(water.value, currStr.value, currReprVal.value)
                         .then((r) => {
                             if(r.code != 404) {
                                 toast.add({ 
+                                    severity: msg.status, 
+                                    summary: msg.tit, 
+                                    detail: 'The range [ Model '  
+                                            + (water.value.model + 1)
+                                            + ' | Chain ' 
+                                            + water.value.chain 
+                                            + ' | ' 
+                                            + msg.range 
+                                            + ' ] of ' 
+                                            + strName 
+                                            + ' structure has been ' 
+                                            + msg.txt 
+                                            + currReprSettings.value.name 
+                                            + ' representation',
+                                    life: 10000
+                                })
+                                /*toast.add({ 
                                     severity: 'info', 
                                     summary: 'Added set of waters', 
                                     detail: 'The range [ Model ' 
@@ -198,11 +216,12 @@ export default {
                                             + currReprSettings.value.name 
                                             + ' representation',
                                     life: 10000
-                                })
+                                })*/
                                 console.log(r.message)
                             } else  console.error(r.message)
                         })
                 }
+                document.querySelectorAll('.water-item:not(.disabled)').forEach(el => el.style.cursor = 'pointer')
             }
             //console.log('multiple on: ',e.target.dataset.model,e.target.dataset.chain,e.target.dataset.resnum, e.target.dataset.resname)
         }

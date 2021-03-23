@@ -7,6 +7,8 @@ const multipleResidues = reactive({
   error: false
 })
 
+const selection = ref([])
+
 export default function useSelections() {
 
   const addMultipleResidues = function (residue) {
@@ -33,19 +35,93 @@ export default function useSelections() {
     return multipleResidues
   }
 
-  // TODO: FUNCTION FOR CREATE A NGL SELECTION, AND RETURN IT
-  const createSelection = function (settings) {
+  const generateNGLSelection = function (molecules) {
+
+    if(!molecules.length) return  'not(*)'
+
+    return molecules.map(e => e.num + ':' + e.chain + '/' + e.model).join(', ')
+
+  }
+
+  // update selection object
+  const getSelection = function (molecules, status, currReprVal, currStr) {
+    // use only chain, num, model
+    const m = molecules.map(({ chain, num, model }) => ({ chain, num, model }))
+    // selection according to currReprVal and currStr
+    const sel = selection.value
+      .filter(item => item.id === currReprVal)[0].structures
+      .filter(item => item.id === currStr)[0].selection
+
+    let string_sel = null
+    if (status === 'add') { 
+      // add new molecules to selection
+      sel.molecules.push(...m)
+      // generate NGL string
+      string_sel = generateNGLSelection(sel.molecules)
+      sel.string = string_sel
+      //console.log('Add', currReprVal, currStr, molecules)
+    } else {
+      // update selection removing molecules
+      selection.value
+      .filter(item => item.id === currReprVal)[0].structures
+      .filter(item => item.id === currStr)[0].selection.molecules = sel.molecules.filter(item => !m.some(elem => (elem.num === item.num && elem.chain === item.chain && elem.model === item.model)))
+      // get selection again
+      const n_sel = selection.value
+      .filter(item => item.id === currReprVal)[0].structures
+      .filter(item => item.id === currStr)[0].selection
+      // generate NGL string
+      string_sel = generateNGLSelection(n_sel.molecules)
+      n_sel.string = string_sel
+      //console.log('Remove', currReprVal, currStr, molecules)
+    }
+
+    //console.log(selection.value)
+
+    return [string_sel, selection.value.filter(item => item.id === currReprVal)[0].structures]
+
+  }
+
+  // set selection with DB data
+  const setSelection = function (representations, defaultRepresentation) {
     
-    // TO CREATE A NEW GLOBAL STRUCTURE (ARRAY OF OBJECTS / MOLECULES) WITH ALL THE MOLECULES 
-    // WHEN SOME ACTION IS PERFORMED, THIS STRUCTURE IS UPDATED AND A NEW SELECTION FOR 
-    // EACH OF THE STRUCTURES OF THE CURRENT REPRESENTATION IS CREATED
+    for(const r of representations) {
+      if(r.id !== defaultRepresentation) {
+        selection.value.push({
+          id: r.id,
+          structures: r.structures
+        })
+      }
+    }
+
+  }
+
+  // TO FIX THAT FOR ADD AND REMOVE REPRESENTATIONS!!!!!!!!
+  const updateSelection = function (representation, structures) {
+    
+    selection.value.push({
+      id: representation,
+      // TODO THAAAAAAT!!!!
+      structures: structures.forEach((v) => { 
+        return { 
+          id: v.id, 
+          selection: {
+            string: 'not(*)',
+            molecules: []
+          }
+        }
+      })
+    })
+
+    console.log(selection.value)
 
   }
 
   return { 
     multipleResidues,
     addMultipleResidues, 
-    createSelection 
+    getSelection,
+    setSelection,
+    updateSelection
   }
 
 }

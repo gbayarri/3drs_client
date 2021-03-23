@@ -130,7 +130,7 @@
                 <div class="p-grid ">
                     <div class="p-col">
                         <Button 
-                        label="Remove"
+                        :label="label_remove"
                         icon="far fa-trash-alt" 
                         class="settings-button" 
                         v-on:dblclick="removeRepresentation"
@@ -138,8 +138,8 @@
                     </div>
                     <div class="p-col">
                         <Button 
-                        label="Structure"
-                        icon="fas fa-project-diagram" 
+                        :label="label_hierarchy"
+                        icon="fas fa-sitemap" 
                         class="settings-button" 
                         @click="visualizeStructure"
                         v-tooltip="ttpvs" />
@@ -161,6 +161,7 @@ import useStage from '@/modules/ngl/useStage'
 import useComponents from '@/modules/ngl/useComponents'
 import useFlags from '@/modules/common/useFlags'
 import useRepresentations from '@/modules/representations/useRepresentations'
+import useSelections from '@/modules/representations/useSelections'
 import structureSettings from '@/modules/structure/structureSettings'
 import structureStorage from '@/modules/structure/structureStorage'
 export default {
@@ -187,6 +188,7 @@ export default {
             deleteRepresentation
         } = useRepresentations()
         const { addNewRepresentationSettings, removeRepresentationSettings } = structureSettings()
+        const { updateSelection } = useSelections()
 
         let isCollapsed = ref(true)
         const currReprSettings = computed(() => getCurrentRepresentationSettings())
@@ -198,8 +200,10 @@ export default {
             ttpu: computed(() => isCollapsed.value ? 'Unfold representation settings' : 'Fold representation settings'),
             label_repr: "Select representation",
             label_new_repr: "Create new representation",
+            label_remove: "Remove",
             ttprr: "Remove representation (double click)",
-            ttpvs: "View representation structure",
+            label_hierarchy: "Hierarchy",
+            ttpvs: "View representation hierarchy map",
             ttphr: computed(() => isVisible.value ? 'Hide representation' : 'Show representation'),
             placeholderNewSel: "Insert new name",
             label_mol_repr: "Select molecular representation",
@@ -266,6 +270,8 @@ export default {
                         updateStructureProject(dp)
                         // update settings
                         addNewRepresentationSettings(r.representation)
+                        // update selection
+                        updateSelection(r.representation, dp.files)
                         // update current representation
                         setCurrentRepresentation(r.representation.id, true)
                             .then((r) => {

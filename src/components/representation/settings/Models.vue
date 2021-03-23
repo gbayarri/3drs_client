@@ -3,7 +3,15 @@
         <template #header>
             <i class="fas fa-layer-group"></i> <div class="p-panel-title">{{ page.header }}</div>
         </template>
-
+        <template #icons>
+            <Button 
+            icon="far fa-lightbulb" 
+            @click="showTips" 
+            style="font-size:16px;"
+            class="p-button-rounded p-button-text" 
+            v-tooltip.left="page.ttpst" 
+            :disabled="models.length <= 1" />
+        </template>
         <div class="p-grid double-col">
             <div class="p-col">
                 <label>{{ page.label_models }}</label>
@@ -39,7 +47,8 @@ export default {
 
         const page = {
             header: "Models",
-            label_models: "Model index"
+            label_models: "Model index",
+            ttpst: "Show tips for Models"
         }
 
         // trick for creating reactivity with computed property
@@ -73,11 +82,15 @@ export default {
             if(mods.length <= 1) isCollapsed.value = true
         })*/
 
+        const showTips = () => {
+            console.log("show tips")
+        }
+
         onUpdated(() => {
             if(models.value.length <= 1) isCollapsed.value = true
         })
 
-        return { page, isCollapsed, selectedModel, models/*, onChange*/ }
+        return { page, isCollapsed, selectedModel, models/*, onChange*/, showTips }
     }
 }
 </script>

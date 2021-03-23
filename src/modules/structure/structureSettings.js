@@ -213,6 +213,7 @@ export default function structureSettings() {
                             .filter(item => item.id === molecule.model)[0][type]
 
         let msg = null
+        let status = null
         if(!checkIfMoleculeExists(molecule, type, currReprVal)) {
             // add
             molecules.push(molecule)
@@ -221,6 +222,7 @@ export default function structureSettings() {
                 tit: 'Added new molecule ',
                 txt: 'added to '
             }
+            status = 'add'
         } else {
             //remove
             settings.value
@@ -232,29 +234,35 @@ export default function structureSettings() {
                 tit: 'Molecule removed',
                 txt: 'removed from '
             }
+            status = 'remove'
         }
 
-        return [settings.value, msg]
+        return [[molecule], msg, status]
 
     }
 
-    const checkIfSetOfMoleculeExists = function (setOfMolecules, type, currReprVal, model) {
-
-        // TODO (NOT WORKING)
-
+    const checkIfSetOfMoleculeExists = function (setOfMolecules, type, currReprVal, model, search) {
+        // get currently selected molecules
         const molecules = settings.value
                             .filter(item => item.id === currentStructure.value)[0].navigation
                             .filter(item => item.id === currReprVal)[0].models
                             .filter(item => item.id === model)[0][type]
 
-        const new_molecules = []
-        for(const m of molecules) {
-            new_molecules.push({
-                num: m.num,
-                label: m.label,
-                chain: m.chain,
-                model: m.model
-            })
+        // reformat molecules only in case search by helix / sheet (less properties)
+        const selected_molecules = []
+        if(search === 'multiple') {
+            for(const m of molecules) {
+                selected_molecules.push(m)
+            }
+        } else {
+            for(const m of molecules) {
+                selected_molecules.push({
+                    num: m.num,
+                    label: m.label,
+                    chain: m.chain,
+                    model: m.model
+                })
+            }
         }
 
         //const { ['id', 'last_sheet', 'longname', 'helix', 'sheet']: remove, ...new_molecules } = molecules
@@ -270,9 +278,7 @@ export default function structureSettings() {
 
         console.log(new_molecules)*/
 
-        console.log(new_molecules)
-
-
+        //console.log(new_molecules)
 
         // clean molecules and leave only label / num / chain / model
         /*new_molecules.forEach((v) => { 
@@ -284,11 +290,12 @@ export default function structureSettings() {
         })*/
 
 
-        console.log(settings.value)
+        //console.log(settings.value)
 
+        // check if all items of setOfMolecules are in selected_molecules
         let molExists = true
         for(const m of setOfMolecules) {
-            if(!new_molecules.some(elem => JSON.stringify(elem) == JSON.stringify(m))) {
+            if(!selected_molecules.some(elem => JSON.stringify(elem) == JSON.stringify(m))) {
                 molExists = false
                 break
             }
@@ -301,41 +308,63 @@ export default function structureSettings() {
         return molExists
     }
 
-    const updateSetOfMolecules = function (type, currReprVal, setOfMolecules, chain ) {
+    const updateSetOfMolecules = function (type, currReprVal, setOfMolecules, chain, search) {
 
         const cm = getCurrentModel(currReprVal)
         if(cm === null) return []
-
-        // TO FINISH THAT!!!!!
-        console.log(checkIfSetOfMoleculeExists(setOfMolecules, type, currReprVal, cm))
 
         // get currently selected molecules
         const molecules = settings.value
                             .filter(item => item.id === currentStructure.value)[0].navigation
                             .filter(item => item.id === currReprVal)[0].models
                             .filter(item => item.id === cm)[0][type]
+        
         // get all molecules of the current representation / model / chain
         const all_molecules = getChainContent(type, currReprVal)
                                 .filter(item => item.id === chain)[0][type]
         // set setOfMolecules to the correct residue format
-        let new_molecules = []
+        let selected_molecules = []
         for(const m of all_molecules) {
-            if(setOfMolecules.some(item => (item.num === m.num && item.chain === m.chain))) new_molecules.push(m)
+            if(setOfMolecules.some(item => (item.num === m.num && item.chain === m.chain))) selected_molecules.push(m)
         }
-        // push new molecules
-        molecules.push(...new_molecules)
-        // set array unique removing repeated items
-        const array_unique = Array.from(new Set(molecules.map(a => a.num)))
-            .map((num) => {
-                return molecules.find(a => a.num === num)
-            })
-        // update settings.value
-        settings.value
+
+        let msg = null
+        // check if adding or removing
+        if(!checkIfSetOfMoleculeExists(setOfMolecules, type, currReprVal, cm, search)) {
+            // push new molecules
+            molecules.push(...selected_molecules)
+            // set array unique removing repeated items
+            const array_output = Array.from(new Set(molecules.map(a => a.num)))
+                                    .map((num) => {
+                                        return molecules.find(a => a.num === num)
+                                    })
+            // update settings.value with new molecules
+            settings.value
             .filter(item => item.id === currentStructure.value)[0].navigation
             .filter(item => item.id === currReprVal)[0].models
-            .filter(item => item.id === cm)[0][type] = array_unique
+            .filter(item => item.id === cm)[0][type] = array_output
 
-        const msg = setOfMolecules[0].num + ' - ' + setOfMolecules[setOfMolecules.length - 1].num
+            msg = {
+                status: 'info',
+                tit: 'Added set of molecules',
+                range: setOfMolecules[0].num + ' - ' + setOfMolecules[setOfMolecules.length - 1].num,
+                txt: 'added to '
+            }
+
+        } else {
+            // update settings.value removing selected molecules
+            settings.value
+                .filter(item => item.id === currentStructure.value)[0].navigation
+                .filter(item => item.id === currReprVal)[0].models
+                .filter(item => item.id === cm)[0][type] = molecules.filter(item => !selected_molecules.some(elem => (elem.num === item.num && elem.chain === item.chain && elem.model === item.model)))
+
+            msg = {
+                status: 'warn',
+                tit: 'Removed set of molecules',
+                range: setOfMolecules[0].num + ' - ' + setOfMolecules[setOfMolecules.length - 1].num,
+                txt: 'removed from '
+            }
+        }
 
         return [settings.value, msg]
 

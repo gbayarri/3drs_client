@@ -59,6 +59,16 @@ export default function useRepresentations() {
     const longTimeOut = 5000
     const shortTimeOut = 500
 
+    const setSelectionRepresentation = async (stage, sele, structures, re, update) => {
+        for(const item of stage.getRepresentationsByName(re).list){
+            item.setSelection( sele )
+        }
+        if(update) {
+            return await updateRepresentationData(prjID, currentRepresentation.value, { structures: structures })
+        }
+    }
+        
+
     const setVisibilityRepresentation = async (stage, status, re, update) => {
         //console.log(re)
         for(const item of stage.getRepresentationsByName(re).list){
@@ -174,6 +184,7 @@ export default function useRepresentations() {
         setCurrentRepresentation,
         getCurrentRepresentationSettings,
         updateRepresentationProperty,
+        setSelectionRepresentation,
         setVisibilityRepresentation,
         setMolecularRepresentation,
         setOpacityRepresentation,

@@ -104,7 +104,7 @@ export default {
             filterPlaceholder: "Search ion",
             ttpsa: computed(() => !allSelected.value ? 'Select all ions' : 'Unselect all ions'),
             ttpcv: "Center view on this ion",
-            ttpst: "Show tips for Ions"
+            ttpst: "Show tips for ions"
         })
 
         const selectedIons = computed({

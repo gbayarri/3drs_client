@@ -104,7 +104,7 @@ export default {
             filterPlaceholder: "Search heteroatom",
             ttpsa: computed(() => !allSelected.value ? 'Select all heteroatoms' : 'Unselect all heteroatoms'),
             ttpcv: "Center view on this heteroatom",
-            ttpst: "Show tips for Heteroatoms"
+            ttpst: "Show tips for heteroatoms"
         })
 
         const selectedHets = computed({

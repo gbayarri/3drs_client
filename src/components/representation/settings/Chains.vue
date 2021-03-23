@@ -3,7 +3,15 @@
         <template #header>
             <i class="fas fa-link"></i> <div class="p-panel-title">{{ page.header }}</div>
         </template>
-
+        <template #icons>
+            <Button 
+            icon="far fa-lightbulb" 
+            @click="showTips" 
+            style="font-size:16px;"
+            class="p-button-rounded p-button-text" 
+            v-tooltip.left="page.ttpst" 
+            :disabled="chains.length <= 1" />
+        </template>
         <MultiSelect 
         v-model="selectedChains" 
         :options="chains" 
@@ -57,7 +65,8 @@ export default {
 
         const page = {
             header: "Chains",
-            placeholder: "Select Chains"
+            placeholder: "Select Chains",
+            ttpst: "Show tips for Chains"
         }
 
         // trick for creating reactivity with computed property
@@ -125,11 +134,15 @@ export default {
             if(chs.length <= 1) isCollapsed.value = true
         })*/
 
+        const showTips = () => {
+            console.log("show tips")
+        }
+
         onUpdated(() => {
             if(chains.value.length <= 1) isCollapsed.value = true
         })
 
-        return { page, isCollapsed, selectedChains, chains, /*onChange,*/ removeChip, onHover, onLeave }
+        return { page, isCollapsed, selectedChains, chains, /*onChange,*/ showTips, removeChip, onHover, onLeave }
     }
 }
 </script>

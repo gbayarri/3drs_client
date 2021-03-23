@@ -64,8 +64,8 @@ export default {
         const { setFlagStatus } = useFlags()
         const { currentStructure, getFileNames, checkIfMoleculeExists, updateMolecule, updateSetOfMolecules, getSetOfMolecules } = structureSettings()
         const { projectData } = structureStorage()
-        const { addMultipleResidues, createSelection } = useSelections()
-        const { currentRepresentation, getCurrentRepresentationSettings } = useRepresentations()
+        const { addMultipleResidues, getSelection } = useSelections()
+        const { currentRepresentation, getCurrentRepresentationSettings, setSelectionRepresentation } = useRepresentations()
         const { setMoleculesSettings, setPositionSettings } = useSettings()
         
         const filesList = computed(() => getFileNames())
@@ -79,6 +79,10 @@ export default {
         const sheets =  computed(() => props.sheets)
         const helixes =  computed(() => props.helixes)
         const window =  computed(() => props.window)
+
+        const re = computed(() => new RegExp('(' + currReprVal.value + '\-' + currStr.value + '\-[a-z]*)', 'g'))
+        
+        //const re = new RegExp('(' + representation_id + '\-' + component.parameters.name + '\-[a-z]*)', 'g')
 
         const isSelected = computed(() => checkIfMoleculeExists(residue.value, 'residues', currReprVal.value))
 
@@ -134,11 +138,15 @@ export default {
 
             //const residues = document.querySelectorAll('[data-model="' + model + '"][data-chain="' + chain + '"][data-resnum="' + resnum + '"][data-resname="' + resname + '"]')
    
-            const [settings, msg] = updateMolecule(residue.value, 'residues', currReprVal.value)
+            const [molecules, msg, status] = updateMolecule(residue.value, 'residues', currReprVal.value)
             const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
             // update representations selections
             //console.log(currReprVal.value)
-            //const selection = createSelection(settings)
+            const [selection, structures] = getSelection(molecules, status, currReprVal.value, currStr.value)
+            // THE selection OBJECT (WITH STRING AND MOLECULES) MUST BE SAVED IN DB TO REPRESENTATIONS / STRUCTURES (currStr.value)
+            // CREATE NEW FUNCTION IN useRepresentations (setRepresentation) AND PASS TO IT selection.string
+            //console.log(selection, structures)
+            // SAVE structures TO API REST VIA setSelectionRepresentation
             // TODO: CLEAN residue, structure
             setMoleculesSettings(residue.value, currStr.value, currReprVal.value)
                 .then((r) => {
@@ -162,6 +170,13 @@ export default {
                                     + ' representation',
                             life: 10000
                         })
+
+                        setSelectionRepresentation(stage, selection, structures, re.value, true)
+                            .then((r) => {
+                                if(r.code != 404) console.log(r.message)
+                                else console.error(r.message)
+                            })
+
                         console.log(r.message)
                     } else  console.error(r.message)
                 })
@@ -192,6 +207,7 @@ export default {
 
         const onSelectMultiple = (model, chain, resnum) => {
             const mr = addMultipleResidues({ model: model, num: resnum, chain, chain})
+            document.querySelectorAll('.sequence-item:not(.disabled)').forEach(el => el.style.cursor = 'copy')
             // on second click
             if(!mr.status) {
                 // check if error
@@ -215,24 +231,26 @@ export default {
                     }
                     // get set of molecules
                     const setOfMolecules = getSetOfMolecules('residues', currReprVal.value, residue.value.chain, first, last)
-                    const [settings, msg] = updateSetOfMolecules('residues', currReprVal.value, setOfMolecules, residue.value.chain)
+                    const [settings, msg] = updateSetOfMolecules('residues', currReprVal.value, setOfMolecules, residue.value.chain, 'multiple')
                     const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
+                    //const [selection, structures] = getSelection(molecules, status, currReprVal.value, currStr.value)
                     // TODO: CLEAN residue, structure
                     setMoleculesSettings(residue.value, currStr.value, currReprVal.value)
                         .then((r) => {
                             if(r.code != 404) {
                                 toast.add({ 
-                                    severity: 'info', 
-                                    summary: 'Added set of residues', 
-                                    detail: 'The range [ Model ' 
+                                    severity: msg.status, 
+                                    summary: msg.tit, 
+                                    detail: 'The range [ Model '  
                                             + (residue.value.model + 1)
                                             + ' | Chain ' 
                                             + residue.value.chain 
                                             + ' | ' 
-                                            + msg 
+                                            + msg.range 
                                             + ' ] of ' 
                                             + strName 
-                                            + ' structure has been added to ' 
+                                            + ' structure has been ' 
+                                            + msg.txt 
                                             + currReprSettings.value.name 
                                             + ' representation',
                                     life: 10000
@@ -241,6 +259,7 @@ export default {
                             } else  console.error(r.message)
                         })
                 }
+                document.querySelectorAll('.sequence-item:not(.disabled)').forEach(el => el.style.cursor = 'pointer')
             }
             //console.log('multiple on: ',e.target.dataset.model,e.target.dataset.chain,e.target.dataset.resnum, e.target.dataset.resname)
         }
@@ -307,7 +326,7 @@ export default {
 
         const sheetClick = (sheet, chain) => {
             const resSheet = props.sheets.filter(item => item.id === chain)[0].sheets[sheet]
-            const [settings, msg] = updateSetOfMolecules('residues', currReprVal.value, resSheet, residue.value.chain)
+            const [settings, msg] = updateSetOfMolecules('residues', currReprVal.value, resSheet, residue.value.chain, 'sheet')
 
             const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
             // TODO: CLEAN residue, structure
@@ -315,17 +334,18 @@ export default {
                 .then((r) => {
                     if(r.code != 404) {
                         toast.add({ 
-                            severity: 'info', 
-                            summary: 'Added set of molecules', 
-                            detail: 'The sheet [ Model ' 
+                            severity: msg.status, 
+                            summary: msg.tit, 
+                            detail: 'The sheet [ Model '  
                                     + (residue.value.model + 1)
                                     + ' | Chain ' 
                                     + residue.value.chain 
                                     + ' | ' 
-                                    + msg 
+                                    + msg.range 
                                     + ' ] of ' 
                                     + strName 
-                                    + ' structure has been added to ' 
+                                    + ' structure has been ' 
+                                    + msg.txt 
                                     + currReprSettings.value.name 
                                     + ' representation',
                             life: 10000
@@ -405,7 +425,7 @@ export default {
 
         const helixClick = (helix, chain) => {
             const resHelix = props.helixes.filter(item => item.id === chain)[0].helixes[helix]
-            const [settings, msg] = updateSetOfMolecules('residues', currReprVal.value, resHelix, residue.value.chain)
+            const [settings, msg] = updateSetOfMolecules('residues', currReprVal.value, resHelix, residue.value.chain, 'helix')
 
             const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
             // TODO: CLEAN residue, structure
@@ -413,17 +433,18 @@ export default {
                 .then((r) => {
                     if(r.code != 404) {
                         toast.add({ 
-                            severity: 'info', 
-                            summary: 'Added set of molecules', 
-                            detail: 'The helix [ Model ' 
+                            severity: msg.status, 
+                            summary: msg.tit, 
+                            detail: 'The helix [ Model '  
                                     + (residue.value.model + 1)
                                     + ' | Chain ' 
                                     + residue.value.chain 
                                     + ' | ' 
-                                    + msg 
+                                    + msg.range 
                                     + ' ] of ' 
                                     + strName 
-                                    + ' structure has been added to ' 
+                                    + ' structure has been ' 
+                                    + msg.txt 
                                     + currReprSettings.value.name 
                                     + ' representation',
                             life: 10000

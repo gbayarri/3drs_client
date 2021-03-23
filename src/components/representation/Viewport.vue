@@ -17,6 +17,7 @@ import useComponents from '@/modules/ngl/useComponents'
 import structureStorage from '@/modules/structure/structureStorage'
 import structureSettings from '@/modules/structure/structureSettings'
 import useRepresentations from '@/modules/representations/useRepresentations'
+import useSelections from '@/modules/representations/useSelections'
 import mouseObserver from '@/modules/ngl/mouseObserver'
 export default {
   props: ['project_id'],
@@ -32,7 +33,8 @@ export default {
     const { setInitOrientation, checkMouseSignals } = mouseObserver()
     const { /*processedStructure,*/ projectData, updateStructureProject, resetStructure, getFirstProjectData } = structureStorage()
     const { settings, setCurrentStructure } = structureSettings()
-    const { setCurrentRepresentation/*, getCurrentRepresentationSettings*/ } = useRepresentations()
+    const { defaultRepresentation, setCurrentRepresentation/*, getCurrentRepresentationSettings*/ } = useRepresentations()
+    const { setSelection } = useSelections()
     const project_id = props.project_id
     //const currReprSettings = computed(() => getCurrentRepresentationSettings())
 
@@ -50,6 +52,7 @@ export default {
       // 2kod: multimodel + multichain
       // 1pik: multimodel + multichain DNA (no structure)
       // 4gxy: RNA
+      // 6acc: spike
 
       //const structures = [{ name:"1pik", id: "1" }, { name:"2kod", id: "3" }, { name:"2rgp", id: "4" }/*{ name:"6ACC", id: "4" }, { name:"2rgp", id: "1" }, /*{ name:"1mbs", id: "2" }, { name:"1pik", id: "3" }, { name:"2kod", id: "4" }, { name:"2vgb", id: "5" },*/  ]
       const structures = dataProject.value.files
@@ -182,6 +185,9 @@ export default {
 
           // save apiData to structureStorage.projectData
           updateStructureProject(apiData.value)
+
+          // set selections global var
+          setSelection(apiData.value.representations, defaultRepresentation)
 
           // create viewport
           createViewport()

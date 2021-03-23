@@ -87,9 +87,10 @@ export default {
         const page = reactive({
             header: "Sequence",
             //ttpha: "Hide all residues",
-            ttpsa: "Select all residues",
-            ttpoo: computed(() => (flags.zoomWindowEnabled && windowType.value === 'residues') ? 'Close external window' : 'View in external window'),
-            ttpst: "Show tips for Sequence residues"
+            //ttpsa: "Select all residues",
+            ttpsa: computed(() => !allSelected.residues ? 'Select all residues' : 'Unselect all residues'),
+            ttpoo: computed(() => (flags.zoomWindowEnabled && windowType.value === 'residues') ? 'Close external window' : 'View sequence in external window'),
+            ttpst: "Show tips for sequence residues"
         })
 
         //const checkAllSelected = computed(() => allSelected['residues'] )
@@ -221,7 +222,7 @@ export default {
     }
     #sequence-text .sequence-item { position:relative; z-index:1; padding:0 0.5px; cursor:default; user-select: none; }
     #sequence-text .sequence-item:not(.disabled) { cursor: pointer; }    
-    #sequence-text .sequence-item:not(.disabled):hover,
+    /*#sequence-text .sequence-item:not(.disabled):hover,*/
     .sequence-item-hover {
         color: #fff;
         background: #99a8b9;

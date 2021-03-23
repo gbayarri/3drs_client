@@ -85,9 +85,10 @@ export default {
         const page = reactive({
             header: "Waters",
             //ttpha: "Hide all waters",
-            ttpsa: "Select all waters",
-            ttpoo: computed(() => (flags.zoomWindowEnabled && windowType.value === 'waters') ? 'Close external window' : 'View in external window'),
-            ttpst: "Show tips for Waters"
+            //ttpsa: "Select all waters",
+            ttpsa: computed(() => !allSelected.waters ? 'Select all waters' : 'Unselect all waters'),
+            ttpoo: computed(() => (flags.zoomWindowEnabled && windowType.value === 'waters') ? 'Close external window' : 'View waters in external window'),
+            ttpst: "Show tips for waters"
         })
 
         //const checkAllSelected = computed(() => allSelected['waters'] )
@@ -208,7 +209,7 @@ export default {
     }
     #water-text .water-item { position:relative; z-index:1; padding:0 1.5px; cursor:default; user-select: none; }
     #water-text .water-item:not(.disabled) { cursor: pointer; }    
-    #water-text .water-item:not(.disabled):hover,
+    /*#water-text .water-item:not(.disabled):hover,*/
     .water-item-hover {
         color: #fff;
         background: #99a8b9;

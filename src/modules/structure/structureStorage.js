@@ -139,7 +139,7 @@ export default function structureStorage() {
         const files = []
         const structure = []
         const setngs = []
-        console.log(settings.value)
+        //console.log(settings.value)
         for(const item of settings.value) {
             files.push({
                 id: item.id,
@@ -167,7 +167,7 @@ export default function structureStorage() {
             settings: setngs
         }
 
-        console.log(data)
+        //console.log(data)
 
         return data
     }

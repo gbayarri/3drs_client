@@ -1,7 +1,7 @@
 <template>
     <div id="zoomwindow" v-if="isActive" class="p-shadow-2" :class="{ 'open-settings': sidebarEnabled }">
         <div id="zoomw-header">
-            <span><i :class="(windowType === 'residues') ? 'fas fa-share-alt' : 'fas fa-tint'"></i>&nbsp;&nbsp;{{ title }}</span>
+            <span><i :class="(windowType === 'residues') ? 'fas fa-ellipsis-h' : 'fas fa-tint'"></i>&nbsp;&nbsp;{{ title }}</span>
             <div>
             <Button 
             :icon="checkAllSelected ? 'fas fa-times-circle' : 'fas fa-check-circle'" 
@@ -90,11 +90,8 @@ export default {
         const toast = useToast()
 
         const page = reactive({
-            title: computed(() => (windowType.value === 'residues') ? 'Residues' : 'Water'),
-            ttpsa: computed(() => {
-                const txt = !allSelected[windowType.value] ? "Select all " : "Unselect all "
-                return txt + windowType.value 
-            })
+            title: computed(() => (windowType.value === 'residues') ? 'Sequence' : 'Water'),
+            ttpsa: computed(() => !allSelected[windowType.value] ? "Select all " + windowType.value : "Unselect all " + windowType.value)
         })
 
         const getModelContent = (wch, label) => {
