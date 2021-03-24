@@ -1,11 +1,14 @@
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 
 const dialog = reactive({
   trajectory: false,
   structure: false,
   share: false,
+  tips: false,
   block: false
 })
+
+const tips = ref('')
 
 const blockProperties = [
   {
@@ -37,8 +40,9 @@ const blockUI = reactive({
 
 export default function useModals() {
 
-  const openModal = function (label) {
+  const openModal = function (label, tps = null) {
     dialog[label] = true
+    if(tips) tips.value = tps
   }
 
   const closeModal = function (label) {
@@ -52,6 +56,6 @@ export default function useModals() {
   }
   
 
-  return { dialog, blockUI, openModal, closeModal, setBlockUI }
+  return { dialog, tips, blockUI, openModal, closeModal, setBlockUI }
 
 }

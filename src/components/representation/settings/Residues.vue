@@ -52,6 +52,8 @@ import useZoomWindow from '@/modules/representations/useZoomWindow'
 import structureSettings from '@/modules/structure/structureSettings'
 import useRepresentations from '@/modules/representations/useRepresentations'
 import useSettings from '@/modules/settings/useSettings'
+import useSelections from '@/modules/representations/useSelections'
+import useModals from '@/modules/common/useModals'
 import Residue from '@/components/representation/settings/addons/Residue'
 export default {
     props: ['stage'],
@@ -70,8 +72,10 @@ export default {
             getCurrentMolecules, 
             getFileNames 
         } = structureSettings()
-        const { currentRepresentation, getCurrentRepresentationSettings } = useRepresentations()
+        const { currentRepresentation, getCurrentRepresentationSettings, setSelectionRepresentation } = useRepresentations()
         const { setMoleculesSettings } = useSettings()
+        const { getSelection } = useSelections()
+        const { openModal } = useModals()
 
         const filesList = computed(() => getFileNames())
         const isCollapsed = ref(true)
@@ -81,6 +85,8 @@ export default {
         const currStr = computed(() => currentStructure.value)
         const externalWindow = computed(() => (flags.zoomWindowEnabled && windowType.value === 'residues'))
         //const allVisible = ref(false)
+
+        const re = computed(() => new RegExp('(' + currReprVal.value + '\-' + currStr.value + '\-[a-z]*)', 'g'))
 
         const toast = useToast()
 
@@ -109,7 +115,7 @@ export default {
 
         const getTotalContent = (wch) => {
             let residues = []
-            for(const c of wch) residues = [...residues, ...c.residues]
+            for(const c of wch) residues = [...residues, ...c.residues.filter(item => (item.name !== null))]
             return residues
         }
 
@@ -137,16 +143,20 @@ export default {
 
         const selectAll = () => {
 
-            let settings, msg
+            let status, msg
             if(allSelected.residues) {
-                [settings, msg] = updateAllMolecules('residues', currReprVal.value, 'unselect')
+                status = 'remove'
+                msg = updateAllMolecules('residues', currReprVal.value, status)
                 //console.log('I want to unselect all')
             } else {
-                [settings, msg] = updateAllMolecules('residues', currReprVal.value, 'select', getTotalContent(modelResidues.value))
+                status = 'add'
+                msg = updateAllMolecules('residues', currReprVal.value, status, getTotalContent(modelResidues.value))
                 //console.log('I want to select all')
             }
 
             const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
+            // update representations selections
+            const [selection, structures] = getSelection(getTotalContent(modelResidues.value), status, currReprVal.value, currStr.value)
             // TODO: CLEAN residue, structure
             setMoleculesSettings(null, null, currReprVal.value)
                 .then((r) => {
@@ -164,6 +174,12 @@ export default {
                                     + ' representation',
                             life: 10000
                         })
+                        // save selection representation
+                        setSelectionRepresentation(stage, selection, structures, re.value, true)
+                            .then((r) => {
+                                if(r.code != 404) console.log(r.message)
+                                else console.error(r.message)
+                            })
                         console.log(r.message)
                     } else  console.error(r.message)
                 })
@@ -171,7 +187,7 @@ export default {
         }
 
         const showTips = () => {
-            console.log("show tips")
+            openModal('tips', 'residues')
         }
 
         // TODO: REPLACE BY COMPUTED GETTER / SETTER

@@ -24,7 +24,7 @@
                 @remove="removeChip" 
                 removable 
                 v-for="option of slotProps.value" 
-                :key="option.id" />
+                :key="option.id"/>
                 <template v-if="!slotProps.value || slotProps.value.length === 0">
                     {{ page.placeholder }}
                 </template>
@@ -46,6 +46,7 @@ import { ref, computed, watch, onUpdated } from 'vue'
 import structureSettings from '@/modules/structure/structureSettings'
 import useRepresentations from '@/modules/representations/useRepresentations'
 import useSettings from '@/modules/settings/useSettings'
+import useModals from '@/modules/common/useModals'
 export default {
     props: ['stage'],
     setup(props) {
@@ -55,6 +56,7 @@ export default {
         const { currentStructure, updateCurrentChains, getCurrentChains, getCurrentModel, getChains } = structureSettings()
         const { currentRepresentation } = useRepresentations()
         const { setChainsSettings } = useSettings()
+        const { openModal } = useModals()
 
         const currReprVal = computed(() => currentRepresentation.value)
         const currStr = computed(() => currentStructure.value)
@@ -86,8 +88,10 @@ export default {
                 chs.push(chain)
             }
             updateCurrentChains(chs, currReprVal.value)
+            // TODO: update selection with some function of useSelection
+            // show toast when added / removed chains
             // TODO: CLEAN chains, model, structure
-            setChainsSettings(selectedChains.value, currModel.value, currStr.value, currReprVal.value)
+            setChainsSettings(null, null, null, currReprVal.value)
                     .then((r) => {
                         if(r.code != 404) console.log(r.message)
                         else console.error(r.message)
@@ -135,7 +139,7 @@ export default {
         })*/
 
         const showTips = () => {
-            console.log("show tips")
+            openModal('tips', 'chains')
         }
 
         onUpdated(() => {

@@ -30,7 +30,6 @@ export default function useSelections() {
           multipleResidues.error = true
         }        
     }
-    // TODO: RETURN VALUE IF SELECT / DESELECT
 
     return multipleResidues
   }
@@ -93,26 +92,38 @@ export default function useSelections() {
       }
     }
 
+    //console.log(selection.value)
+
   }
 
-  // TO FIX THAT FOR ADD AND REMOVE REPRESENTATIONS!!!!!!!!
-  const updateSelection = function (representation, structures) {
-    
-    selection.value.push({
-      id: representation,
-      // TODO THAAAAAAT!!!!
-      structures: structures.forEach((v) => { 
-        return { 
+  // update selection structure
+  const updateSelection = function (representation, structures, type) {
+
+    if(type === 'add') {
+
+      let new_str = []
+      structures.forEach((v) => { 
+        new_str.push({
           id: v.id, 
           selection: {
             string: 'not(*)',
             molecules: []
           }
-        }
+        })
       })
-    })
 
-    console.log(selection.value)
+      selection.value.push({
+        id: representation,
+        structures: new_str
+      })
+
+    } else {
+
+      selection.value = selection.value.filter(item => item.id !== representation)
+
+    }
+
+    //console.log(selection.value)
 
   }
 

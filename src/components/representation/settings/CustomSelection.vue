@@ -31,8 +31,11 @@
 
 <script>
 import { ref, reactive, toRefs } from 'vue'
+import useModals from '@/modules/common/useModals'
 export default {
     setup() {
+
+        const { openModal } = useModals()
 
         const isCollapsed = ref(true)
         const customSelection = ref(null)
@@ -58,7 +61,7 @@ export default {
         }
 
         const showTips = () => {
-            console.log("show tips")
+            openModal('tips', 'custom')
         }
 
         return { 

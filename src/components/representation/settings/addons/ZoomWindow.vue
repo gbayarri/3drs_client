@@ -58,6 +58,7 @@ import useZoomWindow from '@/modules/representations/useZoomWindow'
 import useRepresentations from '@/modules/representations/useRepresentations'
 import structureSettings from '@/modules/structure/structureSettings'
 import useSettings from '@/modules/settings/useSettings'
+import useSelections from '@/modules/representations/useSelections'
 import Residue from '@/components/representation/settings/addons/Residue'
 import Water from '@/components/representation/settings/addons/Water'
 export default {
@@ -75,9 +76,10 @@ export default {
             //getCurrentMolecules, 
             getFileNames 
         } = structureSettings()
-        const { currentRepresentation, getCurrentRepresentationSettings } = useRepresentations()
+        const { currentRepresentation, getCurrentRepresentationSettings, setSelectionRepresentation } = useRepresentations()
         const { windowType, allSelected, setWindowType, toggleAllSelected  } = useZoomWindow()
         const { setMoleculesSettings } = useSettings()
+        const { getSelection } = useSelections()
         
         const filesList = computed(() => getFileNames())
         const currReprVal = computed(() => currentRepresentation.value)
@@ -86,6 +88,8 @@ export default {
         const stage = getStage()
         const sidebarEnabled = computed(() => flags.sidebarEnabled)
         const isActive = computed(() => flags.zoomWindowEnabled)
+
+        const re = computed(() => new RegExp('(' + currReprVal.value + '\-' + currStr.value + '\-[a-z]*)', 'g'))
 
         const toast = useToast()
 
@@ -103,7 +107,7 @@ export default {
 
         const getTotalContent = (wch, type) => {
             let molecules = []
-            for(const c of wch) molecules = [...molecules, ...c[type]]
+            for(const c of wch) molecules = [...molecules, ...c[type].filter(item => (item.name !== null))]
             return molecules
         }
 
@@ -136,17 +140,23 @@ export default {
         // PUT THAT INSIDE WATER / RESIDUE???
         const selectAll = () => {
 
-            let settings, msg
+            let status, msg
             if(allSelected[windowType.value]) {
-                [settings, msg] = updateAllMolecules(windowType.value, currReprVal.value, 'unselect')
+                status = 'remove'
+                msg = updateAllMolecules(windowType.value, currReprVal.value, status)
                 //console.log('I want to unselect all')
             } else {
-                if(windowType.value === 'residues') [settings, msg] = updateAllMolecules('residues', currReprVal.value, 'select', getTotalContent(modelResidues.value, 'residues'))
-                else [settings, msg] = updateAllMolecules('waters', currReprVal.value, 'select', getTotalContent(modelWaters.value, 'waters'))
+                status = 'add'
+                if(windowType.value === 'residues') msg = updateAllMolecules('residues', currReprVal.value, status, getTotalContent(modelResidues.value, 'residues'))
+                else msg = updateAllMolecules('waters', currReprVal.value, status, getTotalContent(modelWaters.value, 'waters'))
                 //console.log('I want to select all')
             }
 
             const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
+            // update representations selections
+            let selection, structures
+            if(windowType.value === 'residues') [selection, structures] = getSelection(getTotalContent(modelResidues.value, 'residues'), status, currReprVal.value, currStr.value)
+            else [selection, structures] = getSelection(getTotalContent(modelWaters.value, 'waters'), status, currReprVal.value, currStr.value)
             // TODO: CLEAN residue, structure
             setMoleculesSettings(null, null, currReprVal.value)
                 .then((r) => {
@@ -164,6 +174,12 @@ export default {
                                     + ' representation',
                             life: 10000
                         })
+                        // save selection representation
+                        setSelectionRepresentation(stage, selection, structures, re.value, true)
+                            .then((r) => {
+                                if(r.code != 404) console.log(r.message)
+                                else console.error(r.message)
+                            })
                         console.log(r.message)
                     } else  console.error(r.message)
                 })

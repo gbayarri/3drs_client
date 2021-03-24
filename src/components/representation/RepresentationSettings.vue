@@ -246,7 +246,7 @@ export default {
         const isVisible = computed(() => currReprSettings.value.visible)
         //setVisibilityRepresentation(stage, isVisible.value, re.value, false)
         const setVisibility = () => {
-            console.log(stage)
+            //console.log(stage)
             const newVal = !isVisible.value
             updateRepresentationProperty('visible', newVal)
             setVisibilityRepresentation(stage, newVal, re.value, true)
@@ -271,7 +271,7 @@ export default {
                         // update settings
                         addNewRepresentationSettings(r.representation)
                         // update selection
-                        updateSelection(r.representation, dp.files)
+                        updateSelection(r.representation.id, dp.files, 'add')
                         // update current representation
                         setCurrentRepresentation(r.representation.id, true)
                             .then((r) => {
@@ -477,6 +477,8 @@ export default {
                         removeRepresentationFromStructure(remRepr)
                         // update settings
                         removeRepresentationSettings(remRepr)
+                        // update selection
+                        updateSelection(remRepr, null, 'remove')
                         // update current representation
                         setCurrentRepresentation(r.newCurrentRepresentation, true)
                             .then((r) => {

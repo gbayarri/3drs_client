@@ -40,6 +40,7 @@ export default function mouseObserver() {
                 const name = filesList.value.filter(item => item.id === pickingProxy.atom.structure.name)[0].name
                 updateLegend({
                     name: name,
+                    model: pickingProxy.atom.modelIndex,
                     chainname: pickingProxy.atom.chainname,
                     resname: pickingProxy.atom.resname,
                     resno: pickingProxy.atom.resno,
@@ -51,6 +52,7 @@ export default function mouseObserver() {
                 const name = filesList.value.filter(item => item.id === pickingProxy.bond.structure.name)[0].name
                 updateLegend({
                     name: name,
+                    model: pickingProxy.bond.atom1.modelIndex,
                     chainname: pickingProxy.bond.atom1.chainname,
                     resname: pickingProxy.bond.atom1.resname,
                     resno: pickingProxy.bond.atom1.resno,

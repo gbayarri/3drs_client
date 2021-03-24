@@ -19,6 +19,7 @@
     <ModalTrajectory />
     <ModalStructure />
     <ModalShare />
+    <ModalTips />
 
 </template>
 
@@ -35,13 +36,14 @@ import Viewport from '@/components/representation/Viewport'
 import ModalTrajectory from '@/components/representation/modals/ModalTrajectory'
 import ModalStructure from '@/components/representation/modals/ModalStructure'
 import ModalShare from '@/components/representation/modals/ModalShare'
+import ModalTips from '@/components/representation/modals/ModalTips'
 export default {
     components: { 
         Tools, ZoomWindow, 
         RepresentationSettings, Settings, 
         Share, Legend, 
         Viewport, 
-        ModalTrajectory, ModalStructure, ModalShare },
+        ModalTrajectory, ModalStructure, ModalShare, ModalTips },
     props: ['id'],
     setup(props) {
 

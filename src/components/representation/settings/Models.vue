@@ -35,12 +35,14 @@ import { ref, computed, watch, onUpdated } from 'vue'
 import structureSettings from '@/modules/structure/structureSettings'
 import useRepresentations from '@/modules/representations/useRepresentations'
 import useSettings from '@/modules/settings/useSettings'
+import useModals from '@/modules/common/useModals'
 export default {
     setup() {
 
         const { currentStructure, updateCurrentModel, getCurrentModel, getModels } = structureSettings()
         const { currentRepresentation } = useRepresentations()
         const { setModelsSettings } = useSettings()
+        const { openModal } = useModals()
 
         const currReprVal = computed(() => currentRepresentation.value)
         const currStr = computed(() => currentStructure.value)
@@ -83,7 +85,7 @@ export default {
         })*/
 
         const showTips = () => {
-            console.log("show tips")
+             openModal('tips', 'models')
         }
 
         onUpdated(() => {

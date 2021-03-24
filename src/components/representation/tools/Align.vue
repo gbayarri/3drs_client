@@ -15,6 +15,7 @@ export default {
     const stage = props.stage
 
     const handleClick = () => {
+      /*
       // TODO: PUT IN A FOR!!!! TEST WITH MORE THAN 2!!!!!
       const c1 = stage.getComponentsByName('1aki').list[0]
       const c2 = stage.getComponentsByName('2rgp').list[0]
@@ -27,6 +28,7 @@ export default {
       new_c.autoView(500)
 
       //c1.addRepresentation( "spacefill", { sele: "* and not(_H)", radius: 5, aspectRatio: 1.5 });
+      */
     }
 
     return { ttp, handleClick }

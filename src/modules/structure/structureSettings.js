@@ -206,7 +206,7 @@ export default function structureSettings() {
     }
 
     const updateMolecule = function (molecule, type, currReprVal) {
-
+        
         const molecules = settings.value
                             .filter(item => item.id === currentStructure.value)[0].navigation
                             .filter(item => item.id === currReprVal)[0].models
@@ -329,6 +329,7 @@ export default function structureSettings() {
         }
 
         let msg = null
+        let status = null
         // check if adding or removing
         if(!checkIfSetOfMoleculeExists(setOfMolecules, type, currReprVal, cm, search)) {
             // push new molecules
@@ -350,7 +351,7 @@ export default function structureSettings() {
                 range: setOfMolecules[0].num + ' - ' + setOfMolecules[setOfMolecules.length - 1].num,
                 txt: 'added to '
             }
-
+            status = 'add'
         } else {
             // update settings.value removing selected molecules
             settings.value
@@ -364,9 +365,11 @@ export default function structureSettings() {
                 range: setOfMolecules[0].num + ' - ' + setOfMolecules[setOfMolecules.length - 1].num,
                 txt: 'removed from '
             }
+            status = 'remove'
         }
 
-        return [settings.value, msg]
+        //return [settings.value, msg]
+        return [status, msg]
 
     }
 
@@ -377,7 +380,7 @@ export default function structureSettings() {
 
         let molecules = null
         let msg = null
-        if(operation == 'select') {
+        if(operation === 'add') {
             molecules = allMolecules
             msg = {
                 status: 'info',
@@ -398,7 +401,7 @@ export default function structureSettings() {
             .filter(item => item.id === currReprVal)[0].models
             .filter(item => item.id === cm)[0][type] = molecules
 
-        return [settings.value, msg]
+        return msg
 
     }
 

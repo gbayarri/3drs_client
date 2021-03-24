@@ -14,7 +14,7 @@
     :data-helix="(residue.helix !== null) ? residue.chain + ':' + residue.helix + '/' + residue.model : null" 
     @mouseover="onMouseOver(residue.model, residue.chain, residue.num, residue.label, residue.longname)"
     @mouseleave="onMouseLeave(residue.model, residue.chain, residue.num, residue.label)"
-    @click.exact="onClick(residue.model, residue.chain, residue.num, residue.label, residue.longname)"
+    @click.exact="onClick(residue.model, residue.chain, residue.num, residue.label)"
     @click.shift.exact="onSelectMultiple(residue.model, residue.chain, residue.num)"
     @click.alt.exact="onCenterResidue(residue.model, residue.chain, residue.num, residue.label)">
         {{ residue.id }}
@@ -25,7 +25,7 @@
     v-if="(residue.sheet !== null) && window" 
     @mouseover="sheetOver(residue.sheet, residue.chain, residue.model)" 
     @mouseleave="sheetLeave(residue.sheet, residue.chain, residue.model)" 
-    @click.exact="sheetClick(residue.sheet, residue.chain)"
+    @click.exact="sheetClick(residue.sheet, residue.chain, residue.model)"
     @click.alt.exact="sheetCenter(residue.sheet, residue.chain, residue.model)"
     :data-sheet="residue.chain + ':' + residue.sheet + '/' + residue.model" >
     <span v-if="!residue.last_sheet">&nbsp;&nbsp;</span><span v-else>&#9654;&nbsp;</span></span>
@@ -34,7 +34,7 @@
     v-if="(residue.helix !== null) && window" 
     @mouseover="helixOver(residue.helix, residue.chain, residue.model)" 
     @mouseleave="helixLeave(residue.helix, residue.chain, residue.model)" 
-    @click.exact="helixClick(residue.helix, residue.chain)"
+    @click.exact="helixClick(residue.helix, residue.chain, residue.model)"
     @click.alt.exact="helixCenter(residue.helix, residue.chain, residue.model)"
     :data-helix="residue.chain + ':' + residue.helix + '/' + residue.model" >&nbsp;&nbsp;</span>
 </template>
@@ -43,7 +43,7 @@
 import { computed } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import structureSettings from '@/modules/structure/structureSettings'
-import structureStorage from '@/modules/structure/structureStorage'
+//import structureStorage from '@/modules/structure/structureStorage'
 import useLegend from '@/modules/viewport/useLegend'
 import useFlags from '@/modules/common/useFlags'
 import useSettings from '@/modules/settings/useSettings'
@@ -63,26 +63,24 @@ export default {
         const { updateLegend } = useLegend()
         const { setFlagStatus } = useFlags()
         const { currentStructure, getFileNames, checkIfMoleculeExists, updateMolecule, updateSetOfMolecules, getSetOfMolecules } = structureSettings()
-        const { projectData } = structureStorage()
+        //const { projectData } = structureStorage()
         const { addMultipleResidues, getSelection } = useSelections()
         const { currentRepresentation, getCurrentRepresentationSettings, setSelectionRepresentation } = useRepresentations()
         const { setMoleculesSettings, setPositionSettings } = useSettings()
         
         const filesList = computed(() => getFileNames())
-        const dataProject = computed(() => projectData.value)
+        //const dataProject = computed(() => projectData.value)
         const currStr = computed(() => currentStructure.value)
         const component = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0])
         const currReprVal = computed(() => currentRepresentation.value)
         const currReprSettings = computed(() => getCurrentRepresentationSettings())
 
         const residue =  computed(() => props.residue)
-        const sheets =  computed(() => props.sheets)
-        const helixes =  computed(() => props.helixes)
+        //const sheets =  computed(() => props.sheets)
+        //const helixes =  computed(() => props.helixes)
         const window =  computed(() => props.window)
 
         const re = computed(() => new RegExp('(' + currReprVal.value + '\-' + currStr.value + '\-[a-z]*)', 'g'))
-        
-        //const re = new RegExp('(' + representation_id + '\-' + component.parameters.name + '\-[a-z]*)', 'g')
 
         const isSelected = computed(() => checkIfMoleculeExists(residue.value, 'residues', currReprVal.value))
 
@@ -108,6 +106,7 @@ export default {
             const name = filesList.value.filter(item => item.id === currStr.value)[0].name
             updateLegend({
                 name: name,
+                model: model,
                 chainname:chain,
                 resname: resname + ' (<span class="lowercase-legend">' + longname + '</span>)',
                 resno: resnum,
@@ -118,7 +117,7 @@ export default {
             // v-tooltip.left="residue.longname[0].toUpperCase() + residue.longname.substring(1) + ' (' +  residue.label + ')<br>' + residue.chain + ': ' + residue.id + ' ' + residue.num"
         }
 
-        const onMouseLeave = (model, chain, resnum, resname) => {
+        const actionLeave = (model, chain, resnum, resname) => {
             // NGL representation
             const sele = resnum + ':' + chain + '/' + model
             const re = currStr.value + '-' + sele + '-hover'
@@ -126,27 +125,29 @@ export default {
                 item.dispose()
             }
             // residue respresentation
-            const residues = document.querySelectorAll('[data-model="' + model + '"][data-chain="' + chain + '"][data-resnum="' + resnum + '"][data-resname="' + resname + '"]')
+            //if(resname) const residues = document.querySelectorAll('[data-model="' + model + '"][data-chain="' + chain + '"][data-resnum="' + resnum + '"][data-resname="' + resname + '"]')
+            const residues = resname ?
+                document.querySelectorAll('[data-model="' + model + '"][data-chain="' + chain + '"][data-resnum="' + resnum + '"][data-resname="' + resname + '"]') :
+                document.querySelectorAll('[data-model="' + model + '"][data-chain="' + chain + '"][data-resnum="' + resnum + '"]')
+
             for(const res of residues) {
                 res.classList.remove('sequence-item-hover')
             }
+        }
+
+        const onMouseLeave = (model, chain, resnum, resname) => {
+            actionLeave(model, chain, resnum, resname)
             // legend
             setFlagStatus('legendEnabled', false)
         }
 
-        const onClick = (model, chain, resnum, resname, longname) => {
-
-            //const residues = document.querySelectorAll('[data-model="' + model + '"][data-chain="' + chain + '"][data-resnum="' + resnum + '"][data-resname="' + resname + '"]')
-   
+        const onClick = (model, chain, resnum, resname) => {  
             const [molecules, msg, status] = updateMolecule(residue.value, 'residues', currReprVal.value)
             const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
             // update representations selections
-            //console.log(currReprVal.value)
             const [selection, structures] = getSelection(molecules, status, currReprVal.value, currStr.value)
-            // THE selection OBJECT (WITH STRING AND MOLECULES) MUST BE SAVED IN DB TO REPRESENTATIONS / STRUCTURES (currStr.value)
-            // CREATE NEW FUNCTION IN useRepresentations (setRepresentation) AND PASS TO IT selection.string
-            //console.log(selection, structures)
-            // SAVE structures TO API REST VIA setSelectionRepresentation
+            // remove mouseover representation
+            actionLeave(model, chain, resnum, resname)
             // TODO: CLEAN residue, structure
             setMoleculesSettings(residue.value, currStr.value, currReprVal.value)
                 .then((r) => {
@@ -170,28 +171,15 @@ export default {
                                     + ' representation',
                             life: 10000
                         })
-
+                        // save selection representation
                         setSelectionRepresentation(stage, selection, structures, re.value, true)
                             .then((r) => {
                                 if(r.code != 404) console.log(r.message)
                                 else console.error(r.message)
                             })
-
                         console.log(r.message)
                     } else  console.error(r.message)
                 })
-
-
-            // MODIFY THAT BY A CALL TO updateMolecules
-            /*for(const res of residues) {
-                if(res.className.indexOf('sequence-item-selected') === -1) res.classList.add('sequence-item-selected')
-                else res.classList.remove('sequence-item-selected', 'sequence-item-hover')
-            }*/
-            // CREATE UPDATE RESIDUES IN STRUCTURE SETTINGS
-
-            // CREATE NGL SELECTION IN USE SELECTIONS
-
-            // GET SELECTION AND SAVE IT INTO settings.value AND MONGO. SAVE NAVIGATION IN MONGO AS WELL
         }
 
         // CENTER STRUCTURE
@@ -206,7 +194,7 @@ export default {
         }
 
         const onSelectMultiple = (model, chain, resnum) => {
-            const mr = addMultipleResidues({ model: model, num: resnum, chain, chain})
+            const mr = addMultipleResidues({ model: model, num: resnum, chain: chain})
             document.querySelectorAll('.sequence-item:not(.disabled)').forEach(el => el.style.cursor = 'copy')
             // on second click
             if(!mr.status) {
@@ -231,9 +219,12 @@ export default {
                     }
                     // get set of molecules
                     const setOfMolecules = getSetOfMolecules('residues', currReprVal.value, residue.value.chain, first, last)
-                    const [settings, msg] = updateSetOfMolecules('residues', currReprVal.value, setOfMolecules, residue.value.chain, 'multiple')
+                    const [status, msg] = updateSetOfMolecules('residues', currReprVal.value, setOfMolecules, residue.value.chain, 'multiple')
                     const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
-                    //const [selection, structures] = getSelection(molecules, status, currReprVal.value, currStr.value)
+                    // update representations selections
+                    const [selection, structures] = getSelection(setOfMolecules, status, currReprVal.value, currStr.value)
+                    // remove mouseover representation
+                    actionLeave(mr.lastRes.model, mr.lastRes.chain, mr.lastRes.num, null)
                     // TODO: CLEAN residue, structure
                     setMoleculesSettings(residue.value, currStr.value, currReprVal.value)
                         .then((r) => {
@@ -255,6 +246,12 @@ export default {
                                             + ' representation',
                                     life: 10000
                                 })
+                                // save selection representation
+                                setSelectionRepresentation(stage, selection, structures, re.value, true)
+                                    .then((r) => {
+                                        if(r.code != 404) console.log(r.message)
+                                        else console.error(r.message)
+                                    })
                                 console.log(r.message)
                             } else  console.error(r.message)
                         })
@@ -270,9 +267,6 @@ export default {
             const firstItem = resSheet[0]
             const lastItem = resSheet[resSheet.length-1]
             const sele = firstItem.num + '-' + lastItem.num + ':' + chain + '/' + model
-            //***************************************************************** */
-            //const sele = '724:A/0, 725:A/0, 726:A/0, 727:A/0, 728:A/0, 729:A/0'
-            //***************************************************************** */
             const repr = resSheet.length > 3 ? 'cartoon' : 'licorice'
             const new_name = currStr.value + '-' + sele + '-hover'
             component.value.addRepresentation( repr, { 
@@ -295,6 +289,7 @@ export default {
             const labelSh = firstItem.label + ' ' + firstItem.num + ' - ' + lastItem.label + ' ' + lastItem.num
             updateLegend({
                 name: name,
+                model: model,
                 chainname: chain,
                 resname: '<span class="lowercase-legend">β-sheet</span>',
                 resno: labelSh,
@@ -303,7 +298,7 @@ export default {
             setFlagStatus('legendEnabled', true)
         }
 
-        const sheetLeave = (sheet, chain, model) => {
+        const actionSheetLeave = (sheet, chain, model) => {
             // NGL representation
             const resSheet = props.sheets.filter(item => item.id === chain)[0].sheets[sheet]
             const firstItem = resSheet[0]
@@ -320,15 +315,22 @@ export default {
                 if(s.className == 'sheet-arrow') s.style.color = 'rgb(104, 158, 153)'
                 if(s.className == 'sequence-item sequence-item-hover')  s.classList.remove('sequence-item-hover')
             }
+        }
+
+        const sheetLeave = (sheet, chain, model) => {
+            actionSheetLeave(sheet, chain, model)
             // legend
             setFlagStatus('legendEnabled', false)
         }
 
-        const sheetClick = (sheet, chain) => {
+        const sheetClick = (sheet, chain, model) => {
             const resSheet = props.sheets.filter(item => item.id === chain)[0].sheets[sheet]
-            const [settings, msg] = updateSetOfMolecules('residues', currReprVal.value, resSheet, residue.value.chain, 'sheet')
-
+            const [status, msg] = updateSetOfMolecules('residues', currReprVal.value, resSheet, residue.value.chain, 'sheet')
             const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
+            // update representations selections
+            const [selection, structures] = getSelection(resSheet, status, currReprVal.value, currStr.value)
+            // remove mouseover representation
+            actionSheetLeave(sheet, chain, model)
             // TODO: CLEAN residue, structure
             setMoleculesSettings(residue.value, currStr.value, currReprVal.value)
                 .then((r) => {
@@ -350,6 +352,12 @@ export default {
                                     + ' representation',
                             life: 10000
                         })
+                        // save selection representation
+                        setSelectionRepresentation(stage, selection, structures, re.value, true)
+                            .then((r) => {
+                                if(r.code != 404) console.log(r.message)
+                                else console.error(r.message)
+                            })
                         console.log(r.message)
                     } else  console.error(r.message)
                 })
@@ -395,6 +403,7 @@ export default {
             const labelHx = firstItem.label + ' ' + firstItem.num + ' - ' + lastItem.label + ' ' + lastItem.num
             updateLegend({
                 name: name,
+                model: model,
                 chainname: chain,
                 resname: '<span class="lowercase-legend">α-helix</span>',
                 resno: labelHx,
@@ -403,7 +412,7 @@ export default {
             setFlagStatus('legendEnabled', true)
         }
 
-        const helixLeave = (helix, chain, model) => {
+        const actionHelixLeave = (helix, chain, model) => {
             // NGL representation
             const resHelix = props.helixes.filter(item => item.id === chain)[0].helixes[helix]
             const firstItem = resHelix[0]
@@ -419,15 +428,22 @@ export default {
                 if(s.className == 'helix') s.style.backgroundPosition = 'center bottom'
                 if(s.className == 'sequence-item sequence-item-hover')  s.classList.remove('sequence-item-hover')
             }
+        }
+
+        const helixLeave = (helix, chain, model) => {
+            actionHelixLeave(helix, chain, model)
             // legend
             setFlagStatus('legendEnabled', false)
         }
 
-        const helixClick = (helix, chain) => {
+        const helixClick = (helix, chain, model) => {
             const resHelix = props.helixes.filter(item => item.id === chain)[0].helixes[helix]
-            const [settings, msg] = updateSetOfMolecules('residues', currReprVal.value, resHelix, residue.value.chain, 'helix')
-
+            const [status, msg] = updateSetOfMolecules('residues', currReprVal.value, resHelix, residue.value.chain, 'helix')
             const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
+            // update representations selections
+            const [selection, structures] = getSelection(resHelix, status, currReprVal.value, currStr.value)
+            // remove mouseover representation
+            actionHelixLeave(helix, chain, model)
             // TODO: CLEAN residue, structure
             setMoleculesSettings(residue.value, currStr.value, currReprVal.value)
                 .then((r) => {
@@ -449,6 +465,12 @@ export default {
                                     + ' representation',
                             life: 10000
                         })
+                        // save selection representation
+                        setSelectionRepresentation(stage, selection, structures, re.value, true)
+                            .then((r) => {
+                                if(r.code != 404) console.log(r.message)
+                                else console.error(r.message)
+                            })
                         console.log(r.message)
                     } else  console.error(r.message)
                 })

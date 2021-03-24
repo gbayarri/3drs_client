@@ -51,9 +51,11 @@ import { ref, reactive, computed, watch, toRefs, onUpdated } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import structureSettings from '@/modules/structure/structureSettings'
 import useRepresentations from '@/modules/representations/useRepresentations'
+import useSelections from '@/modules/representations/useSelections'
 import useSettings from '@/modules/settings/useSettings'
 import useLegend from '@/modules/viewport/useLegend'
 import useFlags from '@/modules/common/useFlags'
+import useModals from '@/modules/common/useModals'
 export default {
     props: ['stage'],
     setup(props) {
@@ -72,8 +74,10 @@ export default {
             updateMolecule, 
             updateAllMolecules 
         } = structureSettings()
-        const { currentRepresentation, getCurrentRepresentationSettings } = useRepresentations()
+        const { currentRepresentation, getCurrentRepresentationSettings, setSelectionRepresentation } = useRepresentations()
         const { setMoleculesSettings, setPositionSettings } = useSettings()
+        const { getSelection } = useSelections()
+        const { openModal } = useModals()
 
         const filesList = computed(() => getFileNames())
         const currReprVal = computed(() => currentRepresentation.value)
@@ -83,6 +87,9 @@ export default {
 
         const isCollapsed = ref(true)
         //const allSelected = ref(false)
+        let clicked = false
+
+        const re = computed(() => new RegExp('(' + currReprVal.value + '\-' + currStr.value + '\-[a-z]*)', 'g'))
 
         const toast = useToast()
 
@@ -121,8 +128,10 @@ export default {
 
             if(!centering) {
 
+                clicked = true
+
                 let lastItem = null
-                let status = null
+                //let status = null
 
                 //console.log(selHs, prevSelection)
 
@@ -130,30 +139,33 @@ export default {
                     if(selHs >= prevSelection) {
                         //console.log('selHs >= prevSelection')
                         lastItem = selHs.filter(({ id: id1 }) => !prevSelection.some(({ id: id2 }) => id2 === id1))[0]
-                        status = 'selected'
+                        //status = 'selected'
                     } else {
                         //console.log('selHs < prevSelection')
                         lastItem = prevSelection.filter(({ id: id1 }) => !selHs.some(({ id: id2 }) => id1 === id2))[0]
-                        status = 'unselected'
+                        //status = 'unselected'
                     }
                 }
 
                 if(!prevSelection || !prevSelection.length) {
                     //console.log('No prev (adding first)')
                     lastItem = selHs[selHs.length - 1]
-                    status = 'selected'
+                    //status = 'selected'
                 }
 
                 if(!selHs || !selHs.length) {
                     //console.log('No selected hets (removing last')
                     lastItem = prevSelection[prevSelection.length - 1]
-                    status = 'unselected'
+                    //status = 'unselected'
                 }
 
                 //console.log(status, lastItem)
-
-                const [settings, msg] = updateMolecule(lastItem, 'heteroatoms', currReprVal.value)
+                const [molecules, msg, status] = updateMolecule(lastItem, 'heteroatoms', currReprVal.value)
                 const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
+                // update representations selections
+                const [selection, structures] = getSelection(molecules, status, currReprVal.value, currStr.value)
+                // remove mouseover representation
+                actionLeave(lastItem)
                 // TODO: CLEAN residue, structure
                 setMoleculesSettings(lastItem, currStr.value, currReprVal.value)
                     .then((r) => {
@@ -177,6 +189,12 @@ export default {
                                         + ' representation',
                                 life: 10000
                             })
+                            // save selection representation
+                            setSelectionRepresentation(stage, selection, structures, re.value, true)
+                                .then((r) => {
+                                    if(r.code != 404) console.log(r.message)
+                                    else console.error(r.message)
+                                })
                             console.log(r.message)
                         } else  console.error(r.message)
                     })
@@ -225,18 +243,22 @@ export default {
             /*page.ttpsa = allSelected.value ? 'Select all heteroatoms' : 'Unselect all heteroatoms'
             selectedHets.value = allSelected.value ? null : modelHeteroatoms.value
             allSelected.value = !allSelected.value*/
-            let settings, msg
+            let status, msg
             if(allSelected.value) {
-                [settings, msg] = updateAllMolecules('heteroatoms', currReprVal.value, 'unselect')
+                status = 'remove'
+                msg = updateAllMolecules('heteroatoms', currReprVal.value, status)
                 //console.log('I want to unselect all')
             } else {
-                [settings, msg] = updateAllMolecules('heteroatoms', currReprVal.value, 'select', modelHeteroatoms.value)
+                status = 'add'
+                msg = updateAllMolecules('heteroatoms', currReprVal.value, status, modelHeteroatoms.value)
                 //console.log('I want to select all')
             }
 
             //console.log(selectedHets.value)
 
             const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
+            // update representations selections
+            const [selection, structures] = getSelection(modelHeteroatoms.value, status, currReprVal.value, currStr.value)
             // TODO: CLEAN residue, structure
             setMoleculesSettings(null, null, currReprVal.value)
                 .then((r) => {
@@ -255,6 +277,12 @@ export default {
                                     + ' representation',
                             life: 10000
                         })
+                        // save selection representation
+                        setSelectionRepresentation(stage, selection, structures, re.value, true)
+                            .then((r) => {
+                                if(r.code != 404) console.log(r.message)
+                                else console.error(r.message)
+                            })
                         console.log(r.message)
                     } else  console.error(r.message)
                 })
@@ -289,45 +317,53 @@ export default {
         // MOUSE OVER
 
         const onHover = (v) => {
-            // NGL representation
-            const sele = v.num + ':' + v.chain + '/' + v.model
-            const new_name = currStr.value + '-' + sele + '-hover'
-            if(stage.getRepresentationsByName(new_name).list.length === 0) {
-                component.value.addRepresentation( "spacefill", { 
-                    name: new_name,
-                    sele: '(' + sele + ')', 
-                    opacity:.5, 
-                    radius:2,
-                    color:'#5E738B' 
+            if(!clicked) {
+                // NGL representation
+                const sele = v.num + ':' + v.chain + '/' + v.model
+                const new_name = currStr.value + '-' + sele + '-hover'
+                if(stage.getRepresentationsByName(new_name).list.length === 0) {
+                    component.value.addRepresentation( "spacefill", { 
+                        name: new_name,
+                        sele: '(' + sele + ')', 
+                        opacity:.5, 
+                        radius:2,
+                        color:'#5E738B' 
+                    })
+                }
+                // legend
+                const name = filesList.value.filter(item => item.id === currStr.value)[0].name
+                updateLegend({
+                    name: name,
+                    model: v.model,
+                    chainname: v.chain,
+                    resname: v.resname,
+                    resno: v.num,
+                    atomname: null
                 })
+                setFlagStatus('legendEnabled', true)
             }
-            // legend
-            const name = filesList.value.filter(item => item.id === currStr.value)[0].name
-            updateLegend({
-                name: name,
-                chainname: v.chain,
-                resname: v.resname,
-                resno: v.num,
-                atomname: null
-            })
-            setFlagStatus('legendEnabled', true)
         }
 
         // MOUSE LEAVE
 
-        const onLeave = (v) => {
+        const actionLeave = (v) => {
             // NGL representation
             const sele = v.num + ':' + v.chain + '/' + v.model
             const re = currStr.value + '-' + sele + '-hover'
             for(const item of stage.getRepresentationsByName(re).list) {
                 item.dispose()
             }
+        }
+
+        const onLeave = (v) => {
+            clicked = false
+            actionLeave(v)
             // legend
             setFlagStatus('legendEnabled', false)
         }
 
         const showTips = () => {
-            console.log("show tips")
+            openModal('tips', 'heteroatoms')
         }
 
         return { 
