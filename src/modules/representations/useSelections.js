@@ -42,7 +42,7 @@ export default function useSelections() {
 
   }
 
-  // update selection object
+  // updates selection object and returns selection string
   const getSelection = function (molecules, status, currReprVal, currStr) {
     // use only chain, num, model
     const m = molecules.map(({ chain, num, model }) => ({ chain, num, model }))
@@ -73,6 +73,37 @@ export default function useSelections() {
       n_sel.string = string_sel
       //console.log('Remove', currReprVal, currStr, molecules)
     }
+
+    //console.log(selection.value)
+
+    return [string_sel, selection.value.filter(item => item.id === currReprVal)[0].structures]
+
+  }
+
+  // updates selection object and returns selection string in case we are updating chains
+  const getSelectionChains = function (chains, currReprVal, currStr) {
+
+    //console.log(chains, currReprVal, currStr)
+    console.log(chains)
+
+    /*console.log(selection.value
+      .filter(item => item.id === currReprVal)[0].structures
+      .filter(item => item.id === currStr)[0].selection.molecules.filter(item => chains.some(elem => (elem.id === item.chain))).length)*/
+
+    // filter only molecules with selected chains
+    // HOW TO CHECK IF ADD OR REMOVE?????????
+    // THIS CODE IS FOR REMOVE CHAINS:
+    const mols = selection.value
+      .filter(item => item.id === currReprVal)[0].structures
+      .filter(item => item.id === currStr)[0].selection.molecules.filter(item => chains.some(elem => (elem.id === item.chain)))
+
+    console.log(mols)
+
+    const string_sel = generateNGLSelection(mols)
+
+    /*selection.value
+      .filter(item => item.id === currReprVal)[0].structures
+      .filter(item => item.id === currStr)[0].selection.molecules = mols*/
 
     //console.log(selection.value)
 
@@ -131,6 +162,7 @@ export default function useSelections() {
     multipleResidues,
     addMultipleResidues, 
     getSelection,
+    getSelectionChains,
     setSelection,
     updateSelection
   }

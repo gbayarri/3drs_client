@@ -46,6 +46,7 @@ import { ref, computed, watch, onUpdated } from 'vue'
 import structureSettings from '@/modules/structure/structureSettings'
 import useRepresentations from '@/modules/representations/useRepresentations'
 import useSettings from '@/modules/settings/useSettings'
+import useSelections from '@/modules/representations/useSelections'
 import useModals from '@/modules/common/useModals'
 export default {
     props: ['stage'],
@@ -54,9 +55,10 @@ export default {
         const stage = props.stage
 
         const { currentStructure, updateCurrentChains, getCurrentChains, getCurrentModel, getChains } = structureSettings()
-        const { currentRepresentation } = useRepresentations()
+        const { currentRepresentation, setSelectionRepresentation } = useRepresentations()
         const { setChainsSettings } = useSettings()
         const { openModal } = useModals()
+        const { getSelectionChains } = useSelections()
 
         const currReprVal = computed(() => currentRepresentation.value)
         const currStr = computed(() => currentStructure.value)
@@ -64,6 +66,8 @@ export default {
         const component = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0])
 
         const isCollapsed = ref(true)
+
+        const re = computed(() => new RegExp('(' + currReprVal.value + '\-' + currStr.value + '\-[a-z]*)', 'g'))
 
         const page = {
             header: "Chains",
@@ -91,11 +95,25 @@ export default {
             // TODO: update selection with some function of useSelection
             // show toast when added / removed chains
             // TODO: CLEAN chains, model, structure
+            const [selection, structures] = getSelectionChains(selectedChains.value, currReprVal.value, currStr.value)
+            //console.log(selection, structures)
+            // ****************************************
+            // ****************************************
             setChainsSettings(null, null, null, currReprVal.value)
                     .then((r) => {
-                        if(r.code != 404) console.log(r.message)
-                        else console.error(r.message)
+                        if(r.code != 404) {
+                            // save selection representation
+                            setSelectionRepresentation(stage, selection, structures, re.value, true)
+                                .then((r) => {
+                                    if(r.code != 404) console.log(r.message)
+                                    else console.error(r.message)
+                                })
+                            console.log(r.message)
+                        } else console.error(r.message) 
                     })
+            // ****************************************
+            // ****************************************
+
         }
 
         /*const onChange = () => {
