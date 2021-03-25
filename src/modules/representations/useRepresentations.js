@@ -2,7 +2,7 @@ import { ref, computed } from 'vue'
 import structureStorage from '@/modules/structure/structureStorage'
 import useAPI from '@/modules/api/useAPI'
 import drawRepresentation from '@/modules/ngl/drawRepresentation'
-const representations = ref({})
+//const representations = ref({})
 let currentRepresentation = ref(null)
 
 export default function useRepresentations() {
@@ -15,6 +15,7 @@ export default function useRepresentations() {
         eliminateRepresentation 
     } = useAPI()
     const { addRepresentationToComponent } = drawRepresentation()
+    //const defaultRepresentation = computed(() => projectData.value.defaultRepresentation)
     const defaultRepresentation = projectData.value.defaultRepresentation
     const prjID = projectData.value._id
 
@@ -176,8 +177,76 @@ export default function useRepresentations() {
         return await eliminateRepresentation(prjID, value )
     }
 
+    // HIERARCHY
+
+    // TODO!!!!
+    const getHierarchy = (selections, filesList) => {
+        const sel = selections.value
+        const defRepr = dataProject.value.defaultRepresentation
+        const allRepresentations = dataProject.value.representations
+        const hierarchy = []
+        for(const repr of allRepresentations) {
+
+            var level1 = {
+                key: repr.id,
+                label: repr.name + ' [ '+ repr.mol_repr + ' / ' + repr.color_scheme + ' ]',
+                data: repr.id,
+                icon: 'fas fa-paint-brush',
+                styleClass: '',
+                children: []
+            }
+
+            if(repr.id === defRepr) {
+                level1.label = repr.name
+                level1.styleClass = 'default-class'
+            } else {
+
+                const allStructures = sel.filter(item => (item.id === repr.id))[0].structures
+
+                for(const str of allStructures) {
+
+                    var level2 = {
+                        key: repr.id + '-' + str.id,
+                        label: filesList.value.filter(item => item.id === str.id)[0].name,
+                        data: str.id,
+                        icon: 'fas fa-dna',
+                        styleClass: '',
+                        children: []
+                    }
+
+                    const allMolecules = str.selection.molecules
+
+                    for(const mol of allMolecules) {
+                        
+                        var level3 = {
+                            key: repr.id + '-' + str.id + '-' + mol.num + ':' + mol.chain + '/' + (mol.model + 1),
+                            // TO FIX
+                            label: 'Model ' + (mol.model + 1) + ' - Chain ' + mol.name,
+                            data: 'Model ' + (mol.model + 1) + ' - Chain ' + mol.name,
+                            icon: 'fas fa-share-alt',
+                            styleClass: '',
+                        }
+
+                        level2.children.push(level3)
+
+                    }
+
+                    if(!level2.children.length) level2.styleClass = 'default-class'
+
+                    level1.children.push(level2)
+                }
+            }
+
+            hierarchy.push(level1)
+        }
+
+        //console.log(selections.value)
+
+        return hierarchy
+    }
+
     return { 
-        representations, 
+        //representations, 
         currentRepresentation,
         defaultRepresentation,
         getRepresentationNames,
@@ -193,6 +262,7 @@ export default function useRepresentations() {
         setColorSchemeRepresentation,
         setColorRepresentation,
         deleteRepresentation,
+        getHierarchy
     }
 
 }

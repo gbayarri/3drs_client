@@ -20,6 +20,7 @@
     <ModalStructure />
     <ModalShare />
     <ModalTips />
+    <ModalHierarchy v-if="stageLoaded" />
 
 </template>
 
@@ -37,13 +38,14 @@ import ModalTrajectory from '@/components/representation/modals/ModalTrajectory'
 import ModalStructure from '@/components/representation/modals/ModalStructure'
 import ModalShare from '@/components/representation/modals/ModalShare'
 import ModalTips from '@/components/representation/modals/ModalTips'
+import ModalHierarchy from '@/components/representation/modals/ModalHierarchy'
 export default {
     components: { 
         Tools, ZoomWindow, 
         RepresentationSettings, Settings, 
         Share, Legend, 
         Viewport, 
-        ModalTrajectory, ModalStructure, ModalShare, ModalTips },
+        ModalTrajectory, ModalStructure, ModalShare, ModalTips, ModalHierarchy },
     props: ['id'],
     setup(props) {
 

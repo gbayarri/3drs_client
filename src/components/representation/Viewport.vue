@@ -120,6 +120,12 @@ export default {
           // close BlockUI
           closeModal('block')
 
+          // disabling autocenter when clicking on an atom
+          stage.mouseControls.remove('clickPick-left')
+          // reset position on double click
+          stage.mouseControls.add('doubleClick+left', function( stage, delta ){
+              stage.autoView(300);
+          } )
 
           console.log(stage)
           

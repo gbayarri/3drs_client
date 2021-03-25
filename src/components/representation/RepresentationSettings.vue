@@ -162,6 +162,7 @@ import useComponents from '@/modules/ngl/useComponents'
 import useFlags from '@/modules/common/useFlags'
 import useRepresentations from '@/modules/representations/useRepresentations'
 import useSelections from '@/modules/representations/useSelections'
+import useModals from '@/modules/common/useModals'
 import structureSettings from '@/modules/structure/structureSettings'
 import structureStorage from '@/modules/structure/structureStorage'
 export default {
@@ -189,6 +190,7 @@ export default {
         } = useRepresentations()
         const { addNewRepresentationSettings, removeRepresentationSettings } = structureSettings()
         const { updateSelection } = useSelections()
+        const { openModal } = useModals()
 
         let isCollapsed = ref(true)
         const currReprSettings = computed(() => getCurrentRepresentationSettings())
@@ -225,8 +227,13 @@ export default {
             get: () => reprList.value.filter(item => item.id === currReprVal.value)[0],
             set: val => {
                 // if Default, close settings menu
-                if(val.id === defaultRepresentation) setFlagStatus('sidebarEnabled', false)
-                else  setFlagStatus('sidebarEnabled', true)
+                if(val.id === defaultRepresentation) {
+                    setFlagStatus('sidebarEnabled', false)
+                    setFlagStatus('zoomWindowEnabled', false)
+                } else  {
+                    setFlagStatus('sidebarEnabled', true)
+                    //setFlagStatus('zoomWindowEnabled', true)
+                }
                 setCurrentRepresentation(val.id, true)
                 .then((r) => {
                     if(r.code != 404) console.log(r.message)
@@ -503,8 +510,7 @@ export default {
                 })
         }
         const visualizeStructure = () => {
-            // open modal with all the content of dataProject.representation[this structure].settings
-            console.log("visualize structure")
+            openModal('hierarchy')
         }
 
         return { 

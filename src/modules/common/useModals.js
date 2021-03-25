@@ -5,7 +5,8 @@ const dialog = reactive({
   structure: false,
   share: false,
   tips: false,
-  block: false
+  block: false,
+  hierarchy: false,
 })
 
 const tips = ref('')

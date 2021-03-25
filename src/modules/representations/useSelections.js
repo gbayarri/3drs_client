@@ -45,7 +45,7 @@ export default function useSelections() {
   // updates selection object and returns selection string
   const getSelection = function (molecules, status, currReprVal, currStr) {
     // use only chain, num, model
-    const m = molecules.map(({ chain, num, model }) => ({ chain, num, model }))
+    const m = molecules.map(({ chain, num, model, name }) => ({ chain, num, model, name }))
     // selection according to currReprVal and currStr
     const sel = selection.value
       .filter(item => item.id === currReprVal)[0].structures
@@ -84,7 +84,7 @@ export default function useSelections() {
   const getSelectionChains = function (chains, currReprVal, currStr) {
 
     //console.log(chains, currReprVal, currStr)
-    console.log(chains)
+    //console.log(chains)
 
     /*console.log(selection.value
       .filter(item => item.id === currReprVal)[0].structures
@@ -97,13 +97,13 @@ export default function useSelections() {
       .filter(item => item.id === currReprVal)[0].structures
       .filter(item => item.id === currStr)[0].selection.molecules.filter(item => chains.some(elem => (elem.id === item.chain)))
 
-    console.log(mols)
+    //console.log(mols)
 
     const string_sel = generateNGLSelection(mols)
 
-    /*selection.value
+    selection.value
       .filter(item => item.id === currReprVal)[0].structures
-      .filter(item => item.id === currStr)[0].selection.molecules = mols*/
+      .filter(item => item.id === currStr)[0].selection.string = string_sel
 
     //console.log(selection.value)
 
@@ -159,6 +159,7 @@ export default function useSelections() {
   }
 
   return { 
+    selection, 
     multipleResidues,
     addMultipleResidues, 
     getSelection,

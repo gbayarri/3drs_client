@@ -37,6 +37,7 @@ export default function mouseObserver() {
         stage.signals.hovered.add( function(pickingProxy){ 
             // update / show legend
             if (pickingProxy && pickingProxy.atom) {
+                //console.log(pickingProxy.atom)
                 const name = filesList.value.filter(item => item.id === pickingProxy.atom.structure.name)[0].name
                 updateLegend({
                     name: name,
@@ -47,6 +48,15 @@ export default function mouseObserver() {
                     atomname: pickingProxy.atom.atomname
                 })
                 setFlagStatus('legendEnabled', true)
+                // TODO BETTER:
+                const allResidues = document.querySelectorAll('.sequence-item, .water-item')
+                for(const res of allResidues) {
+                    res.classList.remove('sequence-item-hover')
+                }
+                const selResidues = document.querySelectorAll('[data-model="' + pickingProxy.atom.modelIndex + '"][data-chain="' + pickingProxy.atom.chainname + '"][data-resnum="' + pickingProxy.atom.resno + '"]')
+                for(const res of selResidues) {
+                    res.classList.add('sequence-item-hover')
+                }
             }
             if (pickingProxy && pickingProxy.bond) {
                 const name = filesList.value.filter(item => item.id === pickingProxy.bond.structure.name)[0].name
@@ -63,8 +73,28 @@ export default function mouseObserver() {
             // hide legend
             if (!pickingProxy) {
                 setFlagStatus('legendEnabled', false)
+                const allResidues = document.querySelectorAll('.sequence-item, .water-item')
+                for(const res of allResidues) {
+                    res.classList.remove('sequence-item-hover')
+                }
             }
         })
+
+        // TODO: CENTER ON CLICKED RESIDUE
+        // stage.autoView DOESN'T WORK WITH MOLECULE AS A PARAMETER, IT SHOULD BE CALLED FROM COMPONENT 
+        //stage.signals.clicked.add( function(pickingProxy){ 
+    		//if (pickingProxy && pickingProxy.atom) {
+    			/*if(typeof repr_res !== 'undefined') component.removeRepresentation(repr_res);
+        		if(typeof repr_res_detail !== 'undefined') component.removeRepresentation(repr_res_detail);
+        		chain = pickingProxy.atom.chainname;
+	        	num = pickingProxy.atom.resno;
+	        	name = pickingProxy.atom.resname;
+	        	Widgets.showLegend(str, chain, name, num);
+        		repr_res_detail = component.addRepresentation( "ball+stick", { sele: '(' + num + ':' + chain + ')', aspectRatio: 1 });*/
+               // console.log('(' + pickingProxy.atom.resno + ':' + pickingProxy.atom.chainname + ')')
+        		//stage.autoView('(' + pickingProxy.atom.resno + ':' + pickingProxy.atom.chainname + '/0)', 500);
+        	//}
+    	//})
 
         // on drag / scroll actions: save orientation after 5s
         let myTimeOut = null

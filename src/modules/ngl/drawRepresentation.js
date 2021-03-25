@@ -23,7 +23,8 @@ export default function drawRepresentation() {
                   sele: selection, 
                   ///********************************************************************* 
                   //sele: '*', 
-                  colorScheme: color_scheme.value,
+                  //colorScheme: color_scheme.value,
+                  color: color_scheme.value,
                   //color: color.value,
                   visible: representation.visible, 
                   opacity: representation.opacity,
@@ -35,7 +36,8 @@ export default function drawRepresentation() {
                   sele: selection, 
                   ///********************************************************************* 
                   //sele: '*', 
-                  colorScheme: color_scheme.value,
+                  //colorScheme: color_scheme.value,
+                  color: color_scheme.value,
                   //color: color.value,
                   visible: representation.visible, 
                   opacity: representation.opacity,
@@ -50,14 +52,15 @@ export default function drawRepresentation() {
                   sele: selection, 
                   ///********************************************************************* 
                   //sele: '*', 
-                  //color: color.value,
-                  colorScheme: color_scheme.value, 
+                  //colorScheme: color_scheme.value, 
+                  color: color_scheme.value,
                   radius: representation.radius.licorice.value,
                   visible: representation.visible, 
                   opacity: representation.opacity,
                   //side: 'front'
                   //depthWrite: false
                 } )
+                //console.log(c1)
                 generatedRepresentations.push(c1)
               break
             case 'ball+stick':
@@ -67,7 +70,8 @@ export default function drawRepresentation() {
                   sele: selection, 
                   ///********************************************************************* 
                   //sele: '*', 
-                  colorScheme: color_scheme.value, 
+                  //colorScheme: color_scheme.value, 
+                  color: color_scheme.value,
                   radius: representation.radius['ball+stick'].value, 
                   visible: representation.visible, 
                   opacity: representation.opacity,
@@ -84,7 +88,8 @@ export default function drawRepresentation() {
                   sele: selection, 
                   ///********************************************************************* 
                   //sele: '*', 
-                  colorScheme: color_scheme.value, 
+                  //colorScheme: color_scheme.value, 
+                  color: color_scheme.value,
                   radius: representation.radius.backbone.value,
                   visible: representation.visible, 
                   opacity: representation.opacity
@@ -98,7 +103,8 @@ export default function drawRepresentation() {
                   sele: selection, 
                   ///********************************************************************* 
                   //sele: '*', 
-                  colorScheme: color_scheme.value,
+                  //colorScheme: color_scheme.value,
+                  color: color_scheme.value,
                   visible: representation.visible, 
                   opacity: representation.opacity                
                 } )
@@ -111,7 +117,8 @@ export default function drawRepresentation() {
                   sele: selection, 
                   ///********************************************************************* 
                   //sele: '*', 
-                  colorScheme: color_scheme.value, 
+                  //colorScheme: color_scheme.value, 
+                  color: color_scheme.value,
                   radius: representation.radius.spacefill.value,
                   visible: representation.visible, 
                   opacity: representation.opacity                
@@ -125,7 +132,8 @@ export default function drawRepresentation() {
                   sele: selection, 
                   ///********************************************************************* 
                   //sele: '*', 
-                  colorScheme: color_scheme.value, 
+                  //colorScheme: color_scheme.value, 
+                  color: color_scheme.value,
                   surfaceType: 'av',
                   /*contour: true,*/ 
                   visible: representation.visible, 
@@ -140,7 +148,8 @@ export default function drawRepresentation() {
                   sele: selection, 
                   ///********************************************************************* 
                   //sele: '*', 
-                  colorScheme: color_scheme.value,
+                  //colorScheme: color_scheme.value,
+                  color: color_scheme.value,
                   visible: representation.visible, 
                   opacity: representation.opacity
                 } )

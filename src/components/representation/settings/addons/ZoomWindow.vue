@@ -94,7 +94,7 @@ export default {
         const toast = useToast()
 
         const page = reactive({
-            title: computed(() => (windowType.value === 'residues') ? 'Sequence' : 'Water'),
+            title: computed(() => (windowType.value === 'residues') ? 'Sequence' : 'Waters'),
             ttpsa: computed(() => !allSelected[windowType.value] ? "Select all " + windowType.value : "Unselect all " + windowType.value)
         })
 

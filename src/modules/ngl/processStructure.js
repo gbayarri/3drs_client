@@ -146,6 +146,7 @@ export default function processStructure() {
                 id: globals.aminoacids[rp.resname.toLowerCase()].id,
                 num: rp.resno,
                 label: rp.resname.toUpperCase(),
+                name: rp.chainname + ': ' + rp.resname.toUpperCase() + ' ' + rp.resno,
                 chain: rp.chainname,
                 model: rp.modelIndex,
                 last_sheet: false,
@@ -219,7 +220,8 @@ export default function processStructure() {
             // push water
             let res = {
                 num: rp.resno,
-                name: rp.resname.toUpperCase(),
+                //name: rp.resname.toUpperCase(),
+                name: rp.chainname + ': ' + rp.resname.toUpperCase() + ' ' + rp.resno,
                 chain: rp.chainname,
                 model: rp.modelIndex
             }

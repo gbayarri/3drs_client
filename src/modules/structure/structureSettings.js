@@ -160,15 +160,46 @@ export default function structureSettings() {
 
     const updateCurrentChains = function (value, currReprVal) {
         const cm = getCurrentModel(currReprVal)
-        const models = settings.value
-                            .filter(item => item.id === currentStructure.value)[0].navigation
-                            .filter(item => item.id === currReprVal)[0].models
-        
+
+        const chains = settings.value
+        .filter(item => item.id === currentStructure.value)[0].navigation
+        .filter(item => item.id === currReprVal)[0].models
+        .filter(item => item.id === cm)[0].chains
+
+        let results, msg
+        if(chains > value) {
+            // remove
+            results = chains.filter(({ id: id1 }) => !value.some(({ id: id2 }) => id2 === id1))
+            //console.log('removing')
+            msg = {
+                status: 'warn',
+                tit: results.length === 1 ? 'Chain removed' : 'Chains removed',
+                txt1: results.length === 1 ? 'The chain ' : 'The chains ',
+                txt2: results.length === 1 ? 'has been removed from ' : 'have been removed from ',
+                chains: results.map(e => e.id).join(', '),
+            }
+        } else {
+            // add
+            results = value.filter(({ id: id1 }) => !chains.some(({ id: id2 }) => id2 === id1))
+            //console.log('adding')
+            msg = {
+                status: 'info',
+                tit: results.length === 1 ? 'Added new chain' : 'Added new chains',
+                txt1: results.length === 1 ? 'The chain ' : 'The chains ',
+                txt2: results.length === 1 ? 'has been added from ' : 'have been added to ',
+                chains: results.map(e => e.id).join(', ')
+            }
+        }
+        //console.log(msg)
+
+
         settings.value
             .filter(item => item.id === currentStructure.value)[0].navigation
             .filter(item => item.id === currReprVal)[0].models
             .filter(item => item.id === cm)[0].chains = value
         
+        return msg
+
         /*
         ????????????????????????
         Not sure why I did that

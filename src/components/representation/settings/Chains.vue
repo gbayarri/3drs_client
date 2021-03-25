@@ -43,6 +43,7 @@
 
 <script>
 import { ref, computed, watch, onUpdated } from 'vue'
+import { useToast } from 'primevue/usetoast'
 import structureSettings from '@/modules/structure/structureSettings'
 import useRepresentations from '@/modules/representations/useRepresentations'
 import useSettings from '@/modules/settings/useSettings'
@@ -54,8 +55,8 @@ export default {
 
         const stage = props.stage
 
-        const { currentStructure, updateCurrentChains, getCurrentChains, getCurrentModel, getChains } = structureSettings()
-        const { currentRepresentation, setSelectionRepresentation } = useRepresentations()
+        const { currentStructure, getFileNames, updateCurrentChains, getCurrentChains, getCurrentModel, getChains } = structureSettings()
+        const { currentRepresentation, getCurrentRepresentationSettings, setSelectionRepresentation } = useRepresentations()
         const { setChainsSettings } = useSettings()
         const { openModal } = useModals()
         const { getSelectionChains } = useSelections()
@@ -63,11 +64,15 @@ export default {
         const currReprVal = computed(() => currentRepresentation.value)
         const currStr = computed(() => currentStructure.value)
         const currModel = computed(() => getCurrentModel(currReprVal.value))
+        const currReprSettings = computed(() => getCurrentRepresentationSettings())
         const component = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0])
+        const filesList = computed(() => getFileNames())
 
         const isCollapsed = ref(true)
 
         const re = computed(() => new RegExp('(' + currReprVal.value + '\-' + currStr.value + '\-[a-z]*)', 'g'))
+
+        const toast = useToast()
 
         const page = {
             header: "Chains",
@@ -91,17 +96,33 @@ export default {
             for(const chain of value){
                 chs.push(chain)
             }
-            updateCurrentChains(chs, currReprVal.value)
+            const msg = updateCurrentChains(chs, currReprVal.value)
+            const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
             // TODO: update selection with some function of useSelection
             // show toast when added / removed chains
             // TODO: CLEAN chains, model, structure
             const [selection, structures] = getSelectionChains(selectedChains.value, currReprVal.value, currStr.value)
             //console.log(selection, structures)
-            // ****************************************
-            // ****************************************
             setChainsSettings(null, null, null, currReprVal.value)
                     .then((r) => {
                         if(r.code != 404) {
+                            toast.add({ 
+                                severity: msg.status, 
+                                summary: msg.tit, 
+                                detail: msg.txt1
+                                        + ' [ '
+                                        + msg.chains
+                                        + ' ] ' 
+                                        + msg.txt2 
+                                        + ' Model ' 
+                                        + (getCurrentModel(currReprVal.value) + 1)
+                                        + ' in ' 
+                                        + strName 
+                                        + ' structure of ' 
+                                        + currReprSettings.value.name 
+                                        + ' representation',
+                                life: 10000
+                            })
                             // save selection representation
                             setSelectionRepresentation(stage, selection, structures, re.value, true)
                                 .then((r) => {
@@ -111,9 +132,6 @@ export default {
                             console.log(r.message)
                         } else console.error(r.message) 
                     })
-            // ****************************************
-            // ****************************************
-
         }
 
         /*const onChange = () => {
