@@ -32,10 +32,11 @@ export default {
     const { loadFileToStage } = useComponents()
     const { setInitOrientation, checkMouseSignals } = mouseObserver()
     const { /*processedStructure,*/ projectData, updateStructureProject, resetStructure, getFirstProjectData } = structureStorage()
-    const { settings, setCurrentStructure } = structureSettings()
-    const { defaultRepresentation, setCurrentRepresentation/*, getCurrentRepresentationSettings*/ } = useRepresentations()
+    const { /*settings,*/ setCurrentStructure } = structureSettings()
+    const { /*defaultRepresentation,*/ currentRepresentation, setCurrentRepresentation/*, getCurrentRepresentationSettings*/ } = useRepresentations()
     const { setSelection } = useSelections()
     const project_id = props.project_id
+    const currReprVal = computed(() => currentRepresentation.value)
     //const currReprSettings = computed(() => getCurrentRepresentationSettings())
 
     const createViewport = () => {
@@ -72,10 +73,10 @@ export default {
 
           //console.log(ol)
 
+          setBlockUI('update')
+
           //IN CASE IS FIRST TIME SEND ALL DATA TO API
           if(dataProject.value.structure.length === 0 && dataProject.value.settings.length === 0) {
-
-            setBlockUI('update')
 
             stage.autoView()
             // set initial orientation for reload button
@@ -126,6 +127,10 @@ export default {
           stage.mouseControls.add('doubleClick+left', function( stage, delta ){
               stage.autoView(300);
           } )
+
+          // open settings automatically if current representation is not default
+          if(currReprVal.value !== dataProject.value.defaultRepresentation) setFlagStatus('sidebarEnabled', true)
+          else setFlagStatus('sidebarEnabled', false)
 
           console.log(stage)
           
@@ -193,7 +198,7 @@ export default {
           updateStructureProject(apiData.value)
 
           // set selections global var
-          setSelection(apiData.value.representations, defaultRepresentation)
+          setSelection(apiData.value.representations, apiData.value.defaultRepresentation)
 
           // create viewport
           createViewport()

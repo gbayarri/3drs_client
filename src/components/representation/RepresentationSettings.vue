@@ -189,7 +189,7 @@ export default {
             deleteRepresentation
         } = useRepresentations()
         const { addNewRepresentationSettings, removeRepresentationSettings } = structureSettings()
-        const { updateSelection } = useSelections()
+        const { updateSelection, getStructureSelection } = useSelections()
         const { openModal } = useModals()
 
         let isCollapsed = ref(true)
@@ -314,7 +314,9 @@ export default {
             if(currReprVal.value !== defaultRepresentation) {
                 //console.log(value.id)
                 updateRepresentationProperty('mol_repr',value.id)
-                setMolecularRepresentation(stage, currReprSettings.value, value.id, re.value, true)
+                // get selections for current representation
+                const str = getStructureSelection(currReprVal.value)
+                setMolecularRepresentation(stage, currReprSettings.value, value.id, re.value, str, true)
                     .then((r) => {
                         if(r.code != 404) console.log(r.message)
                         else console.error(r.message)

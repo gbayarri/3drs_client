@@ -174,8 +174,10 @@ export default {
                         // save selection representation
                         setSelectionRepresentation(stage, selection, structures, re.value, true)
                             .then((r) => {
-                                if(r.code != 404) console.log(r.message)
-                                else console.error(r.message)
+                                if(r.code != 404) {
+                                    //console.log(stage)
+                                    console.log(r.message)
+                                }else console.error(r.message)
                             })
                         console.log(r.message)
                     } else  console.error(r.message)

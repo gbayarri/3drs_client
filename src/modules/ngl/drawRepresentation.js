@@ -78,6 +78,7 @@ export default function drawRepresentation() {
                   //side: 'front'
                   //depthWrite: false
                 } )
+                //console.log(selection)
                 generatedRepresentations.push(c1)
                 //console.log(name_new + '-ball+stick')
               break

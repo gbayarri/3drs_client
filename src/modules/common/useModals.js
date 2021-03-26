@@ -30,7 +30,7 @@ const blockProperties = [
   {
     status: 'update',
     header: 'Updating data',
-    message: 'The project data is being updated, please don\'t close the tab.'
+    message: 'The project data is being loaded, please don\'t close the tab.'
   }
 ]
 

@@ -143,7 +143,7 @@ export default {
         border:none;
     }
     .p-sidebar { padding:0!important; background: transparent!important; }
-    .p-sidebar-right { width:25%; }
+    .p-sidebar-right { width:25%!important; }
     .p-sidebar-content { position: absolute; width: 100%; height: 100%; z-index:10; }
     #sidebar-content {  
         background-size:175px auto; 

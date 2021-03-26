@@ -44,7 +44,7 @@ export default function useSelections() {
 
   // updates selection object and returns selection string
   const getSelection = function (molecules, status, currReprVal, currStr) {
-    // use only chain, num, model
+    // use only chain, num, model, name
     const m = molecules.map(({ chain, num, model, name }) => ({ chain, num, model, name }))
     // selection according to currReprVal and currStr
     const sel = selection.value
@@ -111,6 +111,15 @@ export default function useSelections() {
 
   }
 
+  const getStructureSelection = function (currReprVal) {
+    const strs = selection.value
+                  .filter(item => item.id === currReprVal)[0].structures
+
+    //const m = molecules.map(({ chain, num, model, name }) => ({ chain, num, model, name }))
+                  
+    return strs
+  }
+
   // set selection with DB data
   const setSelection = function (representations, defaultRepresentation) {
     
@@ -165,7 +174,8 @@ export default function useSelections() {
     getSelection,
     getSelectionChains,
     setSelection,
-    updateSelection
+    updateSelection,
+    getStructureSelection
   }
 
 }

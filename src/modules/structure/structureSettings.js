@@ -137,7 +137,7 @@ export default function structureSettings() {
         for(const structure of settings.value) {
             structure.navigation = structure.navigation.filter(item => item.id !== representation)
         }
-        console.log(settings.value/*, representation*/)
+        //console.log(settings.value/*, representation*/)
     }
 
     const setCurrentStructure = function (value) {

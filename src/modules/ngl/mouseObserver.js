@@ -31,6 +31,13 @@ export default function mouseObserver() {
             })
     }
 
+    const cleanSequences = () => {
+        const allResidues = document.querySelectorAll('.sequence-item, .water-item')
+        for(const res of allResidues) {
+            res.classList.remove('sequence-item-hover')
+        }
+    }
+
     const checkMouseSignals = (stage) => {
 
         // on hover actions: show atoms / bonds in legend
@@ -49,10 +56,7 @@ export default function mouseObserver() {
                 })
                 setFlagStatus('legendEnabled', true)
                 // TODO BETTER:
-                const allResidues = document.querySelectorAll('.sequence-item, .water-item')
-                for(const res of allResidues) {
-                    res.classList.remove('sequence-item-hover')
-                }
+                cleanSequences()
                 const selResidues = document.querySelectorAll('[data-model="' + pickingProxy.atom.modelIndex + '"][data-chain="' + pickingProxy.atom.chainname + '"][data-resnum="' + pickingProxy.atom.resno + '"]')
                 for(const res of selResidues) {
                     res.classList.add('sequence-item-hover')
@@ -73,10 +77,7 @@ export default function mouseObserver() {
             // hide legend
             if (!pickingProxy) {
                 setFlagStatus('legendEnabled', false)
-                const allResidues = document.querySelectorAll('.sequence-item, .water-item')
-                for(const res of allResidues) {
-                    res.classList.remove('sequence-item-hover')
-                }
+                cleanSequences()
             }
         })
 

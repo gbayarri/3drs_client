@@ -49,6 +49,7 @@ export default function useRepresentations() {
 
     const updateRepresentationProperty = (property, value) => {
         //const settings = dataProject.value.representations.filter(item => item.id === currentRepresentation.value)[0]
+        //console.log(property, value)
         if(typeof property === 'object' && property.length === 3)
             dataProject.value.representations.filter(item => item.id === currentRepresentation.value)[0][property[0]][property[1]][property[2]] = value
         else
@@ -60,10 +61,18 @@ export default function useRepresentations() {
     const longTimeOut = 5000
     const shortTimeOut = 500
 
+    // NOT UPDATING PROPERLY??????
     const setSelectionRepresentation = async (stage, sele, structures, re, update) => {
-        for(const item of stage.getRepresentationsByName(re).list){
+        //console.log(stage.getRepresentationsByName(re))
+        /*for(const item of stage.getRepresentationsByName(re).list){
             item.setSelection( sele )
-        }
+            console.log(sele, item.parameters)
+        }*/
+        //console.log(stage)
+        stage.getRepresentationsByName(re).list.forEach(function( item ){
+            item.setSelection( sele )
+            //console.log(sele, item)
+        })
         if(update) {
             return await updateRepresentationData(prjID, currentRepresentation.value, { structures: structures })
         }
@@ -94,14 +103,18 @@ export default function useRepresentations() {
         return await createRepresentation(prjID, { name: value })
     }
 
-    const setMolecularRepresentation = async (stage, representation, mol_repr, re, update) => {
+    const setMolecularRepresentation = async (stage, representation, mol_repr, re, strSel, update) => {
+        //console.log(strSel)
         //return await createRepresentation(prjID, { name: value })
         for(const item of stage.getRepresentationsByName(re).list){
             // only create one when coming from cartoon + base
             if(item.repr.type !== 'base') {
+                // get current selection
+                const strName = item.parameters.name.split("-")[1]
+                const sele = strSel.filter(item => item.id === strName)[0].selection.string
                 // create new
                 const name_new = representation.id + "-" + item.parameters.name.split('-')[1]
-                const generatedRepresentations = addRepresentationToComponent(representation, item.parent, name_new, item.parameters.sele)
+                const generatedRepresentations = addRepresentationToComponent(representation, item.parent, name_new, sele)
             }
             // remove current representation
             item.parent.removeRepresentation(item)
@@ -216,13 +229,15 @@ export default function useRepresentations() {
 
                     const allMolecules = str.selection.molecules
 
+                    console.log(allMolecules)
+
                     for(const mol of allMolecules) {
-                        
+                        const name = mol.name === undefined ? mol.chain + ': ' + mol.num : mol.name
                         var level3 = {
                             key: repr.id + '-' + str.id + '-' + mol.num + ':' + mol.chain + '/' + (mol.model + 1),
                             // TO FIX
-                            label: 'Model ' + (mol.model + 1) + ' - Chain ' + mol.name,
-                            data: 'Model ' + (mol.model + 1) + ' - Chain ' + mol.name,
+                            label: 'Model ' + (mol.model + 1) + ' - Chain ' + name,
+                            data: 'Model ' + (mol.model + 1) + ' - Chain ' + name,
                             icon: 'fas fa-share-alt',
                             styleClass: '',
                         }

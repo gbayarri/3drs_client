@@ -35,7 +35,7 @@ export default {
                 const rows = document.getElementsByClassName("p-fileupload-row")
                 for(var item of rows){
                     //item.getElementsByTagName("div")[0].innerHTML = '<img role="presentation" src="' + require(`@/assets/img/pdb.png`) + '" width="100">'
-                    item.querySelector("div")[0].innerHTML = '<img role="presentation" src="' + require(`@/assets/img/pdb.png`) + '" width="100">'
+                    item.querySelector("div").innerHTML = '<img role="presentation" src="' + require(`@/assets/img/pdb.png`) + '" width="100">'
                 }
             }, 20);
         }
