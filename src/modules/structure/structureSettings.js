@@ -366,10 +366,12 @@ export default function structureSettings() {
             // push new molecules
             molecules.push(...selected_molecules)
             // set array unique removing repeated items
-            const array_output = Array.from(new Set(molecules.map(a => a.num)))
+            /*const array_output = Array.from(new Set(molecules.map(a => a.num)))
                                     .map((num) => {
                                         return molecules.find(a => a.num === num)
-                                    })
+                                    })*/
+            const unique = (arr, props = []) => [...new Map(arr.map(entry => [props.map(k => entry[k]).join('|'), entry])).values()]
+            const array_output = unique(molecules, ['num', 'chain', 'model'])
             // update settings.value with new molecules
             settings.value
             .filter(item => item.id === currentStructure.value)[0].navigation

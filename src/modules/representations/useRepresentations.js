@@ -56,6 +56,13 @@ export default function useRepresentations() {
             dataProject.value.representations.filter(item => item.id === currentRepresentation.value)[0][property] = value
     }
 
+    const setNameRepresentation = async (name, update) => {
+        //console.log(status)
+        if(update) {
+            return await updateRepresentationData(prjID, currentRepresentation.value, { name: name })
+        }
+    }
+
     // NGL / REST API
 
     const longTimeOut = 5000
@@ -229,7 +236,7 @@ export default function useRepresentations() {
 
                     const allMolecules = str.selection.molecules
 
-                    console.log(allMolecules)
+                    //console.log(allMolecules)
 
                     for(const mol of allMolecules) {
                         const name = mol.name === undefined ? mol.chain + ': ' + mol.num : mol.name
@@ -268,6 +275,7 @@ export default function useRepresentations() {
         setCurrentRepresentation,
         getCurrentRepresentationSettings,
         updateRepresentationProperty,
+        setNameRepresentation,
         setSelectionRepresentation,
         setVisibilityRepresentation,
         setMolecularRepresentation,

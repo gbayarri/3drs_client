@@ -15,7 +15,7 @@
             </div>
         </div>
         <div class="p-grid">
-            <div class="p-col-10" style="padding-right:0">
+            <div class="p-col">
                 <Dropdown 
                 v-model="representationSelected" 
                 :options="reprList" 
@@ -23,35 +23,86 @@
                 :disabled="reprList.length <= 1"
                 />
             </div>
-            <div class="p-col-2" style="padding-left:0; text-align: center;">
-                <Button 
-                :icon="isVisible ? 'far fa-eye' : 'far fa-eye-slash'" 
-                class="p-button-rounded repr-button" 
-                @click="setVisibility"
-                v-tooltip.top="ttphr" />
+        </div>
+
+        <!-- rename representation -->
+        <div class="p-grid" v-if="enabledRename">
+            <div class="p-col">
+                <label>{{ label_ren_repr }}</label>
+            </div>
+        </div>
+        <div class="p-grid" v-if="enabledRename">
+            <div class="p-col">
+                <div class="p-inputgroup">
+                    <InputText v-model="modelRenSel" :placeholder="placeholderRenSel"/>
+                    <Button 
+                    icon="pi pi-check" 
+                    class="p-button-nr" 
+                    @click="renameRepresentation"
+                    :disabled="rrbDisabled" />
+                </div>
             </div>
         </div>
 
-        <div v-if="!isCollapsed">
+        <!--<div v-if="representationSelected.id != defaultRepresentation">-->
 
-            <!-- new representation -->
-            <div class="p-grid">
+            <!-- remove / schema -->
+            <!--<div class="p-grid ">
                 <div class="p-col">
-                    <label>{{ label_new_repr }}</label>
+                    <Button 
+                    :label="label_remove"
+                    icon="far fa-trash-alt" 
+                    class="settings-button" 
+                    v-on:dblclick="removeRepresentation"
+                    v-tooltip="ttprr" />
+                </div>
+                <div class="p-col">
+                    <Button 
+                    :label="label_hierarchy"
+                    icon="fas fa-sitemap" 
+                    class="settings-button" 
+                    @click="visualizeStructure"
+                    v-tooltip="ttpvs" />
+                </div>
+            </div>-->
+
+            <div class="p-grid ">
+                <div class="p-col-9">
+                    <Button 
+                    :icon="isVisible ? 'far fa-eye' : 'far fa-eye-slash'" 
+                    class="p-button-rounded p-button-outlined repr-button" 
+                    @click="setVisibility"
+                    v-tooltip.right="ttphr" />
+
+                    <Button 
+                    v-if="representationSelected.id != defaultRepresentation"
+                    icon="fas fa-sitemap" 
+                    class="p-button-rounded p-button-outlined repr-button" 
+                    @click="visualizeStructure"
+                    v-tooltip.right="ttpvs" />
+
+                    <Button 
+                    v-if="representationSelected.id != defaultRepresentation"
+                    icon="fas fa-edit" 
+                    class="p-button-rounded p-button-outlined repr-button" 
+                    @click="editRepresentation"
+                    v-tooltip.right="ttper"
+                    :style="enabledRename ? 'background: #546974;' : 'background: transparent;'" />
+                </div>
+
+                <div class="p-col-1">
+                    <Button 
+                    v-if="representationSelected.id != defaultRepresentation"
+                    icon="far fa-trash-alt" 
+                    class="p-button-rounded p-button-outlined repr-button danger" 
+                    v-on:dblclick="removeRepresentation"
+                    v-tooltip.right="ttprr" />
                 </div>
             </div>
-            <div class="p-grid">
-                <div class="p-col">
-                    <div class="p-inputgroup">
-                        <InputText v-model="modelNewSel" :placeholder="placeholderNewSel"/>
-                        <Button 
-                        icon="pi pi-plus" 
-                        class="p-button-nr" 
-                        @click="newRepresentation"
-                        :disabled="nrbDisabled"/>
-                    </div>
-                </div>
-            </div>
+
+        <!--</div>-->
+
+        <div v-if="!isCollapsed">
 
             <hr />
             
@@ -122,30 +173,25 @@
                 </div>
             </div>
 
-            <div v-if="representationSelected.id != defaultRepresentation">
+            <hr />
 
-                <hr />
-
-                <!-- remove / schema -->
-                <div class="p-grid ">
-                    <div class="p-col">
+            <!-- new representation -->
+            <div class="p-grid">
+                <div class="p-col">
+                    <label>{{ label_new_repr }}</label>
+                </div>
+            </div>
+            <div class="p-grid margin-bottom-10">
+                <div class="p-col">
+                    <div class="p-inputgroup">
+                        <InputText v-model="modelNewSel" :placeholder="placeholderNewSel"/>
                         <Button 
-                        :label="label_remove"
-                        icon="far fa-trash-alt" 
-                        class="settings-button" 
-                        v-on:dblclick="removeRepresentation"
-                        v-tooltip="ttprr" />
-                    </div>
-                    <div class="p-col">
-                        <Button 
-                        :label="label_hierarchy"
-                        icon="fas fa-sitemap" 
-                        class="settings-button" 
-                        @click="visualizeStructure"
-                        v-tooltip="ttpvs" />
+                        icon="pi pi-plus" 
+                        class="p-button-nr" 
+                        @click="newRepresentation"
+                        :disabled="nrbDisabled"/>
                     </div>
                 </div>
-
             </div>
 
         </div>
@@ -154,7 +200,7 @@
 </template>
 
 <script>
-import { ref, watch, computed, reactive, toRefs, inject } from 'vue'
+import { ref, watch, computed, reactive, toRefs, onUpdated } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import globals from '@/globals'
 import useStage from '@/modules/ngl/useStage'
@@ -178,6 +224,7 @@ export default {
             getRepresentationNames, 
             getCurrentRepresentationSettings,
             updateRepresentationProperty,
+            setNameRepresentation,
             setCurrentRepresentation,
             setMolecularRepresentation,
             setVisibilityRepresentation,
@@ -195,18 +242,22 @@ export default {
         let isCollapsed = ref(true)
         const currReprSettings = computed(() => getCurrentRepresentationSettings())
         const currReprVal = computed(() => currentRepresentation.value)
+        //const currReprName = computed(() => currReprSettings.value.name)
 
         const re = computed(() => new RegExp('(' + currReprVal.value + '\-[0-9a-z]*\-[a-z]*)', 'g'))
 
         const page = reactive({
             ttpu: computed(() => isCollapsed.value ? 'Unfold representation settings' : 'Fold representation settings'),
             label_repr: "Select representation",
+            label_ren_repr: "Rename representation",
             label_new_repr: "Create new representation",
             label_remove: "Remove",
             ttprr: "Remove representation (double click)",
             label_hierarchy: "Hierarchy",
-            ttpvs: "View representation hierarchy map",
+            ttpvs: "View hierarchy map",
+            ttper: "Edit representation name",
             ttphr: computed(() => isVisible.value ? 'Hide representation' : 'Show representation'),
+            placeholderRenSel: "Insert new name",
             placeholderNewSel: "Insert new name",
             label_mol_repr: "Select molecular representation",
             label_radius: "Select radius",
@@ -511,9 +562,42 @@ export default {
                     }
                 })
         }
+
+        const enabledRename = ref(false)
+        const editRepresentation = () => {
+            enabledRename.value = !enabledRename.value
+            // fer una variable que oculti / mostri una caixa de text a sota del desplegable select representation
+        }
+
+        let newName = currReprSettings.value.name
+        const modelRenSel = computed({
+            get: () => currReprSettings.value.name,
+            set: val => newName = val
+        })
+
+        // NOT WORKING
+        const rrbDisabled = computed(() => newName.length === 0)
+
+        const renameRepresentation = () => {
+            if(newName) {
+                //console.log(newName, currReprVal.value)
+                updateRepresentationProperty('name', newName)
+                setNameRepresentation(newName, true)
+                    .then((r) => {
+                        if(r.code != 404) console.log(r.message)
+                        else console.error(r.message)
+                    })
+            }
+        }
+
         const visualizeStructure = () => {
             openModal('hierarchy')
         }
+
+        onUpdated(() => {
+            if(enabledRename.value && newName !== currReprSettings.value.name) enabledRename.value = false
+            newName = currReprSettings.value.name
+        })
 
         return { 
             isCollapsed, isVisible, 
@@ -527,7 +611,7 @@ export default {
             radius, min_radius, max_radius, hasRadius, /*onChangeRadius,*/
             colorScheme, mainStructureColor, /*onChangeColorScheme,*/ colorUniform, color,
             opacity, /*onChangeOpacity,*/
-            removeRepresentation, visualizeStructure,
+            removeRepresentation, visualizeStructure, enabledRename, editRepresentation, renameRepresentation, modelRenSel, rrbDisabled
         }
     }
 }
@@ -595,13 +679,16 @@ export default {
     }
 
     #minisettings .repr-button {
+        color:#ffffff;
         height: 1.5rem;
         width: 1.5rem;
-        font-size: 13px;
-        margin: .3rem 0 0 .1rem;
+        font-size: 12px;
+        margin: .3rem 0 0 .6rem;
         background:transparent;
-        border:none;
+        /*border:none;*/
     }
-    #minisettings .repr-button:hover { background: #546974;}
+    #minisettings .repr-button.danger { position:absolute; right:.8rem; }
+    #minisettings .repr-button:hover { background: #546974!important;}
+    #minisettings .repr-button.danger:hover { background: #c75959!important;}
 
 </style>

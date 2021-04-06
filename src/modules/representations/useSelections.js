@@ -55,6 +55,9 @@ export default function useSelections() {
     if (status === 'add') { 
       // add new molecules to selection
       sel.molecules.push(...m)
+      // set array unique removing repeated items
+      const unique = (arr, props = []) => [...new Map(arr.map(entry => [props.map(k => entry[k]).join('|'), entry])).values()]
+      sel.molecules = unique(sel.molecules, ['num', 'chain', 'model'])
       // generate NGL string
       string_sel = generateNGLSelection(sel.molecules)
       sel.string = string_sel

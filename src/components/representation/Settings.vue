@@ -27,8 +27,8 @@
             <TitleSettings title="structures" />
             <SelectFile :stage="stage" />
             <MenuFile :stage="stage" />
-            <hr class="subsection" />
-            <UploadFile />
+            <!--<hr class="subsection" />
+            <UploadFile />-->
             <hr />
             <TitleSettings :title="tit_mod_chs" />
             <Models class="settings-panel models" :stage="stage" />
@@ -218,6 +218,7 @@ export default {
     .settings-panel .p-listbox .p-listbox-list .p-listbox-item { justify-content:space-between; display:flex; padding:0; }
     .settings-panel .p-listbox .p-listbox-list .p-listbox-item div { padding: 0.5rem 1rem; width:100%; }
     .settings-panel .p-listbox .p-listbox-list .p-listbox-item div button { position:absolute;right:.5rem;top:.25rem;z-index:100; }
+    .settings-panel .p-listbox:not(.p-disabled) .p-listbox-item:not(.p-highlight):not(.p-disabled):hover { background: #e9ecef!important; }
 
     /* slider */
     .settings-panel .p-slider.p-slider-horizontal { width: 95%; margin: 0 2.5%; }

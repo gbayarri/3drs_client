@@ -32,7 +32,8 @@
             <template #option="slotProps">
                 <div
                     @mouseover="onHover(slotProps.option)"
-                    @mouseleave="onLeave(slotProps.option)">
+                    @mouseleave="onLeave(slotProps.option)"
+                    :id="generateID(slotProps.option.name)">
                         <Button 
                         icon="fas fa-bullseye" 
                         class="p-button-rounded p-button-text" 
@@ -362,6 +363,14 @@ export default {
             setFlagStatus('legendEnabled', false)
         }
 
+        // ID
+
+        const generateID = (s) => {
+            return s.replace(/\:\ |\ /g,'-').toLowerCase()
+        }
+        
+        // TIPS
+
         const showTips = () => {
             openModal('tips', 'heteroatoms')
         }
@@ -369,7 +378,7 @@ export default {
         return { 
             ...toRefs(page), isCollapsed, 
             modelHeteroatoms,
-            selectedHets, centerHetero, onHover, onLeave, 
+            selectedHets, centerHetero, onHover, onLeave, generateID, 
             allSelected, selectAll,
             showTips
         }

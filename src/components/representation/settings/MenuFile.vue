@@ -1,11 +1,11 @@
 <template>
     <div id="file-buttons" class="margin-top-5">
-        <Button 
+        <!--<Button 
         icon="far fa-trash-alt" 
         class="p-button-rounded p-button-text" 
         v-on:dblclick="removeFile"
         v-tooltip.top="page.ttprf" 
-        v-if="numStructures > 1" />
+        v-if="numStructures > 1" />-->
         <Button 
         icon="fas fa-bullseye" 
         class="p-button-rounded p-button-text" 
