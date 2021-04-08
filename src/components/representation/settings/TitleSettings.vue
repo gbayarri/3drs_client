@@ -1,5 +1,6 @@
 <template>
   <h3 class="settings-title">{{ title }}</h3>
+  
 </template>
 
 <script>

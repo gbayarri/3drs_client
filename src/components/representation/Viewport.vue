@@ -30,11 +30,11 @@ export default {
     const { dialog, openModal, closeModal, setBlockUI } = useModals()
     const { apiData, fetchProject, updateProjectData } = useAPI()
     const { loadFileToStage } = useComponents()
-    const { setInitOrientation, checkMouseSignals } = mouseObserver()
+    const { setInitOrientation, checkMouseSignals, zoomToResidue, selectResidue } = mouseObserver()
     const { /*processedStructure,*/ projectData, updateStructureProject, resetStructure, getFirstProjectData } = structureStorage()
     const { /*settings,*/ setCurrentStructure } = structureSettings()
     const { /*defaultRepresentation,*/ currentRepresentation, setCurrentRepresentation/*, getCurrentRepresentationSettings*/ } = useRepresentations()
-    const { setSelection } = useSelections()
+    const { setSelection, checkSelectionType } = useSelections()
     const project_id = props.project_id
     const currReprVal = computed(() => currentRepresentation.value)
     //const currReprSettings = computed(() => getCurrentRepresentationSettings())
@@ -125,12 +125,28 @@ export default {
           stage.mouseControls.remove('clickPick-left')
           // reset position on double click
           stage.mouseControls.add('doubleClick+left', function( stage, delta ){
-              stage.autoView(300);
+              stage.autoView(300)
           } )
+          // remove previous action of clickPick+left-ctrl
+          stage.mouseControls.remove('clickPick+left-ctrl')
+          // zoom to residue
+          stage.mouseControls.add('clickPick+left-ctrl', function( stage, pickingProxy ){
+            zoomToResidue(stage, pickingProxy)
+          })
+          // select residue
+          stage.mouseControls.add('clickPick+left', function( stage, pickingProxy ){
+            selectResidue(stage, pickingProxy)
+          })
 
           // open settings automatically if current representation is not default
-          if(currReprVal.value !== dataProject.value.defaultRepresentation) setFlagStatus('sidebarEnabled', true)
-          else setFlagStatus('sidebarEnabled', false)
+          if(currReprVal.value !== dataProject.value.defaultRepresentation) {
+            setFlagStatus('sidebarEnabled', true)
+            // according to dataProject.value.currentStructure, set flags.customEnabled
+            const sel_type = checkSelectionType(dataProject.value.currentRepresentation, dataProject.value.currentStructure)
+            setFlagStatus('customEnabled', (sel_type === 'custom'))
+          } else {
+            setFlagStatus('sidebarEnabled', false)
+          }
 
           console.log(stage)
           

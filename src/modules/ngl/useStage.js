@@ -1,5 +1,5 @@
 import { reactive } from 'vue'
-import { Stage, Selection } from 'ngl'
+import { Stage, Selection/*, DatasourceRegistry, MdsrvDatasource*/ } from 'ngl'
 
 let stage = reactive({})
 let selection = reactive({})
@@ -7,6 +7,11 @@ let selection = reactive({})
 export default function useStage() {
 
     const createStage = function (layer) {
+
+        /*DatasourceRegistry.add("file", new MdsrvDatasource( window.location.origin + "/tool-mdsrv/" ))
+        DatasourceRegistry.listing = DatasourceRegistry.get( "file" )
+        DatasourceRegistry.trajectory = DatasourceRegistry.get( "file" )*/
+
         stage = new Stage(layer, { tooltip:false })
         //console.log('stage created')
         return stage 

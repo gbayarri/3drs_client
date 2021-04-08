@@ -190,6 +190,10 @@ export default {
                                         + ' representation',
                                 life: 10000
                             })
+                            // check if selection is empty
+                            if(selection === 'not(*)') {
+                                toast.add({ severity: 'warn', summary: 'Empty structure', detail: 'Warning! The ' + strName + ' structure of the ' + currReprSettings.value.name + ' representation is currently empty.', life: 10000 })
+                            }
                             // save selection representation
                             setSelectionRepresentation(stage, selection, structures, re.value, true)
                                 .then((r) => {
@@ -278,6 +282,10 @@ export default {
                                     + ' representation',
                             life: 10000
                         })
+                        // check if selection is empty
+                        if(selection === 'not(*)') {
+                            toast.add({ severity: 'warn', summary: 'Empty structure', detail: 'Warning! The ' + strName + ' structure of the ' + currReprSettings.value.name + ' representation is currently empty.', life: 10000 })
+                        }
                         // save selection representation
                         setSelectionRepresentation(stage, selection, structures, re.value, true)
                             .then((r) => {

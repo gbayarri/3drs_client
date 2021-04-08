@@ -235,13 +235,14 @@ export default {
             createNewRepresentation,
             deleteRepresentation
         } = useRepresentations()
-        const { addNewRepresentationSettings, removeRepresentationSettings } = structureSettings()
-        const { updateSelection, getStructureSelection } = useSelections()
+        const { currentStructure, addNewRepresentationSettings, removeRepresentationSettings } = structureSettings()
+        const { updateSelection, getStructureSelection, checkSelectionType } = useSelections()
         const { openModal } = useModals()
 
         let isCollapsed = ref(true)
         const currReprSettings = computed(() => getCurrentRepresentationSettings())
         const currReprVal = computed(() => currentRepresentation.value)
+        const currStr = computed(() => currentStructure.value)
         //const currReprName = computed(() => currReprSettings.value.name)
 
         const re = computed(() => new RegExp('(' + currReprVal.value + '\-[0-9a-z]*\-[a-z]*)', 'g'))
@@ -287,8 +288,11 @@ export default {
                 }
                 setCurrentRepresentation(val.id, true)
                 .then((r) => {
-                    if(r.code != 404) console.log(r.message)
-                    else console.error(r.message)
+                    if(r.code != 404) {
+                        const sel_type = checkSelectionType(currReprVal.value, currStr.value)
+                        setFlagStatus('customEnabled', (sel_type === 'custom'))
+                        console.log(r.message)
+                    } else console.error(r.message)
                 })
             }
         })
@@ -580,12 +584,23 @@ export default {
 
         const renameRepresentation = () => {
             if(newName) {
+                const oldName = modelRenSel.value
                 //console.log(newName, currReprVal.value)
                 updateRepresentationProperty('name', newName)
                 setNameRepresentation(newName, true)
                     .then((r) => {
-                        if(r.code != 404) console.log(r.message)
-                        else console.error(r.message)
+                        if(r.code != 404) {
+                            toast.add({ 
+                                severity: 'info', 
+                                summary: 'Representation renamed', 
+                                detail:'The representation ' 
+                                        + oldName 
+                                        + ' has been renamed to '
+                                        + newName + '.', 
+                                life: 5000
+                            });
+                            console.log(r.message)
+                        } else console.error(r.message)
                     })
             }
         }

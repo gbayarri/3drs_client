@@ -123,6 +123,31 @@ export default function useSelections() {
     return strs
   }
 
+  const getCurrentSelection = function (currReprVal, currStr, type) {
+    return selection.value
+                  .filter(item => item.id === currReprVal)[0].structures
+                  .filter(item => item.id === currStr)[0].selection[type]
+  }
+
+  const setCurrentCustomSelection = function (currReprVal, currStr, str) {
+    selection.value
+                  .filter(item => item.id === currReprVal)[0].structures
+                  .filter(item => item.id === currStr)[0].selection.custom = str
+
+    const string = selection.value
+                  .filter(item => item.id === currReprVal)[0].structures
+                  .filter(item => item.id === currStr)[0].selection.string
+
+    //console.log(selection)
+    return [string, selection.value.filter(item => item.id === currReprVal)[0].structures ]
+  }
+
+  const checkSelectionType = function (currReprVal, currStr) {
+    return (selection.value
+                  .filter(item => item.id === currReprVal)[0].structures
+                  .filter(item => item.id === currStr)[0].selection.custom === '') ? 'manual' : 'custom'
+  }
+
   // set selection with DB data
   const setSelection = function (representations, defaultRepresentation) {
     
@@ -149,7 +174,8 @@ export default function useSelections() {
         new_str.push({
           id: v.id, 
           selection: {
-            string: 'not(*)',
+            string: '*',
+            custom: '',
             molecules: []
           }
         })
@@ -176,6 +202,9 @@ export default function useSelections() {
     addMultipleResidues, 
     getSelection,
     getSelectionChains,
+    getCurrentSelection,
+    setCurrentCustomSelection,
+    checkSelectionType,
     setSelection,
     updateSelection,
     getStructureSelection

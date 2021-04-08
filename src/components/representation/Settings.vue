@@ -30,16 +30,16 @@
             <!--<hr class="subsection" />
             <UploadFile />-->
             <hr />
-            <TitleSettings :title="tit_mod_chs" />
-            <Models class="settings-panel models" :stage="stage" />
-            <Chains class="settings-panel chains" :stage="stage" />
-            <hr class="subsection" />
+            <TitleSettings :title="tit_mod_chs" v-if="!customEnabled" />
+            <Models class="settings-panel models" :stage="stage" v-if="!customEnabled" />
+            <Chains class="settings-panel chains" :stage="stage" v-if="!customEnabled" />
+            <hr class="subsection" v-if="!customEnabled" />
             <TitleSettings :title="tit_mols" />
-            <Residues class="settings-panel residues" :stage="stage" />
-            <Heteroatoms class="settings-panel hetero" :stage="stage" />
-            <Ions class="settings-panel ions" :stage="stage" />
-            <Waters class="settings-panel water" :stage="stage" />
-            <CustomSelection class="settings-panel custom" :stage="stage" />
+            <Residues class="settings-panel residues" :stage="stage" v-if="!customEnabled" />
+            <Heteroatoms class="settings-panel hetero" :stage="stage" v-if="!customEnabled" />
+            <Ions class="settings-panel ions" :stage="stage" v-if="!customEnabled" />
+            <Waters class="settings-panel water" :stage="stage" v-if="!customEnabled" />
+            <CustomSelection class="settings-panel custom" :stage="stage" v-if="customEnabled" />
             <hr class="subsection" />
             <TitleSettings :title="tit_traj" />
             <Trajectory />
@@ -81,6 +81,7 @@ export default {
         const stage = getStage()
         const reprList = computed(() => getRepresentationNames())
         const currReprVal = computed(() => currentRepresentation.value)
+        const customEnabled = computed(() => flags.customEnabled)
 
         const page = reactive({
             tit_mod_chs: "models / chains",
@@ -104,7 +105,8 @@ export default {
             /*onSidebarShown, 
             onSidebarHidden, */
             ...toRefs(page),
-            reprList, currReprVal, defaultRepresentation
+            reprList, currReprVal, defaultRepresentation,
+            customEnabled
         }
     }
 }

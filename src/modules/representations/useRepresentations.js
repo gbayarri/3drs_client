@@ -118,7 +118,11 @@ export default function useRepresentations() {
             if(item.repr.type !== 'base') {
                 // get current selection
                 const strName = item.parameters.name.split("-")[1]
-                const sele = strSel.filter(item => item.id === strName)[0].selection.string
+                //const sele = strSel.filter(item => item.id === strName)[0].selection.string
+                const sele = 
+                            strSel.filter(item => item.id === strName)[0].selection.custom === "" ? 
+                            strSel.filter(item => item.id === strName)[0].selection.string :
+                            strSel.filter(item => item.id === strName)[0].selection.custom
                 // create new
                 const name_new = representation.id + "-" + item.parameters.name.split('-')[1]
                 const generatedRepresentations = addRepresentationToComponent(representation, item.parent, name_new, sele)

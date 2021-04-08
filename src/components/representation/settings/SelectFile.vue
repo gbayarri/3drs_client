@@ -26,7 +26,10 @@
 import { computed, ref } from 'vue'
 import structureSettings from '@/modules/structure/structureSettings'
 import structureStorage from '@/modules/structure/structureStorage'
+import useRepresentations from '@/modules/representations/useRepresentations'
+import useSelections from '@/modules/representations/useSelections'
 import useAPI from '@/modules/api/useAPI'
+import useFlags from '@/modules/common/useFlags'
 export default {
     props: ['stage'],
     setup(props) {
@@ -34,12 +37,16 @@ export default {
         const stage = props.stage
         const placeholder = "Select a File"
 
+        const { currentRepresentation } = useRepresentations()
         const { currentStructure, setCurrentStructure, getFileNames } = structureSettings()
         const { projectData } = structureStorage()
         const { updateProjectData } = useAPI()
+        const { checkSelectionType } = useSelections()
+        const { setFlagStatus } = useFlags()
         
         const dataProject = computed(() => projectData.value)
         const filesList = computed(() => getFileNames())
+        const currReprVal = computed(() => currentRepresentation.value)
         const currStr = computed(() => currentStructure.value)
 
         const doHover = ref(true)
@@ -52,6 +59,9 @@ export default {
         const change = (value) => {
             doHover.value = false
             setCurrentStructure(value.id)
+            // check if currStr has custom selection or not and modify flags.customEnabled
+            const sel_type = checkSelectionType(currReprVal.value, currStr.value)
+            setFlagStatus('customEnabled', (sel_type === 'custom'))
             updateProjectData(dataProject.value._id, { currentStructure: value.id })
                 .then((r) => {
                     if(r.code != 404) console.log(r.message)

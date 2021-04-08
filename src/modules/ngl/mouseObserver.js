@@ -18,6 +18,7 @@ export default function mouseObserver() {
     const filesList = computed(() => getFileNames())
     const currStr = computed(() => currentStructure.value)
     const dataProject = computed(() => projectData.value)
+    const shortTimeOut = 1000
     const timeOut = 5000
 
     const setInitOrientation = function (orientation) {
@@ -80,10 +81,10 @@ export default function mouseObserver() {
                 setFlagStatus('legendEnabled', true)
                 // TODO BETTER:
                 cleanSequences()
-                //cleanHeteroIons()
+                cleanHeteroIons()
                 // FIX WITH MULTIMODEL!!!!!!
                 const selResidues = document.querySelectorAll('[data-model="' + model + '"][data-chain="' + chain + '"][data-resnum="' + resnum + '"]')
-                console.log('[data-model="' + model + '"][data-chain="' + chain + '"][data-resnum="' + resnum + '"]')
+                //console.log('[data-model="' + model + '"][data-chain="' + chain + '"][data-resnum="' + resnum + '"]')
                 for(const res of selResidues) {
                     res.classList.add('sequence-item-hover')
                 }
@@ -94,7 +95,7 @@ export default function mouseObserver() {
                     radius = 2
                     //console.log(pickingProxy)
                     const selHetsIons = document.querySelectorAll('[aria-label="' + chain + ': ' + resname + ' ' + resnum + '"]')
-                    console.log(chain + ': ' + resname + ' ' + resnum)
+                    //console.log(chain + ': ' + resname + ' ' + resnum)
                     /*if(!selHetsIons[0].classList.contains('p-highlight')) */
                     if(selHetsIons.length === 1) selHetsIons[0].style.background = '#e9ecef'
                     //selHetsIons[0].classList.add('p-highlight')
@@ -130,27 +131,11 @@ export default function mouseObserver() {
             if (!pickingProxy) {
                 setFlagStatus('legendEnabled', false)
                 cleanSequences()
-                //cleanHeteroIons()
+                cleanHeteroIons()
                 const re = new RegExp('(' + currStr.value + '\-[0-9A-Z\:\/]*\-hover)', 'g')
                 cleanRepresentation(stage, re)
             }
         })
-
-        // TODO: CENTER ON CLICKED RESIDUE
-        // stage.autoView DOESN'T WORK WITH MOLECULE AS A PARAMETER, IT SHOULD BE CALLED FROM COMPONENT 
-        //stage.signals.clicked.add( function(pickingProxy){ 
-    		//if (pickingProxy && pickingProxy.atom) {
-    			/*if(typeof repr_res !== 'undefined') component.removeRepresentation(repr_res);
-        		if(typeof repr_res_detail !== 'undefined') component.removeRepresentation(repr_res_detail);
-        		chain = pickingProxy.atom.chainname;
-	        	num = pickingProxy.atom.resno;
-	        	name = pickingProxy.atom.resname;
-	        	Widgets.showLegend(str, chain, name, num);
-        		repr_res_detail = component.addRepresentation( "ball+stick", { sele: '(' + num + ':' + chain + ')', aspectRatio: 1 });*/
-               // console.log('(' + pickingProxy.atom.resno + ':' + pickingProxy.atom.chainname + ')')
-        		//stage.autoView('(' + pickingProxy.atom.resno + ':' + pickingProxy.atom.chainname + '/0)', 500);
-        	//}
-    	//})
 
         // on drag / scroll actions: save orientation after 5s
         let myTimeOut = null
@@ -169,12 +154,49 @@ export default function mouseObserver() {
             myTimeOut = setTimeout(() => autoSaveOrientation(stage.viewerControls.getOrientation().elements), timeOut)
         })
 
+        //console.log(stage.signals)
+
+    }
+
+    const zoomToResidue = (stage, pickingProxy) => {
+        if (pickingProxy && pickingProxy.atom) {
+
+            let myTimeOut = null
+            const component = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0])
+            const model = pickingProxy.atom.modelIndex
+            const chain = pickingProxy.atom.chainname
+            const resnum = pickingProxy.atom.resno
+
+            const sele = resnum + ':' + chain + '/' + model
+
+            component.value.autoView(sele, 500)
+
+            clearTimeout(myTimeOut)
+            myTimeOut = setTimeout(() => autoSaveOrientation(stage.viewerControls.getOrientation().elements), shortTimeOut)
+        }
+    }
+
+    const selectResidue = (stage, pickingProxy) => {
+        if (pickingProxy && pickingProxy.atom) {
+            const name = filesList.value.filter(item => item.id === pickingProxy.atom.structure.name)[0].name
+            const model = pickingProxy.atom.modelIndex
+            const chain = pickingProxy.atom.chainname
+            const resname = pickingProxy.atom.resname
+            const resnum = pickingProxy.atom.resno
+            const atomname = pickingProxy.atom.atomname
+
+            // REPLICATE ALL onClick FUNCTIONS OF WATER, RESIDUE, ION & HETERO????
+
+            console.log('add ',name, model, chain, resname, resnum)
+        }
     }
 
   return { 
       initialOrientation,
       setInitOrientation,
-      checkMouseSignals 
+      checkMouseSignals, 
+      zoomToResidue,
+      selectResidue
     }
 
 }

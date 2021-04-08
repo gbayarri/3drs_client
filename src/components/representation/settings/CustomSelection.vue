@@ -20,8 +20,9 @@
         <div class="p-grid">
             <div class="p-col">
                 <div class="p-inputgroup">
+                    <Button icon="pi pi-check" @click="createCustom" :disabled="bDisabled" />
                     <InputText v-model="customSelection" :placeholder="placeholder"/>
-                    <Button icon="pi pi-check" @click="handleClick"/>
+                    <Button icon="pi pi-trash" @click="removeCustom" id="remove-custom" v-if="!bDisabled"  />
                 </div>
             </div>
         </div>
@@ -30,19 +31,43 @@
 </template>
 
 <script>
-import { ref, reactive, toRefs } from 'vue'
+import { ref, computed, reactive, toRefs, watch } from 'vue'
+import { useToast } from 'primevue/usetoast'
 import useModals from '@/modules/common/useModals'
+import useRepresentations from '@/modules/representations/useRepresentations'
+import structureSettings from '@/modules/structure/structureSettings'
+import useSelections from '@/modules/representations/useSelections'
 export default {
-    setup() {
+    props: ['stage'],
+    setup(props) {
+
+        const stage = props.stage
 
         const { openModal } = useModals()
+        const { currentRepresentation, setSelectionRepresentation, getCurrentRepresentationSettings } = useRepresentations()
+        const { currentStructure, getFileNames } = structureSettings()
+        const { getCurrentSelection, setCurrentCustomSelection } = useSelections()
 
         const isCollapsed = ref(true)
-        const customSelection = ref(null)
-        /*const header = "Custom selection"
-        const label = "Add custom selection"
-        const ttp = 'Need help with NGL viewer Selection Language? Click here.'
-        const placeholder = "e.g. 10:F.CA/0..."*/
+        const currReprVal = computed(() => currentRepresentation.value)
+        const currStr = computed(() => currentStructure.value)
+        const currReprSettings = computed(() => getCurrentRepresentationSettings())
+        const filesList = computed(() => getFileNames())
+
+        const re = computed(() => new RegExp('(' + currReprVal.value + '\-' + currStr.value + '\-[a-z]*)', 'g'))
+        
+        let newSelection = getCurrentSelection(currReprVal.value, currStr.value, 'custom')
+        let bDisabled = ref(newSelection.length === 0)
+
+        const toast = useToast()
+
+        const customSelection = computed({
+            get: () => getCurrentSelection(currReprVal.value, currStr.value, 'custom'),
+            set: val => {
+                newSelection = val
+                bDisabled.value = (newSelection.length === 0)
+            }
+        })
 
         const page = reactive({
             header: "Custom selection",
@@ -54,19 +79,75 @@ export default {
 
         const openHelp = () => {
             window.open(process.env.VUE_APP_NGL_HELP_URL, '_blank')
+        }        
+
+        const createCustom = () => {
+            if(newSelection) {
+                //console.log(newSelection, 'redraw!!!')
+                const [old_sele, structures] = setCurrentCustomSelection(currReprVal.value, currStr.value, newSelection)
+                // save selection representation
+                setSelectionRepresentation(stage, newSelection, structures, re.value, true)
+                    .then((r) => {
+                        if(r.code != 404) {
+                            //console.log(stage)
+                            const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
+                            toast.add({ 
+                                severity: 'info', 
+                                summary: 'New custom representation', 
+                                detail: 'A new custom selection has been added to the structure '
+                                        + strName
+                                        + ' of the '
+                                        + currReprSettings.value.name 
+                                        + ' representation',
+                                life: 10000
+                            })
+                            console.log(r.message)
+                        }else console.error(r.message)
+                    })
+            }
         }
 
-        const handleClick = () => {
-            console.log(customSelection.value)
+        const removeCustom = () => {
+            if(newSelection) {
+                newSelection = ''
+                bDisabled.value = true
+                //console.log(newSelection, 'redraw!!!')
+                const [sele, structures] = setCurrentCustomSelection(currReprVal.value, currStr.value, '')
+                // save selection representation
+                setSelectionRepresentation(stage, sele, structures, re.value, true)
+                    .then((r) => {
+                        if(r.code != 404) {
+                            //console.log(stage)
+                            const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
+                            toast.add({ 
+                                severity: 'warn', 
+                                summary: 'Removed custom representation', 
+                                detail: 'The custom representation linked to the structure '
+                                        + strName
+                                        + ' of the '
+                                        + currReprSettings.value.name 
+                                        + ' representation has been removed',
+                                life: 10000
+                            })
+                            console.log(r.message)
+                        }else console.error(r.message)
+                    })
+            }
         }
 
         const showTips = () => {
             openModal('tips', 'custom')
         }
 
+        watch([currStr], (newValues, prevValues) => {
+            newSelection = getCurrentSelection(currReprVal.value, currStr.value, 'custom')
+            //console.log(newSelection.length)
+            bDisabled.value = (newSelection.length === 0)
+        })
+
         return { 
             ...toRefs(page), isCollapsed, customSelection, 
-            openHelp, handleClick,
+            openHelp, createCustom, removeCustom, bDisabled,
             showTips
         }
     }
@@ -75,4 +156,6 @@ export default {
 
 <style>
     #custom-help { cursor:pointer; }
+    #remove-custom { background: #c75959; border-color: #c75959; }
+    #remove-custom:hover { background: #9c4a4a; border-color: #9c4a4a; }
 </style>
