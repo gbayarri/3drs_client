@@ -142,7 +142,10 @@ export default function useSelections() {
     return [string, selection.value.filter(item => item.id === currReprVal)[0].structures ]
   }
 
-  const checkSelectionType = function (currReprVal, currStr) {
+  const checkSelectionType = function (currReprVal, currStr, defaultRepresentation = null) {
+
+    if(currReprVal === defaultRepresentation) return null
+
     return (selection.value
                   .filter(item => item.id === currReprVal)[0].structures
                   .filter(item => item.id === currStr)[0].selection.custom === '') ? 'manual' : 'custom'

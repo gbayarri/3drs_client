@@ -88,7 +88,7 @@ export default {
             tit_mols: "molecules",
             tit_traj: "trajectory",
             ttdb: computed(() => (reprList.value.length <= 1 && currReprVal.value === defaultRepresentation) ? "Settings are disabled until you create a new representation" : "Default representation has no access to settings"),
-            ttst: "Open representation settings"
+            ttst: "Open structure settings"
         })
 
         /*const onSidebarShown = () => {

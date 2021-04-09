@@ -289,7 +289,7 @@ export default {
                 setCurrentRepresentation(val.id, true)
                 .then((r) => {
                     if(r.code != 404) {
-                        const sel_type = checkSelectionType(currReprVal.value, currStr.value)
+                        const sel_type = checkSelectionType(currReprVal.value, currStr.value, defaultRepresentation)
                         setFlagStatus('customEnabled', (sel_type === 'custom'))
                         console.log(r.message)
                     } else console.error(r.message)

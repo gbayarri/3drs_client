@@ -1,9 +1,11 @@
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import useLegend from '@/modules/viewport/useLegend'
 import structureStorage from '@/modules/structure/structureStorage'
 import useFlags from '@/modules/common/useFlags'
 import useAPI from '@/modules/api/useAPI'
 import structureSettings from '@/modules/structure/structureSettings'
+import useRepresentations from '@/modules/representations/useRepresentations'
+import useActions from '@/modules/representations/useActions'
 const initialOrientation = ref([])
 
 // Stage interactions
@@ -13,13 +15,23 @@ export default function mouseObserver() {
     const { setFlagStatus } = useFlags()
     const { projectData } = structureStorage()
     const { updateProjectData } = useAPI()
-    const { currentStructure, getFileNames } = structureSettings()
+    const { currentStructure, getFileNames, getMolecule } = structureSettings()
+    const { currentRepresentation, getCurrentRepresentationSettings } = useRepresentations()
+    const { actionSelectSingleMolecule } = useActions()
 
     const filesList = computed(() => getFileNames())
     const currStr = computed(() => currentStructure.value)
+    const currReprVal = computed(() => currentRepresentation.value)
+    const currReprSettings = computed(() => getCurrentRepresentationSettings())
     const dataProject = computed(() => projectData.value)
     const shortTimeOut = 1000
     const timeOut = 5000
+
+    const re = computed(() => new RegExp('(' + currReprVal.value + '\-' + currStr.value + '\-[a-z]*)', 'g'))
+
+    /*onMounted(() => {
+        console.log(currentStructure.value)
+    })*/
 
     const setInitOrientation = function (orientation) {
         initialOrientation.value = orientation
@@ -91,7 +103,8 @@ export default function mouseObserver() {
                 
                 let radius = 1
                 // nor residues neither waters ( === hetero && ions )
-                if(selResidues.length === 0) {
+                //if(selResidues.length === 0) {
+                if(pickingProxy.atom.isHetero() || pickingProxy.atom.isIon()) {
                     radius = 2
                     //console.log(pickingProxy)
                     const selHetsIons = document.querySelectorAll('[aria-label="' + chain + ': ' + resname + ' ' + resnum + '"]')
@@ -185,9 +198,35 @@ export default function mouseObserver() {
             const resnum = pickingProxy.atom.resno
             const atomname = pickingProxy.atom.atomname
 
-            // REPLICATE ALL onClick FUNCTIONS OF WATER, RESIDUE, ION & HETERO????
+            const properties = {
+                stage: stage,
+                model: model, 
+                chain: chain, 
+                resnum: resnum, 
+                resname: resname,
+                currRepr: currReprVal.value,
+                currReprSettings: currReprSettings.value,
+                currStr: currStr.value,
+                strName: filesList.value.filter(item => item.id === currStr.value)[0].name,
+                re: re.value
+            }
 
-            console.log('add ',name, model, chain, resname, resnum)
+            let type = ''
+            if(pickingProxy.atom.isPolymer()) {
+                type = 'residues'
+                properties.css_type = 'sequence'
+            }
+            if(pickingProxy.atom.isWater()) {
+                type = 'waters'
+                properties.css_type = 'water'
+            }
+            if(pickingProxy.atom.isHetero()) type = 'heteroatoms'
+            if(pickingProxy.atom.isIon()) type = 'ions'
+
+            properties.residue = getMolecule(currReprVal.value, type, model, chain, resnum)
+            properties.type = type
+
+            actionSelectSingleMolecule(properties)
         }
     }
 

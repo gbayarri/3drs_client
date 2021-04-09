@@ -29,6 +29,7 @@ import useFlags from '@/modules/common/useFlags'
 import useSettings from '@/modules/settings/useSettings'
 import useSelections from '@/modules/representations/useSelections'
 import useRepresentations from '@/modules/representations/useRepresentations'
+import useActions from '@/modules/representations/useActions'
 export default {
     props: ['water', 'window', 'index', 'item', 'stage'],
     setup(props) {
@@ -42,6 +43,7 @@ export default {
         const { addMultipleResidues, getSelection } = useSelections()
         const { currentRepresentation, getCurrentRepresentationSettings, setSelectionRepresentation } = useRepresentations()
         const { setMoleculesSettings, setPositionSettings } = useSettings()
+        const { actionLeaveSingleMolecule, actionSelectSingleMolecule, actionSelectSetOfMolecules } = useActions()
 
         const filesList = computed(() => getFileNames())
         //const dataProject = computed(() => projectData.value)
@@ -81,7 +83,8 @@ export default {
                 name: name,
                 model: model,
                 chainname: chain,
-                resname: resname,
+                //resname: resname,
+                resname: 'HOH',
                 resno: resnum,
                 atomname: null
             })
@@ -90,7 +93,7 @@ export default {
             //v-tooltip.left="'Water<br>' + water.chain + ': ' + water.name + ' ' + water.num"
         }
 
-        const actionLeave = (model, chain, resnum, resname) => {
+        /*const actionLeave = (model, chain, resnum, resname) => {
             // NGL representation
             const sele = resnum + ':' + chain + '/' + model
             const re = currStr.value + '-' + sele + '-hover'
@@ -106,16 +109,32 @@ export default {
             for(const wat of waters) {
                 wat.classList.remove('water-item-hover')
             }
-        }
+        }*/
 
         const onMouseLeave = (model, chain, resnum, resname) => {
-            actionLeave(model, chain, resnum, resname)
+            actionLeaveSingleMolecule(stage, currStr.value, model, chain, resnum, resname, 'water')
             // legend
             setFlagStatus('legendEnabled', false)
         }
 
         const onClick = (model, chain, resnum, resname) => {
-            const [molecules, msg, status] = updateMolecule(water.value, 'waters', currReprVal.value)
+            const properties = {
+                stage: stage,
+                residue: water.value,
+                model: model, 
+                chain: chain, 
+                resnum: resnum, 
+                resname: resname,
+                type: 'waters',
+                css_type: 'water',
+                currRepr: currReprVal.value,
+                currReprSettings: currReprSettings.value,
+                currStr: currStr.value,
+                strName: filesList.value.filter(item => item.id === currStr.value)[0].name,
+                re: re.value
+            }
+            actionSelectSingleMolecule(properties)
+            /*const [molecules, msg, status] = updateMolecule(water.value, 'waters', currReprVal.value)
             const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
             // update representations selections
             //console.log(molecules, status, currReprVal.value, currStr.value)
@@ -157,7 +176,7 @@ export default {
                             })
                         console.log(r.message)
                     } else  console.error(r.message)
-                })
+                })*/
         }
 
         // CENTER STRUCTURE
@@ -196,7 +215,25 @@ export default {
                     }
                     // get set of molecules
                     const setOfMolecules = getSetOfMolecules('waters', currReprVal.value, water.value.chain, first, last)
-                    const [status, msg] = updateSetOfMolecules('waters', currReprVal.value, setOfMolecules, water.value.chain, 'multiple')
+                    const properties = {
+                        stage: stage,
+                        setOfMolecules: setOfMolecules,
+                        residue: water.value,
+                        model: mr.lastRes.model, 
+                        chain:  mr.lastRes.chain, 
+                        resnum: mr.lastRes.num, 
+                        resname: null,
+                        type: 'waters',
+                        css_type: 'water',
+                        set_type: 'multiple',
+                        currRepr: currReprVal.value,
+                        currReprSettings: currReprSettings.value,
+                        currStr: currStr.value,
+                        strName: filesList.value.filter(item => item.id === currStr.value)[0].name,
+                        re: re.value
+                    }
+                    actionSelectSetOfMolecules(properties)
+                    /*const [status, msg] = updateSetOfMolecules('waters', currReprVal.value, setOfMolecules, water.value.chain, 'multiple')
                     const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
                     // update representations selections
                     const [selection, structures] = getSelection(setOfMolecules, status, currReprVal.value, currStr.value)
@@ -235,7 +272,7 @@ export default {
                                     })
                                 console.log(r.message)
                             } else  console.error(r.message)
-                        })
+                        })*/
                 }
                 document.querySelectorAll('.water-item:not(.disabled)').forEach(el => el.style.cursor = 'pointer')
             }

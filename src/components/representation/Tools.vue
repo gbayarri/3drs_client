@@ -8,6 +8,7 @@
         <Picture :stage="stage" />
         <Align :stage="stage" />
         <Help />
+        <ProjectSettings />
     </div>
 </template>
 
@@ -21,8 +22,9 @@ import FullScreen from '@/components/representation/tools/FullScreen'
 import Picture from '@/components/representation/tools/Picture'
 import Help from '@/components/representation/tools/Help'
 import Align from '@/components/representation/tools/Align'
+import ProjectSettings from '@/components/representation/tools/ProjectSettings'
 export default {
-    components: { Reload, Rotate, Center, Background, FullScreen, Picture, Help, Align },
+    components: { Reload, Rotate, Center, Background, FullScreen, Picture, Help, Align, ProjectSettings },
     setup() {
         const { getStage } = useStage()
         const stage = getStage()

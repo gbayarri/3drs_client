@@ -57,6 +57,7 @@ import useSettings from '@/modules/settings/useSettings'
 import useLegend from '@/modules/viewport/useLegend'
 import useFlags from '@/modules/common/useFlags'
 import useModals from '@/modules/common/useModals'
+import useActions from '@/modules/representations/useActions'
 export default {
     props: ['stage'],
     setup(props) {
@@ -79,6 +80,7 @@ export default {
         const { setMoleculesSettings, setPositionSettings } = useSettings()
         const { getSelection } = useSelections()
         const { openModal } = useModals()
+        const { actionLeaveSingleHetero, actionSelectSingleMolecule, actionSelectAllHeteros } = useActions()
 
         const filesList = computed(() => getFileNames())
         const currReprVal = computed(() => currentRepresentation.value)
@@ -160,8 +162,20 @@ export default {
                     //status = 'unselected'
                 }
 
+                const properties = {
+                    stage: stage,
+                    residue: lastItem,
+                    type: 'heteroatoms',
+                    currRepr: currReprVal.value,
+                    currReprSettings: currReprSettings.value,
+                    currStr: currStr.value,
+                    strName: filesList.value.filter(item => item.id === currStr.value)[0].name,
+                    re: re.value
+                }
+                actionSelectSingleMolecule(properties)
+
                 //console.log(status, lastItem)
-                const [molecules, msg, status] = updateMolecule(lastItem, 'heteroatoms', currReprVal.value)
+                /*const [molecules, msg, status] = updateMolecule(lastItem, 'heteroatoms', currReprVal.value)
                 const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
                 // update representations selections
                 const [selection, structures] = getSelection(molecules, status, currReprVal.value, currStr.value)
@@ -202,7 +216,7 @@ export default {
                                 })
                             console.log(r.message)
                         } else  console.error(r.message)
-                    })
+                    })*/
 
                 prevSelection = selHs
 
@@ -248,7 +262,21 @@ export default {
             /*page.ttpsa = allSelected.value ? 'Select all heteroatoms' : 'Unselect all heteroatoms'
             selectedHets.value = allSelected.value ? null : modelHeteroatoms.value
             allSelected.value = !allSelected.value*/
-            let status, msg
+
+            const properties = {
+                    stage: stage,
+                    allSelected: allSelected.value,
+                    model: modelHeteroatoms.value,
+                    type: 'heteroatoms',
+                    currRepr: currReprVal.value,
+                    currReprSettings: currReprSettings.value,
+                    currStr: currStr.value,
+                    strName: filesList.value.filter(item => item.id === currStr.value)[0].name,
+                    re: re.value
+                }
+            prevSelection = actionSelectAllHeteros(properties)
+
+            /*let status, msg
             if(allSelected.value) {
                 status = 'remove'
                 msg = updateAllMolecules('heteroatoms', currReprVal.value, status)
@@ -294,7 +322,7 @@ export default {
                             })
                         console.log(r.message)
                     } else  console.error(r.message)
-                })
+                })*/
 
         }
 
@@ -355,18 +383,19 @@ export default {
 
         // MOUSE LEAVE
 
-        const actionLeave = (v) => {
+        /*const actionLeave = (v) => {
             // NGL representation
             const sele = v.num + ':' + v.chain + '/' + v.model
             const re = currStr.value + '-' + sele + '-hover'
             for(const item of stage.getRepresentationsByName(re).list) {
                 item.dispose()
             }
-        }
+        }*/
 
         const onLeave = (v) => {
             clicked = false
-            actionLeave(v)
+            //actionLeave(v)
+            actionLeaveSingleHetero(stage, currStr.value, v)
             // legend
             setFlagStatus('legendEnabled', false)
         }

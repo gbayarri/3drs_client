@@ -508,6 +508,19 @@ export default function structureSettings() {
             .filter(item => item.id === cm)[0][type]
     }
 
+    const getMolecule = function (currReprVal, type, model, chain, resnum) {
+        // avoid check settings before its creation
+        if(settings.value.length === 0) return false
+        const cm = getCurrentModel(currReprVal)
+        if(cm === null) return []
+
+        return settings.value
+                .filter(item => item.id === currentStructure.value)[0].original.models
+                .filter(item => item.id === cm)[0].chains
+                .filter(item => item.id === chain)[0][type]
+                .filter(item => item.model === model && item.chain === chain && item.num === resnum)[0]
+    }
+
     return { 
         settings,
         currentStructure,
@@ -516,7 +529,8 @@ export default function structureSettings() {
         getModels,
         getChains,
         getChainContent,
-        getCurrentMolecules,    
+        getCurrentMolecules,
+        getMolecule,
         setCurrentStructure,
         updateCurrentModel,
         updateCurrentChains,

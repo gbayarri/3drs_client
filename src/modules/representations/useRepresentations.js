@@ -17,7 +17,7 @@ export default function useRepresentations() {
     const { addRepresentationToComponent } = drawRepresentation()
     //const defaultRepresentation = computed(() => projectData.value.defaultRepresentation)
     const defaultRepresentation = projectData.value.defaultRepresentation
-    const prjID = projectData.value._id
+    let prjID = projectData.value._id
 
     const dataProject = computed(() => projectData.value)
 
@@ -81,6 +81,7 @@ export default function useRepresentations() {
             //console.log(sele, item)
         })
         if(update) {
+            if(prjID === undefined) prjID = dataProject.value._id
             return await updateRepresentationData(prjID, currentRepresentation.value, { structures: structures })
         }
     }

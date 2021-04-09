@@ -11,7 +11,7 @@ export default function useSettings() {
 
     const dataProject = computed(() => projectData.value)
 
-    const prjID = dataProject.value._id
+    let prjID = dataProject.value._id
 
     const longTimeOut = 5000
     const shortTimeOut = 1000
@@ -40,6 +40,7 @@ export default function useSettings() {
     // MOLECULES
     // TODO: CLEAN residue, structure
     const setMoleculesSettings = async (residue, structure, representation) => {
+        if(prjID === undefined) prjID = dataProject.value._id
         const data = setDataMolecules(residue, structure, representation)
         return await updateRepresentationData(prjID, representation, data)
     }
