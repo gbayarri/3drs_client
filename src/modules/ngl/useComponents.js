@@ -53,6 +53,13 @@ export default function useComponents() {
                 component.addRepresentation( "ball+stick", { name: def_repr.value + "-" + id + "-ligand", sele: "/0 and hetero and not(water or ion)",  radius: .3 } )
                 component.addRepresentation( "ball+stick", { name: def_repr.value + "-" + id + "-water", sele: "/0 and (water and not sol)",  radius: .3 } )
                 component.addRepresentation( "ball+stick", { name: def_repr.value + "-" + id + "-ion", sele: "/0 and ion",  radius: .3 } )
+
+                // *************************************************
+                // *************************************************
+                //component.addTrajectory( "3dRS/md_1u19.xtc", {centerPdb: true, removePbc: true, superpose: true, initialFrame: 0} );
+                // *************************************************
+                // *************************************************
+
                 // set initial values for default representation
                 const re = new RegExp('(' + def_repr.value + '\-' + id + '\-[a-z]*)', 'g')
                 const visible = representations.value.filter(item => item.id === def_repr.value)[0].visible
