@@ -59,10 +59,11 @@ export default {
       const structures = dataProject.value.files
       const array_promises = []
       for(const str of structures) {
+        //console.log(str)
         array_promises
           .push(
             //loadFileToStage(stage, "https://files.rcsb.org/download/" + str.name + ".pdb", str.name, str.id)
-            loadFileToStage(stage, process.env.VUE_APP_API_LOCATION + '/download/' + str.id, str.name, str.id)
+            loadFileToStage(stage, process.env.VUE_APP_API_LOCATION + '/download/' + str.id, str.name, str.ext, str.id, str.trajectory)
           )
       }
 

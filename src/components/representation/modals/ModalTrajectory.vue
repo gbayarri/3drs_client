@@ -31,18 +31,22 @@
 </template>
 
 <script>
-import { ref, inject } from 'vue'
+import { ref, inject, computed } from 'vue'
 import useModals from '@/modules/common/useModals'
+import structureSettings from '@/modules/structure/structureSettings'
 export default {
+    props: ['project_id'],
     components: {  },
-    setup() {
-
-        // TODO!! ADD TAB FROM LAUNCH AND CUSTOM SOME DATA FOR REUSE THE SAME TabPanelFile.vue COMPONENT
+    setup(props) {
 
         /* MODAL */
         const header = "Upload Trajectory"
         //const modals = inject('modals')
         const { dialog, closeModal } = useModals()
+        const { currentStructure } = structureSettings()
+
+        const project_id = props.project_id
+        const currStr = computed(() => currentStructure.value)
 
         const closeThisModal = () => {
             closeModal('trajectory')
@@ -78,10 +82,11 @@ export default {
                 formData.append('file' + key, value)
             }
 
-            console.log('Uploading trajectory file!!!')
+            formData.append('project', project_id)
+            formData.append('structure', currStr.value);
 
-            /*$axios
-                .post(process.env.VUE_APP_API_LOCATION + '/upload/file/', formData)
+            $axios
+                .post(process.env.VUE_APP_API_LOCATION + '/upload/traj/', formData)
                 .then(function (response) {
                     //console.log(response);
                     resp = response.data
@@ -92,7 +97,26 @@ export default {
                     //router.push({ name: 'Contact', params: { id } }) 
                     //$router.push({ path: `/representation/${id}` }) 
                     console.log(resp)
-                })*/
+                    //disableFileUpload.value = false
+                    if(resp.status === 'error') {
+                        /*closeModal('block')
+                        const msg = {
+                            severity: 'error',
+                            content: resp.message,
+                            show: true
+                        }
+                        setMessage('launch', msg)*/
+                        // SHOW ERROR IN MODAL
+                        disableFileUpload.value = false
+                    } else if(resp.status === 'success') {
+                        //setBlockUI('load')
+                        //$router.push({ name: 'Representation', params: { id: resp.id } }) 
+                        //  DO SOMETHING WITH STORAGE DATA AND UPDATE WITH NEW TRAJECTORY!!!!!!
+                        // CLOSE MODAL
+                        closeModal('trajectory')
+                        disableFileUpload.value = false
+                    }
+                })
         }
 
         return { header, dialog, closeThisModal, 

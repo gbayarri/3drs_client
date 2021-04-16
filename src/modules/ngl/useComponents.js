@@ -3,6 +3,7 @@ import processStructure from '@/modules/ngl/processStructure'
 import structureStorage from '@/modules/structure/structureStorage'
 import useRepresentations from '@/modules/representations/useRepresentations'
 import drawRepresentation from '@/modules/ngl/drawRepresentation'
+import useStage from '@/modules/ngl/useStage'
 // Stage interactions
 export default function useComponents() {
 
@@ -13,14 +14,16 @@ export default function useComponents() {
         setOpacityRepresentation
     } = useRepresentations()
     const { addRepresentationToComponent } = drawRepresentation()
+    const { createTrajectoryPlayer } = useStage()
 
     const dataProject = computed(() => projectData.value)
     //const curr_repr = computed(() => projectData.value.currentRepresentation) 
     const def_repr = computed(() => projectData.value.defaultRepresentation) 
     const representations = computed(() => dataProject.value.representations) 
 
-    const loadFileToStage = (stage, url, name, id) => {
-        return stage.loadFile(url, { defaultRepresentation: false, ext: 'pdb', name:id })
+    const loadFileToStage = (stage, url, name, ext, id, traj) => {
+        const extension = (ext === undefined) ? 'pdb' : ext
+        return stage.loadFile(url, { defaultRepresentation: false, ext: extension, name:id })
             .then(function (component) {
 
             //console.log(component.parameters.name)
@@ -32,7 +35,7 @@ export default function useComponents() {
             // ONLY PARSE NGL IF FIRST TIME
             let structure = null
             if(dataProject.value.structure.length === 0 && dataProject.value.settings.length === 0) {
-                structure = getStructure(component, name)
+                structure = getStructure(component, name, extension)
                 updateStructureFirst(structure, id)
             } else {
                 structure = {
@@ -56,7 +59,33 @@ export default function useComponents() {
 
                 // *************************************************
                 // *************************************************
-                //component.addTrajectory( "3dRS/md_1u19.xtc", {centerPdb: true, removePbc: true, superpose: true, initialFrame: 0} );
+                if(traj !== null) {
+                    console.log('loading', traj.path, 'size', traj.size)
+                    const t = component.addTrajectory( '3dRS/trajectories/' + traj.path, {centerPdb: true, removePbc: true, superpose: true, initialFrame: 0} )
+                    console.log(t)
+                    const player = createTrajectoryPlayer(t.trajectory, 1, 0, 150)
+                    // HARDCODED!!!!
+                    player.parameters.end = 150
+                    console.log(player)
+                    player.play()
+                    /*totalFrames = 151
+					var player = new NGL.TrajectoryPlayer( traj, {
+							step: step,
+							//timeout: 100,
+							start: 0,
+							end: totalFrames,
+							interpolateType: "linear",
+							mode: "loop"
+					} );
+					player.end = traj.frames.length;
+					traj.setPlayer( player );
+					traj.player.play();
+					trajectoryPlayer = traj.player;
+					
+					traj.signals.frameChanged.add((a) => {
+						updateCurrentFrame(a);
+					});*/
+                }
                 // *************************************************
                 // *************************************************
 

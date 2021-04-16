@@ -16,7 +16,7 @@
 
     <Viewport :project_id="project_id" />
 
-    <ModalTrajectory />
+    <ModalTrajectory :project_id="project_id" />
     <ModalStructure />
     <ModalShare />
     <ModalTips />

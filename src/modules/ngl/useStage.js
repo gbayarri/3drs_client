@@ -1,5 +1,5 @@
 import { reactive } from 'vue'
-import { Stage, Selection, DatasourceRegistry, MdsrvDatasource, setListingDatasource, setTrajectoryDatasource } from 'ngl'
+import { Stage, Selection, DatasourceRegistry, MdsrvDatasource, setListingDatasource, setTrajectoryDatasource, TrajectoryPlayer } from 'ngl'
 
 let stage = reactive({})
 let selection = reactive({})
@@ -36,7 +36,22 @@ export default function useStage() {
         //console.log('stage created')
         return selection 
     }
+
+    const createTrajectoryPlayer = function (traj, step, start, end) {
+        
+        return new TrajectoryPlayer( traj, {
+            /*step: step,
+            //timeout: 100,
+            start: start,
+            end: end,
+            interpolateType: "linear",
+            mode: "loop"*/
+            // END NOT WORKING!!!!!!
+            // LOOK PROMISES FOR LOADING THE PLAYER ONCE THE addTrajectory HAS FINISHED!!!!
+            start:1, end: 140, /*timeout: 100,*/ mode: "loop", interpolateType: "spline",step: 1, interpolateStep: 5
+        } ) 
+    }
   
-    return { stage, selection, createStage, getStage, createSelection }
+    return { stage, selection, createStage, getStage, createSelection, createTrajectoryPlayer }
   
   }

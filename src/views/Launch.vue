@@ -60,7 +60,7 @@ export default {
         }, 
         file: {
             header: "Upload your own structure",
-            desc: "Please click or drag and drop files:",
+            desc: "Please click or drag and drop files, only <strong>PDB</strong> and <strong>GRO</strong> files accepted:",
             int_desc: "Click <strong>Select button</strong> above or drag and drop files to here to upload."
         }
       }

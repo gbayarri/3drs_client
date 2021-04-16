@@ -20,6 +20,7 @@ export default function structureStorage() {
 
     const updateStructureProject = function (data) {
         projectData.value = data
+        //console.log(projectData.value)
     }
 
     const removeRepresentationFromStructure = (value) => {
@@ -39,6 +40,7 @@ export default function structureStorage() {
         settings.value.push({
             id: id,
             name: str.name,
+            ext: str.ext,
             navigation: [
                 /*curr_model: 0,
                 visible: true,
@@ -108,6 +110,7 @@ export default function structureStorage() {
         settings.value.push({
             id: id,
             name: str.name,
+            ext: str.ext,
             navigation: file_nav,
             original: str
         })
@@ -141,13 +144,17 @@ export default function structureStorage() {
         const setngs = []
         //console.log(settings.value)
         for(const item of settings.value) {
+            //console.log(item)
+            //console.log(item.ext)
             files.push({
                 id: item.id,
                 name: item.name,
+                ext: item.ext,
                 //type: item.original.type.isProtein ? 'protein' : 'nucleic',
                 type: item.original.type,
                 trajectory: null
             })
+            //console.log(files)
             setngs.push({
                 id: item.id,
                 curr_model: item.navigation[0].curr_model,

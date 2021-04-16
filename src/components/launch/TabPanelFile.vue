@@ -1,9 +1,9 @@
 <template>
-    <p>{{ texts.desc }}</p>
+    <p v-html="texts.desc"></p>
     <FileUpload 
     @uploader="uploader"
     @select="selector"
-    accept=".pdb" 
+    accept=".pdb, .gro" 
     :customUpload="true"
     :multiple="true" 
     :maxFileSize="52428800"

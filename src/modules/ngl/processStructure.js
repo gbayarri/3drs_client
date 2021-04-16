@@ -163,9 +163,22 @@ export default function processStructure() {
                 }
                 prev_sh = rp.isSheet()
                 // push residue
-                //console.log(rp)
+                //console.log(rp.resname.toLowerCase())
+                let res_id = null
+                let res_longname = null
+                if(globals.aminoacids[rp.resname.toLowerCase()] === undefined) {
+                    // *********** ????
+                    // *********** ????
+                    res_id = 'X'
+                    // *********** ????
+                    // *********** ????
+                    res_longname = 'modified residue'
+                } else {
+                    res_id = globals.aminoacids[rp.resname.toLowerCase()].id
+                    res_longname = globals.aminoacids[rp.resname.toLowerCase()].name
+                }
                 let res = {
-                    id: globals.aminoacids[rp.resname.toLowerCase()].id,
+                    id: res_id,
                     num: rp.resno,
                     label: rp.resname.toUpperCase(),
                     name: rp.chainname + ': ' + rp.resname.toUpperCase() + ' ' + rp.resno,
@@ -174,7 +187,7 @@ export default function processStructure() {
                     last_sheet: false,
                     sheet: sheet,
                     helix: helix,
-                    longname: globals.aminoacids[rp.resname.toLowerCase()].name
+                    longname: res_longname
                 }
                 sequence.push(res)
                 prev_res = rp.resno
@@ -274,10 +287,11 @@ export default function processStructure() {
         return waters
     }
 
-    const getStructure = (component, name) => {
+    const getStructure = (component, name, extension) => {
 
         const structure = { 
             name: name,
+            ext: extension,
             type: getType(component),
             models: [] 
         }
