@@ -37,18 +37,16 @@ export default function useStage() {
         return selection 
     }
 
-    const createTrajectoryPlayer = function (traj, step, start, end) {
+    const createTrajectoryPlayer = function (traj, settings) {
         
         return new TrajectoryPlayer( traj, {
-            /*step: step,
-            //timeout: 100,
-            start: start,
-            end: end,
-            interpolateType: "linear",
-            mode: "loop"*/
-            // END NOT WORKING!!!!!!
-            // LOOK PROMISES FOR LOADING THE PLAYER ONCE THE addTrajectory HAS FINISHED!!!!
-            start:1, end: 140, /*timeout: 100,*/ mode: "loop", interpolateType: "spline",step: 1, interpolateStep: 5
+            step: settings.step,
+            //timeout: 100, ??
+            // interpolateStep: 5, ??
+            start: settings.start,
+            end: settings.end,
+            interpolateType: "spline",
+            mode: settings.mode
         } ) 
     }
   

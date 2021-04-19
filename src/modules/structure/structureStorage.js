@@ -76,6 +76,7 @@ export default function structureStorage() {
     const updateStructure = function (str, id) {
 
         // ADD NEW LEVEL RESPRESENTATIONS IN settings.value.navigation
+        //console.log(str)
 
         // get list of representations except default
         const representations = projectData.value.representations.filter(item => item.id !== projectData.value.defaultRepresentation)
@@ -111,6 +112,7 @@ export default function structureStorage() {
             id: id,
             name: str.name,
             ext: str.ext,
+            trajectory: str.trajectory,
             navigation: file_nav,
             original: str
         })

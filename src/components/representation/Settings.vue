@@ -42,7 +42,7 @@
             <CustomSelection class="settings-panel custom" :stage="stage" v-if="customEnabled" />
             <hr class="subsection" />
             <TitleSettings :title="tit_traj" />
-            <Trajectory />
+            <Trajectory :stage="stage" />
         </div>
     </Sidebar>
 </template>

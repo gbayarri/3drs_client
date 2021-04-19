@@ -663,7 +663,7 @@ export default {
     #minisettings .settings-button:hover { background:#546974; color:#fff; }
     /* label */
     #minisettings label { margin:0 2.5%; color:#fff;}
-    /* label */
+    /* slider */
     #minisettings .p-slider.p-slider-horizontal { width: 90%; margin: 0 5%; background: #ccc; }
     #minisettings .p-slider .p-slider-range { background: #fff; }
     #minisettings .p-slider .p-slider-handle { border-color: #b4cce6; }

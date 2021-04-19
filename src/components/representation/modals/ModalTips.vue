@@ -17,6 +17,7 @@
         <TipsIons v-if="type === 'ions'" @changeModalTitle="modalTitleChange" />
         <TipsWaters v-if="type === 'waters'" @changeModalTitle="modalTitleChange" />
         <TipsCustom v-if="type === 'custom'" @changeModalTitle="modalTitleChange" />
+        <TipsTrajectory v-if="type === 'trajectory'" @changeModalTitle="modalTitleChange" />
 
         <template #footer>
             <Button :label="labelClose" icon="pi pi-times" @click="closeThisModal" />
@@ -34,8 +35,9 @@ import TipsHeteroatoms from '@/components/representation/modals/tips/TipsHeteroa
 import TipsIons from '@/components/representation/modals/tips/TipsIons'
 import TipsWaters from '@/components/representation/modals/tips/TipsWaters'
 import TipsCustom from '@/components/representation/modals/tips/TipsCustom'
+import TipsTrajectory from '@/components/representation/modals/tips/TipsTrajectory'
 export default {
-    components: { TipsModels, TipsChains, TipsSequence, TipsHeteroatoms, TipsIons, TipsWaters, TipsCustom },
+    components: { TipsModels, TipsChains, TipsSequence, TipsHeteroatoms, TipsIons, TipsWaters, TipsCustom, TipsTrajectory },
     setup() {
 
         const page = reactive({

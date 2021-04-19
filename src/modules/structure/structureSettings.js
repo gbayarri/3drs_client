@@ -521,6 +521,16 @@ export default function structureSettings() {
                 .filter(item => item.model === model && item.chain === chain && item.num === resnum)[0]
     }
 
+    const checkIfTrajectory = function() {
+        return settings.value
+            .filter(item => item.id === currentStructure.value)[0].trajectory !== null
+    }
+
+    const getTrajectorySettings = function() {
+        return settings.value
+            .filter(item => item.id === currentStructure.value)[0].trajectory.settings
+    }
+
     return { 
         settings,
         currentStructure,
@@ -542,7 +552,9 @@ export default function structureSettings() {
         getCurrentModel,
         getCurrentChains,
         addNewRepresentationSettings,
-        removeRepresentationSettings
+        removeRepresentationSettings,
+        checkIfTrajectory,
+        getTrajectorySettings
     }
 
 }

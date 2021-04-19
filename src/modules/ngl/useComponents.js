@@ -1,9 +1,12 @@
 import { computed } from 'vue'
 import processStructure from '@/modules/ngl/processStructure'
 import structureStorage from '@/modules/structure/structureStorage'
+import structureSettings from '@/modules/structure/structureSettings'
 import useRepresentations from '@/modules/representations/useRepresentations'
 import drawRepresentation from '@/modules/ngl/drawRepresentation'
+import useTrajectories from '@/modules/ngl/useTrajectories'
 import useStage from '@/modules/ngl/useStage'
+import useAPI from '@/modules/api/useAPI'
 // Stage interactions
 export default function useComponents() {
 
@@ -13,11 +16,15 @@ export default function useComponents() {
         setVisibilityRepresentation,
         setOpacityRepresentation
     } = useRepresentations()
+    const { currentStructure } = structureSettings()
     const { addRepresentationToComponent } = drawRepresentation()
     const { createTrajectoryPlayer } = useStage()
+    const { checkTrajectory, setTrajectoryPlayer, updateCurrentFrame } = useTrajectories()
+    const { updateTrajectoryData } = useAPI()
 
     const dataProject = computed(() => projectData.value)
     //const curr_repr = computed(() => projectData.value.currentRepresentation) 
+    const currStr = computed(() => currentStructure.value)
     const def_repr = computed(() => projectData.value.defaultRepresentation) 
     const representations = computed(() => dataProject.value.representations) 
 
@@ -38,9 +45,12 @@ export default function useComponents() {
                 structure = getStructure(component, name, extension)
                 updateStructureFirst(structure, id)
             } else {
+                const f = dataProject.value.files.filter(item => item.id === id)[0]
                 structure = {
-                    name: dataProject.value.files.filter(item => item.id === id)[0].name,
-                    type: dataProject.value.files.filter(item => item.id === id)[0].type,
+                    name: f.name,
+                    type: f.type,
+                    ext: f.ext,
+                    trajectory: f.trajectory,
                     models: dataProject.value.structure.filter(item => item.id === id)[0].models 
                 }
                 //console.log(dataProject.value.settings)
@@ -62,29 +72,37 @@ export default function useComponents() {
                 if(traj !== null) {
                     console.log('loading', traj.path, 'size', traj.size)
                     const t = component.addTrajectory( '3dRS/trajectories/' + traj.path, {centerPdb: true, removePbc: true, superpose: true, initialFrame: 0} )
-                    console.log(t)
-                    const player = createTrajectoryPlayer(t.trajectory, 1, 0, 150)
-                    // HARDCODED!!!!
-                    player.parameters.end = 150
-                    console.log(player)
-                    player.play()
-                    /*totalFrames = 151
-					var player = new NGL.TrajectoryPlayer( traj, {
-							step: step,
-							//timeout: 100,
-							start: 0,
-							end: totalFrames,
-							interpolateType: "linear",
-							mode: "loop"
-					} );
-					player.end = traj.frames.length;
-					traj.setPlayer( player );
-					traj.player.play();
-					trajectoryPlayer = traj.player;
-					
-					traj.signals.frameChanged.add((a) => {
-						updateCurrentFrame(a);
-					});*/
+                    //console.log(t)
+
+                    // wait until trajectory parameters are completely loaded
+                    checkTrajectory(t)
+                        .then((trajectory) => {
+                            //console.log(trajectory.frameCount)
+                            const settings = traj.settings
+                            // if no settings.end (first time): default settings
+                            // *************************************************
+                            // THIS SHOULDN'T BE HERE (addtrajectory FUNCTION OR SIMILAR)
+                            if(traj.settings.end === null) {
+                                settings.end =  trajectory.frameCount - 1
+                                const project = dataProject.value._id
+                                const structure = currStr.value
+                                //console.log(project, structure, settings)
+                                updateTrajectoryData(project, { structure: structure, settings: settings })
+                                    .then((r) => {
+                                        if(r.code != 404) console.log(r.message)
+                                        else console.error(r.message)
+                                    })
+                            }
+                            // *************************************************
+                            const player = createTrajectoryPlayer(trajectory, settings)
+                            setTrajectoryPlayer(player)
+                            //console.log(trajectory.signals)
+                            trajectory.signals.frameChanged.add((a) => {
+                                updateCurrentFrame(a);
+                            });
+                            if(traj.settings.autoplay) player.play()
+                        })
+
                 }
                 // *************************************************
                 // *************************************************

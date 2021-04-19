@@ -74,6 +74,21 @@ export default function useAPI() {
 
   }
 
+  const updateTrajectoryData = async (id, data) => {
+
+    const response = await fetch(process.env.VUE_APP_API_LOCATION + '/trajectory/' + id, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+    const resp = await response.json()
+
+    return resp
+
+  }
+
   // updateStructure (when new file added)
 
   return { 
@@ -82,7 +97,8 @@ export default function useAPI() {
     updateProjectData,
     createRepresentation,
     updateRepresentationData,
-    eliminateRepresentation
+    eliminateRepresentation,
+    updateTrajectoryData
   }
 
 }

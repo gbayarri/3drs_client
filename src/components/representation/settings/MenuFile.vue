@@ -93,7 +93,7 @@ export default {
 
 <style>
     #file-buttons { margin-left: 2.5%; width: 95%; margin-bottom:0px; }
-    #file-buttons button { height: 1.8rem; width: 1.8rem; font-size: 13px; color:#fff; }
+    /*#file-buttons button { height: 1.8rem; width: 1.8rem; font-size: 13px; color:#fff; }*/
 
     #file-buttons button {
         height: 1.6rem;
@@ -103,6 +103,7 @@ export default {
         margin: .3rem 0 0 .1rem;
         background:transparent;
         border-color: #fff; 
+        color:#fff; 
     }
     #file-buttons button:hover { background: #546974;}
 
