@@ -6,7 +6,7 @@ import useRepresentations from '@/modules/representations/useRepresentations'
 import drawRepresentation from '@/modules/ngl/drawRepresentation'
 import useTrajectories from '@/modules/ngl/useTrajectories'
 import useStage from '@/modules/ngl/useStage'
-import useAPI from '@/modules/api/useAPI'
+//import useAPI from '@/modules/api/useAPI'
 // Stage interactions
 export default function useComponents() {
 
@@ -16,11 +16,11 @@ export default function useComponents() {
         setVisibilityRepresentation,
         setOpacityRepresentation
     } = useRepresentations()
-    const { currentStructure } = structureSettings()
+    const { currentStructure, updateTrajectorySettings } = structureSettings()
     const { addRepresentationToComponent } = drawRepresentation()
     const { createTrajectoryPlayer } = useStage()
-    const { checkTrajectory, setTrajectoryPlayer, updateCurrentFrame } = useTrajectories()
-    const { updateTrajectoryData } = useAPI()
+    const { checkTrajectory, setTrajectoryPlayer, updateCurrentFrame, setTrajectorySettings } = useTrajectories()
+    //const { updateTrajectoryData } = useAPI()
 
     const dataProject = computed(() => projectData.value)
     //const curr_repr = computed(() => projectData.value.currentRepresentation) 
@@ -84,11 +84,11 @@ export default function useComponents() {
                             // THIS SHOULDN'T BE HERE (addtrajectory FUNCTION OR SIMILAR)
                             if(traj.settings.end === null) {
                                 settings.end =  trajectory.frameCount - 1
-                                const project = dataProject.value._id
-                                const structure = currStr.value
-                                //console.log(project, structure, settings)
-                                updateTrajectoryData(project, { structure: structure, settings: settings })
+                                settings.range[1] =  trajectory.frameCount - 1
+                                updateTrajectorySettings(settings)
+                                setTrajectorySettings({ structure: currStr.value, settings: settings })
                                     .then((r) => {
+                                        //console.log(stage)
                                         if(r.code != 404) console.log(r.message)
                                         else console.error(r.message)
                                     })
@@ -96,7 +96,7 @@ export default function useComponents() {
                             // *************************************************
                             const player = createTrajectoryPlayer(trajectory, settings)
                             setTrajectoryPlayer(player)
-                            //console.log(trajectory.signals)
+                            //console.log(player)
                             trajectory.signals.frameChanged.add((a) => {
                                 updateCurrentFrame(a);
                             });

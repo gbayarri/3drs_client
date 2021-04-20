@@ -41,12 +41,12 @@ export default function useStage() {
         
         return new TrajectoryPlayer( traj, {
             step: settings.step,
-            //timeout: 100, ??
+            timeout: 100,
             // interpolateStep: 5, ??
-            start: settings.start,
-            end: settings.end,
-            interpolateType: "spline",
-            mode: settings.mode
+            start: settings.range[0],
+            end: settings.range[1],
+            interpolateType: settings.interpolation,
+            mode: settings.loop ? "loop": "once"
         } ) 
     }
   

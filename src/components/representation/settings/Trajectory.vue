@@ -1,97 +1,86 @@
 <template>
     <div v-if="!hasTrajectory" class="margin-bottom-20">
+
         <Button 
         :label="btn_label" 
         icon="fas fa-film" 
         class="settings-button" 
         @click="openModalTrajectory" 
         :disabled="dialog.trajectory"  />
+
     </div>
     <div v-else class="margin-bottom-20" id="sidebar-player">
         
-        <div class="p-grid">
-            <div class="p-col">
-                <Slider v-model="frames" :min="min" :max="max" :step="step" />
-            </div>
-        </div>
-        <div class="p-grid double-col">
-            <div class="p-col">
-                <Button 
-                :icon="isRunning ? 'fas fa-pause' : 'fas fa-play'" 
-                id="play-button"
-                class="p-button-rounded p-button-text"
-                @click="playTraj" />
-            </div>
-            <div class="p-col slider-value">
-                <label>{{ frames }}</label>
-            </div>
-        </div>
-
-        <SettingsTrajectory class="settings-panel settings-traj" />
+        <PlayerTrajectory :stage="stage" />
+        <SettingsTrajectory class="settings-panel settings-traj" :stage="stage" />
 
     </div>
 </template>
 
 <script>
-import { ref, reactive, computed, toRefs } from 'vue'
+import { ref, reactive, computed, toRefs, onUpdated } from 'vue'
 import useModals from '@/modules/common/useModals'
 import structureSettings from '@/modules/structure/structureSettings'
+import PlayerTrajectory from '@/components/representation/settings/addons/PlayerTrajectory'
 import SettingsTrajectory from '@/components/representation/settings/addons/SettingsTrajectory'
-import useTrajectories from '@/modules/ngl/useTrajectories'
+//import useTrajectories from '@/modules/ngl/useTrajectories'
 export default {
-    components: { SettingsTrajectory},
+    components: { PlayerTrajectory, SettingsTrajectory },
     props: ['stage'],
     setup(props) {
 
         const stage = props.stage
 
-        const { checkIfTrajectory, getTrajectorySettings, currentStructure } = structureSettings()
-        const { currentFrame, getTrajectoryPlayer, setCurrentFrame } = useTrajectories()
+        /*const { checkIfTrajectory, getTrajectorySettings, currentStructure } = structureSettings()
+        const { currentFrame, getTrajectoryPlayer, setCurrentFrame } = useTrajectories()*/
+        const { checkIfTrajectory } = structureSettings()
         const { dialog, openModal } = useModals()
 
-        const currStr = computed(() => currentStructure.value)
+        /*const currStr = computed(() => currentStructure.value)
+        const currFr = computed(() => currentFrame.value)*/
         const hasTrajectory = computed(() => checkIfTrajectory())
-        const trajSettings = computed(() => getTrajectorySettings())
-        const player =  computed(() => getTrajectoryPlayer())
+        /*const trajSettings = computed(() => getTrajectorySettings())
+        const player =  computed(() => getTrajectoryPlayer())*/
         
-        const currTraj = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0].trajList[0])
+        const page = reactive({
+            btn_label: "Add Trajectory"
+        })
+
+        //const currTraj = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0].trajList[0])
         //console.log(currTraj.value)
+
+        //setCurrentFrame(currTraj.value, trajSettings.value.range[0])
+
+        /*onUpdated(() => {
+            isRunning.value = player.value.isRunning
+        })
 
         const isRunning = ref(false)
         const page = reactive({
             btn_label: "Add Trajectory"
         })
         const settings = reactive({
-            min: computed(() => trajSettings.value.start),
-            max: computed(() => trajSettings.value.end),
+            min: computed(() => trajSettings.value.range[0]),
+            max: computed(() => trajSettings.value.range[1]),
             step: computed(() => trajSettings.value.step)
         })
         
         //console.log(stage)
 
         const changeFrame = (frame) => {
-            //console.log(frame)
             setCurrentFrame(currTraj.value, frame)
-            //currTraj.value.setFrame(frame)
-            /*updateRepresentationProperty('opacity', (value / 100))
-            setOpacityRepresentation(stage, value, re.value, true)
-                .then((r) => {
-                    if(r.code != 404) console.log(r.message)
-                    else console.error(r.message)
-                })*/
         }
 
         const frames = computed({
-            get: () => parseInt(currentFrame.value) + 1,
+            get: () => parseInt(currFr.value) + 1,
             set: val => changeFrame(val)
-        })
+        })*/
 
         const openModalTrajectory = () => {
             openModal('trajectory')
         }
 
-        const playTraj = () => {
-
+        /*const playTraj = () => {
             isRunning.value = !isRunning.value
 
             if(isRunning.value)  player.value.play()
@@ -99,53 +88,50 @@ export default {
 
         }
 
+        const frameStep = (dir) => {
+            const start = computed(() => trajSettings.value.range[0]).value
+            const end = computed(() => trajSettings.value.range[1]).value
+            const step = computed(() => trajSettings.value.step).value
+            let f = parseInt(currFr.value) + (dir * step)
+            if(f < start) f = end
+            if(f > end) f = start
+            //console.log(f)
+            player.value.pause()
+            setCurrentFrame(currTraj.value, f)
+
+        }*/
+
         return { 
             ...toRefs(page), dialog, hasTrajectory, 
-            openModalTrajectory,
-            frames, isRunning, playTraj,
-            ...toRefs(settings)
+            openModalTrajectory/*,
+            frames, isRunning, playTraj, frameStep,
+            ...toRefs(settings)*/
         }
     }
 }
 
-
-/*const changeOpacity = (value) => {
-            //console.log(value)
-            updateRepresentationProperty('opacity', (value / 100))
-            setOpacityRepresentation(stage, value, re.value, true)
-                .then((r) => {
-                    if(r.code != 404) console.log(r.message)
-                    else console.error(r.message)
-                })
-        }
-
-        //const opacity = ref(Math.round(currReprSettings.value.opacity * 100))
-        const opacity = computed({
-            get: () => Math.round(currReprSettings.value.opacity * 100),
-            set: val => changeOpacity(val)
-        })*/
 </script>
 
 <style>
 
     #sidebar-player .double-col { margin: -.5rem 0.25rem; }
-    #sidebar-player .p-slider.p-slider-horizontal { width: 90%; margin: 0 5%; background: #ccc; }
-    #sidebar-player .p-slider .p-slider-range { background: #fff; }
-    #sidebar-player .p-slider .p-slider-handle { border-color: #b4cce6; }
-    #sidebar-player .p-slider:not(.p-disabled) .p-slider-handle:hover { background: #6f96a9;  border-color: #fff; }
+    #sidebar-player #player-slider.p-slider.p-slider-horizontal { width: 90%; margin: 0 5%; background: #ccc; }
+    #sidebar-player #player-slider.p-slider .p-slider-range { background: #fff; }
+    #sidebar-player #player-slider.p-slider .p-slider-handle { border-color: #b4cce6; }
+    #sidebar-player #player-slider.p-slider:not(.p-disabled) .p-slider-handle:hover { background: #6f96a9;  border-color: #fff; }
     #sidebar-player .slider-value { text-align:right; font-weight: 700; }
     #sidebar-player .slider-value label { vertical-align: sub; color:#fff; }
 
-    #play-button {
-        height: 1.6rem;
+    .p-button-rounded.p-button-text.player-button {
+        height: 1.6rem!important;
         width: 1.6rem;
         font-size: 12px;
         padding:0; 
-        margin: .3rem 0 0 .1rem;
+        margin: .3rem 0.3rem 0 .1rem;
         background:transparent;
         border-color: #fff; 
         color:#fff; 
     }
-    #play-button:hover { background: #546974;}
+    .p-button-rounded.p-button-text.player-button:hover { background: #546974!important; color:#fff!important; border-color: #fff!important; }
 
 </style>

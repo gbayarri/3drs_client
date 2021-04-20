@@ -14,6 +14,14 @@ export default function useMessages() {
     messages[label] = content
   }
 
-  return { messages, setMessage }
+  const resetMessage = function (label) {
+    messages[label] = {
+      severity: null,
+      content: null,
+      show: false
+    }
+  }
+
+  return { messages, setMessage, resetMessage }
 
 }

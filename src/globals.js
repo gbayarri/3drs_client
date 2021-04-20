@@ -54,5 +54,10 @@ module.exports = {
         { name: 'Residue name', id: 'resname' },
         { name: 'Secondary structure', id: 'sstruc' },
         { name: 'Uniform', id: 'uniform' }
+    ],
+    interpolation: [
+        { name: 'None', id: '' },
+        { name: 'Linear', id: 'linear' },
+        { name: 'Spline', id: 'spline' }
     ]
 }

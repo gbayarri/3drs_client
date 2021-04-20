@@ -117,6 +117,9 @@ body, html { scrollbar-color: #858f98 #f1f1f1; scrollbar-width: thin; }
 .p-listbox .p-listbox-header .p-listbox-filter { padding:.25rem 1.5rem .25rem .5rem ; }
 .p-inputtext:enabled:hover { border-color: #5e738b; }
 .p-inputtext:enabled:focus { border-color: #5e738b; box-shadow: 0 0 0 0.2rem rgb(94 115 139 / 0.3); }
+/* switch */
+.p-inputswitch.p-inputswitch-checked .p-inputswitch-slider { background: #6f96a9!important; }
+.p-inputswitch.p-focus .p-inputswitch-slider { box-shadow: none; }
 
 /* breadcrumbs */
 .p-breadcrumb { background:transparent; border:none; padding:0; font-size: 14px; }

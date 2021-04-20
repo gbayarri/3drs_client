@@ -10,12 +10,15 @@
             <i class="fas fa-film"></i> <h3>{{ header }}</h3>
         </template>
 
+        <Message :severity="message.severity" :key="message.content" v-if="message.show">{{message.content}}</Message>
+
         <FileUpload 
         @uploader="uploader"
         @select="selector"
         accept=".xtc, .dcd" 
         :customUpload="true"
         :multiple="false" 
+        :fileLimit="1"
         :maxFileSize="52428800"
         :disabled="disableFileUpload"
         chooseLabel="Select">
@@ -33,6 +36,7 @@
 <script>
 import { ref, inject, computed } from 'vue'
 import useModals from '@/modules/common/useModals'
+import useMessages from '@/modules/common/useMessages'
 import structureSettings from '@/modules/structure/structureSettings'
 export default {
     props: ['project_id'],
@@ -44,11 +48,14 @@ export default {
         //const modals = inject('modals')
         const { dialog, closeModal } = useModals()
         const { currentStructure } = structureSettings()
+        const { messages, setMessage, resetMessage } = useMessages()
 
         const project_id = props.project_id
         const currStr = computed(() => currentStructure.value)
+        const message = computed(() => messages.launch)
 
         const closeThisModal = () => {
+            resetMessage('launch')
             closeModal('trajectory')
         }
 
@@ -96,30 +103,30 @@ export default {
                     // CONTROL ERRORS WHEN EMPTY FILE, FOR EXAMPLE
                     //router.push({ name: 'Contact', params: { id } }) 
                     //$router.push({ path: `/representation/${id}` }) 
-                    console.log(resp)
+                    //console.log(resp)
                     //disableFileUpload.value = false
                     if(resp.status === 'error') {
-                        /*closeModal('block')
                         const msg = {
                             severity: 'error',
                             content: resp.message,
                             show: true
                         }
-                        setMessage('launch', msg)*/
-                        // SHOW ERROR IN MODAL
+                        setMessage('launch', msg)
                         disableFileUpload.value = false
                     } else if(resp.status === 'success') {
                         //setBlockUI('load')
                         //$router.push({ name: 'Representation', params: { id: resp.id } }) 
                         //  DO SOMETHING WITH STORAGE DATA AND UPDATE WITH NEW TRAJECTORY!!!!!!
                         // CLOSE MODAL
+                        // CREATE useCOmponentS > addTrajectory WITH THE 77-106 CODE!!!
+                        console.log('????')
                         closeModal('trajectory')
                         disableFileUpload.value = false
                     }
                 })
         }
 
-        return { header, dialog, closeThisModal, 
+        return { header, dialog, closeThisModal, message,
                  descr, selector, uploader, disableFileUpload }
     }
 }

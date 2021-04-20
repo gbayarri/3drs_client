@@ -41,6 +41,7 @@ export default function structureStorage() {
             id: id,
             name: str.name,
             ext: str.ext,
+            trajectory: null,
             navigation: [
                 /*curr_model: 0,
                 visible: true,

@@ -26,6 +26,8 @@ import Message from 'primevue/message'
 import Toast from 'primevue/toast'
 import ToastService from 'primevue/toastservice'
 import Tree from 'primevue/tree'
+import InputNumber from 'primevue/inputnumber'
+import InputSwitch from 'primevue/inputswitch'
 
 // generic components
 import Header from '@/components/global/Header'
@@ -80,6 +82,8 @@ app.component('InputText', InputText)
 app.component('Message', Message)
 app.component('Toast', Toast)
 app.component('Tree', Tree)
+app.component('InputNumber', InputNumber)
+app.component('InputSwitch', InputSwitch)
 
 // create directives
 app.directive('tooltip', Tooltip)
