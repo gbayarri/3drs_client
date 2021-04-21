@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue'
 import structureStorage from '@/modules/structure/structureStorage'
 import useAPI from '@/modules/api/useAPI'
+//import structureSettings from '@/modules/structure/structureSettings'
 
 const player = ref(null)
 const currentFrame = ref(0)
@@ -10,22 +11,44 @@ export default function useTrajectories() {
 
     const { projectData/*, updateStructureProject*/ } = structureStorage()
     const { updateTrajectoryData } = useAPI()
+    //const { getTrajectorySettings } = structureSettings()
+
     const shortTimeOut = 2000
     const dataProject = computed(() => projectData.value)
+    //const trajSettings = computed(() => getTrajectorySettings())
     let prjID = projectData.value._id
 
     // TRAJECTORY
 
-    // when t.trajectory.frameCount === 0, trajectory settings are fully loaded
-    const pollTraj = (t) => {
+    // when t.trajectory.frameCount !== 0, trajectory settings are fully loaded
+    /*const pollTraj = (t) => {
         return new Promise(resolve => {
+            console.log(t.trajectory.frameCount)
             if (t.trajectory.frameCount === 0) setTimeout(resolve, 300)
         })
+    }*/
+
+    /*const pollTraj = async (t) => {
+        return new Promise(function (resolve) {
+            (function waitForTraj(){
+                if (t.trajectory.frameCount !== 0) return resolve()
+                setTimeout(waitForTraj, 300)
+            })()
+        })
+    }*/
+
+    let sleep = ms => new Promise(r => setTimeout(r, ms) )
+    let waitFor = async function waitFor(f){
+        while(!f()) await sleep(1000)
+        return f()
     }
 
     // check if trajectory settings are fully loaded
     const checkTrajectory = async (t) => {
-        await pollTraj(t)
+        //await pollTraj(t)
+
+        await waitFor(() => t.trajectory.frameCount > 0 )
+
         return t.trajectory
     }
 
@@ -43,15 +66,7 @@ export default function useTrajectories() {
 
     // update current frame
     const updateCurrentFrame = (f) => {
-        currentFrame.value = parseInt(f);
-        /*
-        // ***************************************
-        // ***************************************
-        if(f == (totalFrames - step)) traj.setFrame(0);
-        // ***************************************
-        // ***************************************
-        */
-    
+        currentFrame.value = parseInt(f)    
     }
 
     // set current frame 

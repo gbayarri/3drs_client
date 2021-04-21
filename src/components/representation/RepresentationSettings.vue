@@ -211,6 +211,7 @@ import useSelections from '@/modules/representations/useSelections'
 import useModals from '@/modules/common/useModals'
 import structureSettings from '@/modules/structure/structureSettings'
 import structureStorage from '@/modules/structure/structureStorage'
+import useProjectSettings from '@/modules/structure/useProjectSettings'
 export default {
     setup() {
 
@@ -238,11 +239,13 @@ export default {
         const { currentStructure, addNewRepresentationSettings, removeRepresentationSettings } = structureSettings()
         const { updateSelection, getStructureSelection, checkSelectionType } = useSelections()
         const { openModal } = useModals()
+        const { getProjectSettings } = useProjectSettings()
 
         let isCollapsed = ref(true)
         const currReprSettings = computed(() => getCurrentRepresentationSettings())
         const currReprVal = computed(() => currentRepresentation.value)
         const currStr = computed(() => currentStructure.value)
+        const toastSettings = computed(() => getProjectSettings().toasts) 
         //const currReprName = computed(() => currReprSettings.value.name)
 
         const re = computed(() => new RegExp('(' + currReprVal.value + '\-[0-9a-z]*\-[a-z]*)', 'g'))
@@ -343,14 +346,16 @@ export default {
                         // draw new representation
                         addRepresentation(stage, r.representation)
                         // show toast with new representation info
-                        toast.add({ 
-                            severity:'info', 
-                            summary: 'New representation', 
-                            detail:'The new representation ' 
-                                    + r.representation.name 
-                                    + ' has been successfully created. Now you have to integrate components to it from the right Settings menu.', 
-                            life: 10000
-                        });
+                        if(toastSettings.value) {
+                            toast.add({ 
+                                severity:'info', 
+                                summary: 'New representation', 
+                                detail:'The new representation ' 
+                                        + r.representation.name 
+                                        + ' has been successfully created. Now you have to integrate components to it from the right Settings menu.', 
+                                life: 10000
+                            });
+                        }
                         // open settings if closed
                         setFlagStatus('sidebarEnabled', true)
                         console.log(r.message)
@@ -549,14 +554,16 @@ export default {
                                 if(r.code != 404) console.log(r.message)
                                 else console.error(r.message)
                             })
-                        toast.add({ 
-                            severity: 'warn', 
-                            summary: 'Representation removed', 
-                            detail:'The representation ' 
-                                    + reprName 
-                                    + ' has been removed from your workspace.', 
-                            life: 5000
-                        });
+                        if(toastSettings.value) {
+                            toast.add({ 
+                                severity: 'warn', 
+                                summary: 'Representation removed', 
+                                detail:'The representation ' 
+                                        + reprName 
+                                        + ' has been removed from your workspace.', 
+                                life: 5000
+                            });
+                        }
                         // update settings status (closed if default, open otherwise)
                         if(r.newCurrentRepresentation === defaultRepresentation) setFlagStatus('sidebarEnabled', false)
                         else setFlagStatus('sidebarEnabled', true)
@@ -590,15 +597,17 @@ export default {
                 setNameRepresentation(newName, true)
                     .then((r) => {
                         if(r.code != 404) {
-                            toast.add({ 
-                                severity: 'info', 
-                                summary: 'Representation renamed', 
-                                detail:'The representation ' 
-                                        + oldName 
-                                        + ' has been renamed to '
-                                        + newName + '.', 
-                                life: 5000
-                            });
+                            if(toastSettings.value) {
+                                toast.add({ 
+                                    severity: 'info', 
+                                    summary: 'Representation renamed', 
+                                    detail:'The representation ' 
+                                            + oldName 
+                                            + ' has been renamed to '
+                                            + newName + '.', 
+                                    life: 5000
+                                });
+                            }
                             console.log(r.message)
                         } else console.error(r.message)
                     })

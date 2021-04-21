@@ -55,12 +55,19 @@ export default {
         setCurrentFrame(currTraj.value, trajSettings.value.range[0])
 
         onUpdated(() => {
-            isRunning.value = player.value.isRunning
-            /*console.log(currTraj.value, trajSettings.value.range[0])
-            setCurrentFrame(currTraj.value, trajSettings.value.range[0])*/
+            // update isRunningValue once the player has been created
+            isRunning.value = computed(() => player.value.isRunning).value
+            // if no loop and player at end, set isRunning to false
+            if(!trajSettings.value.loop && player.value.traj.currentFrame === trajSettings.value.range[1]) isRunning.value = false
         })
 
         const isRunning = ref(false)
+        /*const isRunning = reactive({
+            status: computed(() => {
+                        if(player.value === undefined || player.value === null) return false
+                        return player.value.isRunning
+                    })
+        })*/
         const settings = reactive({
             min: computed(() => trajSettings.value.range[0]),
             max: computed(() => trajSettings.value.range[1]),
@@ -79,6 +86,7 @@ export default {
         })
 
         const playTraj = () => {
+
             isRunning.value = !isRunning.value
 
             if(isRunning.value)  player.value.play()

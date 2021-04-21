@@ -20,7 +20,6 @@ export default function structureStorage() {
 
     const updateStructureProject = function (data) {
         projectData.value = data
-        //console.log(projectData.value)
     }
 
     const removeRepresentationFromStructure = (value) => {

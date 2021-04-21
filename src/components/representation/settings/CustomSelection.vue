@@ -37,6 +37,7 @@ import useModals from '@/modules/common/useModals'
 import useRepresentations from '@/modules/representations/useRepresentations'
 import structureSettings from '@/modules/structure/structureSettings'
 import useSelections from '@/modules/representations/useSelections'
+import useProjectSettings from '@/modules/structure/useProjectSettings'
 export default {
     props: ['stage'],
     setup(props) {
@@ -47,12 +48,14 @@ export default {
         const { currentRepresentation, setSelectionRepresentation, getCurrentRepresentationSettings } = useRepresentations()
         const { currentStructure, getFileNames } = structureSettings()
         const { getCurrentSelection, setCurrentCustomSelection } = useSelections()
+        const { getProjectSettings } = useProjectSettings()
 
         const isCollapsed = ref(true)
         const currReprVal = computed(() => currentRepresentation.value)
         const currStr = computed(() => currentStructure.value)
         const currReprSettings = computed(() => getCurrentRepresentationSettings())
         const filesList = computed(() => getFileNames())
+        const toastSettings = computed(() => getProjectSettings().toasts) 
 
         const re = computed(() => new RegExp('(' + currReprVal.value + '\-' + currStr.value + '\-[a-z]*)', 'g'))
         
@@ -91,16 +94,18 @@ export default {
                         if(r.code != 404) {
                             //console.log(stage)
                             const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
-                            toast.add({ 
-                                severity: 'info', 
-                                summary: 'New custom representation', 
-                                detail: 'A new custom selection has been added to the structure '
-                                        + strName
-                                        + ' of the '
-                                        + currReprSettings.value.name 
-                                        + ' representation',
-                                life: 10000
-                            })
+                            if(toastSettings.value) {
+                                toast.add({ 
+                                    severity: 'info', 
+                                    summary: 'New custom representation', 
+                                    detail: 'A new custom selection has been added to the structure '
+                                            + strName
+                                            + ' of the '
+                                            + currReprSettings.value.name 
+                                            + ' representation',
+                                    life: 10000
+                                })
+                            }
                             console.log(r.message)
                         }else console.error(r.message)
                     })
@@ -119,16 +124,18 @@ export default {
                         if(r.code != 404) {
                             //console.log(stage)
                             const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
-                            toast.add({ 
-                                severity: 'warn', 
-                                summary: 'Removed custom representation', 
-                                detail: 'The custom representation linked to the structure '
-                                        + strName
-                                        + ' of the '
-                                        + currReprSettings.value.name 
-                                        + ' representation has been removed',
-                                life: 10000
-                            })
+                            if(toastSettings.value) {
+                                toast.add({ 
+                                    severity: 'warn', 
+                                    summary: 'Removed custom representation', 
+                                    detail: 'The custom representation linked to the structure '
+                                            + strName
+                                            + ' of the '
+                                            + currReprSettings.value.name 
+                                            + ' representation has been removed',
+                                    life: 10000
+                                })
+                            }
                             console.log(r.message)
                         }else console.error(r.message)
                     })

@@ -49,6 +49,7 @@ import useRepresentations from '@/modules/representations/useRepresentations'
 import useSettings from '@/modules/settings/useSettings'
 import useSelections from '@/modules/representations/useSelections'
 import useModals from '@/modules/common/useModals'
+import useProjectSettings from '@/modules/structure/useProjectSettings'
 export default {
     props: ['stage'],
     setup(props) {
@@ -60,6 +61,7 @@ export default {
         const { setChainsSettings } = useSettings()
         const { openModal } = useModals()
         const { getSelectionChains } = useSelections()
+        const { getProjectSettings } = useProjectSettings()
 
         const currReprVal = computed(() => currentRepresentation.value)
         const currStr = computed(() => currentStructure.value)
@@ -67,6 +69,7 @@ export default {
         const currReprSettings = computed(() => getCurrentRepresentationSettings())
         const component = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0])
         const filesList = computed(() => getFileNames())
+        const toastSettings = computed(() => getProjectSettings().toasts) 
 
         const isCollapsed = ref(true)
 
@@ -106,23 +109,25 @@ export default {
             setChainsSettings(null, null, null, currReprVal.value)
                     .then((r) => {
                         if(r.code != 404) {
-                            toast.add({ 
-                                severity: msg.status, 
-                                summary: msg.tit, 
-                                detail: msg.txt1
-                                        + ' [ '
-                                        + msg.chains
-                                        + ' ] ' 
-                                        + msg.txt2 
-                                        + ' Model ' 
-                                        + (getCurrentModel(currReprVal.value) + 1)
-                                        + ' in ' 
-                                        + strName 
-                                        + ' structure of ' 
-                                        + currReprSettings.value.name 
-                                        + ' representation',
-                                life: 10000
-                            })
+                            if(toastSettings.value) {
+                                toast.add({ 
+                                    severity: msg.status, 
+                                    summary: msg.tit, 
+                                    detail: msg.txt1
+                                            + ' [ '
+                                            + msg.chains
+                                            + ' ] ' 
+                                            + msg.txt2 
+                                            + ' Model ' 
+                                            + (getCurrentModel(currReprVal.value) + 1)
+                                            + ' in ' 
+                                            + strName 
+                                            + ' structure of ' 
+                                            + currReprSettings.value.name 
+                                            + ' representation',
+                                    life: 10000
+                                })
+                            }
                             // save selection representation
                             setSelectionRepresentation(stage, selection, structures, re.value, true)
                                 .then((r) => {

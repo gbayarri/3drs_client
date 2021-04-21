@@ -531,6 +531,11 @@ export default function structureSettings() {
             .filter(item => item.id === currentStructure.value)[0].trajectory.settings
     }
 
+    const updateTrajectory = function(t) {
+        settings.value
+            .filter(item => item.id === currentStructure.value)[0].trajectory = t
+    }
+
     const updateTrajectorySettings = function(s) {
         settings.value
             .filter(item => item.id === currentStructure.value)[0].trajectory.settings = s
@@ -560,6 +565,7 @@ export default function structureSettings() {
         removeRepresentationSettings,
         checkIfTrajectory,
         getTrajectorySettings,
+        updateTrajectory,
         updateTrajectorySettings
     }
 

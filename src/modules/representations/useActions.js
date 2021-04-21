@@ -1,9 +1,10 @@
-//import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import structureSettings from '@/modules/structure/structureSettings'
 import useSelections from '@/modules/representations/useSelections'
 import useSettings from '@/modules/settings/useSettings'
 import useRepresentations from '@/modules/representations/useRepresentations'
+import useProjectSettings from '@/modules/structure/useProjectSettings'
 
 export default function UseActions() {
 
@@ -11,7 +12,10 @@ export default function UseActions() {
     const { getSelection } = useSelections()
     const { setMoleculesSettings } = useSettings()
     const { setSelectionRepresentation } = useRepresentations()
+    const { getProjectSettings } = useProjectSettings()
     
+    const toastSettings = computed(() => getProjectSettings().toasts) 
+
     const toast = useToast()
 
     const actionLeaveSingleMolecule = (stage, currStr, model, chain, resnum, resname, type) => {
@@ -111,27 +115,29 @@ export default function UseActions() {
         setMoleculesSettings(p.residue, p.currStr, p.currRepr)
             .then((r) => {
                 if(r.code != 404) {
-                    toast.add({ 
-                        severity: msg.status, 
-                        summary: msg.tit, 
-                        detail: 'The ' + txt_type + ' [ Model ' 
-                                + (p.residue.model + 1)
-                                + ' | Chain ' 
-                                + p.residue.chain 
-                                + ' | ' 
-                                + res
-                                + ' ' 
-                                + p.residue.num 
-                                + ' ] of ' 
-                                + p.strName 
-                                + ' structure has been ' 
-                                + msg.txt 
-                                + p.currReprSettings.name 
-                                + ' representation',
-                        life: 10000
-                    })
+                    if(toastSettings.value) {
+                        toast.add({ 
+                            severity: msg.status, 
+                            summary: msg.tit, 
+                            detail: 'The ' + txt_type + ' [ Model ' 
+                                    + (p.residue.model + 1)
+                                    + ' | Chain ' 
+                                    + p.residue.chain 
+                                    + ' | ' 
+                                    + res
+                                    + ' ' 
+                                    + p.residue.num 
+                                    + ' ] of ' 
+                                    + p.strName 
+                                    + ' structure has been ' 
+                                    + msg.txt 
+                                    + p.currReprSettings.name 
+                                    + ' representation',
+                            life: 10000
+                        })
+                    }
                     // check if selection is empty
-                    if(selection === 'not(*)') {
+                    if(selection === 'not(*)' && toastSettings.value) {
                         toast.add({ severity: 'warn', summary: 'Empty structure', detail: 'Warning! The ' + p.strName + ' structure of the ' + p.currReprSettings.name + ' representation is currently empty.', life: 10000 })
                     }
                     // save selection representation
@@ -171,25 +177,27 @@ export default function UseActions() {
         setMoleculesSettings(p.residue, p.currStr, p.currRepr)
             .then((r) => {
                 if(r.code != 404) {
-                    toast.add({ 
-                        severity: msg.status, 
-                        summary: msg.tit, 
-                        detail: 'The ' + txt_type + ' [ Model '  
-                                + (p.residue.model + 1)
-                                + ' | Chain ' 
-                                + p.residue.chain 
-                                + ' | ' 
-                                + msg.range 
-                                + ' ] of ' 
-                                + p.strName 
-                                + ' structure has been ' 
-                                + msg.txt 
-                                + p.currReprSettings.name 
-                                + ' representation',
-                        life: 10000
-                    })
+                    if(toastSettings.value) {
+                        toast.add({ 
+                            severity: msg.status, 
+                            summary: msg.tit, 
+                            detail: 'The ' + txt_type + ' [ Model '  
+                                    + (p.residue.model + 1)
+                                    + ' | Chain ' 
+                                    + p.residue.chain 
+                                    + ' | ' 
+                                    + msg.range 
+                                    + ' ] of ' 
+                                    + p.strName 
+                                    + ' structure has been ' 
+                                    + msg.txt 
+                                    + p.currReprSettings.name 
+                                    + ' representation',
+                            life: 10000
+                        })
+                    }
                     // check if selection is empty
-                    if(selection === 'not(*)') {
+                    if(selection === 'not(*)' && toastSettings.value) {
                         toast.add({ severity: 'warn', summary: 'Empty structure', detail: 'Warning! The ' + p.strName + ' structure of the ' + p.currReprSettings.name + ' representation is currently empty.', life: 10000 })
                     }
                     // save selection representation
@@ -223,21 +231,23 @@ export default function UseActions() {
             .then((r) => {
                 if(r.code != 404) {
                     //prevSelection = getCurrentMolecules(p.currRepr, 'heteroatoms')
-                    toast.add({ 
-                        severity: msg.status, 
-                        summary: msg.tit, 
-                        detail: 'All the ' + p.type + ' of Model ' 
-                                + (getCurrentModel(p.currRepr) + 1)
-                                + ' in ' 
-                                + p.strName 
-                                + ' structure have been ' 
-                                + msg.txt 
-                                + p.currReprSettings.name 
-                                + ' representation',
-                        life: 10000
-                    })
+                    if(toastSettings.value) {
+                        toast.add({ 
+                            severity: msg.status, 
+                            summary: msg.tit, 
+                            detail: 'All the ' + p.type + ' of Model ' 
+                                    + (getCurrentModel(p.currRepr) + 1)
+                                    + ' in ' 
+                                    + p.strName 
+                                    + ' structure have been ' 
+                                    + msg.txt 
+                                    + p.currReprSettings.name 
+                                    + ' representation',
+                            life: 10000
+                        })
+                    }
                     // check if selection is empty
-                    if(selection === 'not(*)') {
+                    if(selection === 'not(*)' && toastSettings.value) {
                         toast.add({ severity: 'warn', summary: 'Empty structure', detail: 'Warning! The ' + p.strName + ' structure of the ' + p.currReprSettings.name + ' representation is currently empty.', life: 10000 })
                     }
                     // save selection representation

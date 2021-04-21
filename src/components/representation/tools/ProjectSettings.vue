@@ -3,13 +3,16 @@
 </template>
 
 <script>
+import useModals from '@/modules/common/useModals'
 export default {
   setup() {
+
+    const { openModal } = useModals()
+
     const ttp = "Open project settings"
 
     const handleClick = () => {
-      // TODO
-      console.log('open modal with project settings: project name, author, disable toasts & allow "forkability"')
+      openModal('settings')
     }
 
     return { ttp, handleClick }

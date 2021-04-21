@@ -4,6 +4,7 @@ const dialog = reactive({
   trajectory: false,
   structure: false,
   share: false,
+  settings: false,
   tips: false,
   block: false,
   hierarchy: false,
@@ -31,6 +32,11 @@ const blockProperties = [
     status: 'update',
     header: 'Updating data',
     message: 'The project data is being loaded, please don\'t close the tab.'
+  },
+  {
+    status: 'traj',
+    header: 'Loading trajectory',
+    message: 'The new trajectory is being loaded to the server, please don\'t close the tab.'
   }
 ]
 

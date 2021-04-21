@@ -48,10 +48,10 @@
 
 <script>
 import { ref, reactive, computed, watch, toRefs, onUpdated } from 'vue'
-import { useToast } from 'primevue/usetoast'
+//import { useToast } from 'primevue/usetoast'
 import structureSettings from '@/modules/structure/structureSettings'
 import useRepresentations from '@/modules/representations/useRepresentations'
-import useSelections from '@/modules/representations/useSelections'
+//import useSelections from '@/modules/representations/useSelections'
 import useSettings from '@/modules/settings/useSettings'
 import useLegend from '@/modules/viewport/useLegend'
 import useFlags from '@/modules/common/useFlags'
@@ -70,14 +70,14 @@ export default {
             getCurrentChains, 
             getChainContent, 
             getFileNames, 
-            getCurrentModel, 
+            //getCurrentModel, 
             getCurrentMolecules, 
-            updateMolecule,
-            updateAllMolecules 
+            /*updateMolecule,
+            updateAllMolecules */
         } = structureSettings()
         const { currentRepresentation, getCurrentRepresentationSettings, setSelectionRepresentation } = useRepresentations()
-        const { setMoleculesSettings, setPositionSettings } = useSettings()
-        const { getSelection } = useSelections()
+        const { /*setMoleculesSettings,*/ setPositionSettings } = useSettings()
+        //const { getSelection } = useSelections()
         const { openModal } = useModals()
         const { actionLeaveSingleHetero, actionSelectSingleMolecule, actionSelectAllHeteros } = useActions()
 
@@ -93,7 +93,7 @@ export default {
 
         const re = computed(() => new RegExp('(' + currReprVal.value + '\-' + currStr.value + '\-[a-z]*)', 'g'))
 
-        const toast = useToast()
+        //const toast = useToast()
 
         // trick for catch which is the last selected / unselected
         let prevSelection = null

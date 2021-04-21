@@ -52,6 +52,7 @@ import useRepresentations from '@/modules/representations/useRepresentations'
 import useSettings from '@/modules/settings/useSettings'
 import useSelections from '@/modules/representations/useSelections'
 import useModals from '@/modules/common/useModals'
+import useProjectSettings from '@/modules/structure/useProjectSettings'
 import Water from '@/components/representation/settings/addons/Water'
 export default {
     props: ['stage'],
@@ -75,6 +76,7 @@ export default {
         const { setMoleculesSettings } = useSettings()
         const { getSelection } = useSelections()
         const { openModal } = useModals()
+        const { getProjectSettings } = useProjectSettings()
 
         const filesList = computed(() => getFileNames())
         const isCollapsed = ref(true)
@@ -83,6 +85,7 @@ export default {
         const currReprVal = computed(() => currentRepresentation.value)
         const currStr = computed(() => currentStructure.value)
         const externalWindow = computed(() => (flags.zoomWindowEnabled && windowType.value === 'waters'))
+        const toastSettings = computed(() => getProjectSettings().toasts) 
 
         const re = computed(() => new RegExp('(' + currReprVal.value + '\-' + currStr.value + '\-[a-z]*)', 'g'))
 
@@ -151,21 +154,23 @@ export default {
             setMoleculesSettings(null, null, currReprVal.value)
                 .then((r) => {
                     if(r.code != 404) {
-                        toast.add({ 
-                            severity: msg.status, 
-                            summary: msg.tit, 
-                            detail: 'All the waters of Model ' 
-                                    + (getCurrentModel(currReprVal.value) + 1)
-                                    + ' in ' 
-                                    + strName 
-                                    + ' structure have been ' 
-                                    + msg.txt 
-                                    + currReprSettings.value.name 
-                                    + ' representation',
-                            life: 10000
-                        })
+                        if(toastSettings.value) {
+                            toast.add({ 
+                                severity: msg.status, 
+                                summary: msg.tit, 
+                                detail: 'All the waters of Model ' 
+                                        + (getCurrentModel(currReprVal.value) + 1)
+                                        + ' in ' 
+                                        + strName 
+                                        + ' structure have been ' 
+                                        + msg.txt 
+                                        + currReprSettings.value.name 
+                                        + ' representation',
+                                life: 10000
+                            })
+                        }
                         // check if selection is empty
-                        if(selection === 'not(*)') {
+                        if(selection === 'not(*)' && toastSettings.value) {
                             toast.add({ severity: 'warn', summary: 'Empty structure', detail: 'Warning! The ' + strName + ' structure of the ' + currReprSettings.value.name + ' representation is currently empty.', life: 10000 })
                         }
                         // save selection representation

@@ -1,5 +1,6 @@
 <template>
     <Dialog v-model:visible="dialog.trajectory" 
+            @hide="hideDialog"
             :closable="true"
             :closeOnEscape="true" 
             :dismissableMask="true" 
@@ -19,7 +20,7 @@
         :customUpload="true"
         :multiple="false" 
         :fileLimit="1"
-        :maxFileSize="52428800"
+        :maxFileSize="524288000"
         :disabled="disableFileUpload"
         chooseLabel="Select">
             <template #empty>
@@ -38,6 +39,7 @@ import { ref, inject, computed } from 'vue'
 import useModals from '@/modules/common/useModals'
 import useMessages from '@/modules/common/useMessages'
 import structureSettings from '@/modules/structure/structureSettings'
+import useComponents from '@/modules/ngl/useComponents'
 export default {
     props: ['project_id'],
     components: {  },
@@ -46,17 +48,22 @@ export default {
         /* MODAL */
         const header = "Upload Trajectory"
         //const modals = inject('modals')
-        const { dialog, closeModal } = useModals()
+        const { dialog, openModal, closeModal, setBlockUI } = useModals()
         const { currentStructure } = structureSettings()
         const { messages, setMessage, resetMessage } = useMessages()
+        const { addNewTrajectory } = useComponents()
 
         const project_id = props.project_id
         const currStr = computed(() => currentStructure.value)
         const message = computed(() => messages.launch)
 
         const closeThisModal = () => {
-            resetMessage('launch')
             closeModal('trajectory')
+        }
+
+        const hideDialog = () => {
+            resetMessage('launch')
+            disableFileUpload.value = false
         }
 
         /* FILE UPLOAD */
@@ -66,18 +73,33 @@ export default {
         
         const selector = (e) => {
             setTimeout(function(){
-                let ext = 'dcd'
+                let ext = ''
                 if(e.originalEvent.path[3].innerText.indexOf('.xtc') != -1) ext = 'xtc'
+                if(e.originalEvent.path[3].innerText.indexOf('.dcd') != -1) ext = 'dcd'
 
-                const rows = document.getElementsByClassName("p-fileupload-row")
-                for(var item of rows){
-                    //item.getElementsByTagName("div")[0].innerHTML = '<span class="fu-ext-traj">' + ext + '</span><br><span class="fu-traj">trajectory</span>'
-                    //item.getElementsByTagName("div")[0].style.lineHeight = '15px'
-                    item.querySelector("div").innerHTML = '<span class="fu-ext-traj">' + ext + '</span><br><span class="fu-traj">trajectory</span>'
-                    item.querySelector("div").style.lineHeight = '15px'
+                if(ext != '') {
+                    const rows = document.getElementsByClassName("p-fileupload-row")
+                    for(var item of rows){
+                        //item.getElementsByTagName("div")[0].innerHTML = '<span class="fu-ext-traj">' + ext + '</span><br><span class="fu-traj">trajectory</span>'
+                        //item.getElementsByTagName("div")[0].style.lineHeight = '15px'
+                        //let ext = ''
+                        if(item.getElementsByTagName("div")[1].innerText.indexOf('.xtc') != -1) ext = 'xtc'
+                        if(item.getElementsByTagName("div")[1].innerText.indexOf('.dcd') != -1) ext = 'dcd'
+                        item.querySelector("div").innerHTML = '<span class="fu-ext-traj">' + ext + '</span><br><span class="fu-traj">trajectory</span>'
+                        item.querySelector("div").style.lineHeight = '15px'
+                    }
+                } else {
+                    const msg = {
+                            severity: 'warn',
+                            content: 'Error: only trajectory formats allowed. Please close this modal window and try again.',
+                            show: true
+                        }
+                    setMessage('launch', msg)
+                    disableFileUpload.value = true
                 }
             }, 20);
         }
+
 
         const uploader = (e) => {
             disableFileUpload.value = true
@@ -119,15 +141,19 @@ export default {
                         //  DO SOMETHING WITH STORAGE DATA AND UPDATE WITH NEW TRAJECTORY!!!!!!
                         // CLOSE MODAL
                         // CREATE useCOmponentS > addTrajectory WITH THE 77-106 CODE!!!
-                        console.log('????')
                         closeModal('trajectory')
+                        setBlockUI('traj')
+                        openModal('block')
+                        addNewTrajectory(resp.data)
+                        //closeModal('trajectory')
+                        
                         disableFileUpload.value = false
                     }
                 })
         }
 
         return { header, dialog, closeThisModal, message,
-                 descr, selector, uploader, disableFileUpload }
+                 descr, selector, uploader, disableFileUpload, hideDialog }
     }
 }
 </script>

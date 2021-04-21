@@ -92,7 +92,7 @@ export default {
 </script>
 
 <style>
-    #file-buttons { margin-left: 2.5%; width: 95%; margin-bottom:0px; }
+    #file-buttons { margin-left: 2.5%; width: 95%; margin-bottom:0px; position:relative; }
     /*#file-buttons button { height: 1.8rem; width: 1.8rem; font-size: 13px; color:#fff; }*/
 
     #file-buttons button {

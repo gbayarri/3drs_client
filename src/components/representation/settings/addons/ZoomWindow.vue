@@ -59,6 +59,7 @@ import useRepresentations from '@/modules/representations/useRepresentations'
 import structureSettings from '@/modules/structure/structureSettings'
 import useSettings from '@/modules/settings/useSettings'
 import useSelections from '@/modules/representations/useSelections'
+import useProjectSettings from '@/modules/structure/useProjectSettings'
 import Residue from '@/components/representation/settings/addons/Residue'
 import Water from '@/components/representation/settings/addons/Water'
 export default {
@@ -77,9 +78,10 @@ export default {
             getFileNames 
         } = structureSettings()
         const { currentRepresentation, getCurrentRepresentationSettings, setSelectionRepresentation } = useRepresentations()
-        const { windowType, allSelected, setWindowType, toggleAllSelected  } = useZoomWindow()
+        const { windowType, allSelected, setWindowType/*, toggleAllSelected*/  } = useZoomWindow()
         const { setMoleculesSettings } = useSettings()
         const { getSelection } = useSelections()
+        const { getProjectSettings } = useProjectSettings()
         
         const filesList = computed(() => getFileNames())
         const currReprVal = computed(() => currentRepresentation.value)
@@ -88,6 +90,7 @@ export default {
         const stage = getStage()
         const sidebarEnabled = computed(() => flags.sidebarEnabled)
         const isActive = computed(() => flags.zoomWindowEnabled)
+        const toastSettings = computed(() => getProjectSettings().toasts) 
 
         const re = computed(() => new RegExp('(' + currReprVal.value + '\-' + currStr.value + '\-[a-z]*)', 'g'))
 
@@ -161,21 +164,23 @@ export default {
             setMoleculesSettings(null, null, currReprVal.value)
                 .then((r) => {
                     if(r.code != 404) {
-                        toast.add({ 
-                            severity: msg.status, 
-                            summary: msg.tit, 
-                            detail: 'All the ' + windowType.value + ' of Model ' 
-                                    + (getCurrentModel(currReprVal.value) + 1)
-                                    + ' in ' 
-                                    + strName 
-                                    + ' structure have been ' 
-                                    + msg.txt 
-                                    + currReprSettings.value.name 
-                                    + ' representation',
-                            life: 10000
-                        })
+                        if(toastSettings.value) {
+                            toast.add({ 
+                                severity: msg.status, 
+                                summary: msg.tit, 
+                                detail: 'All the ' + windowType.value + ' of Model ' 
+                                        + (getCurrentModel(currReprVal.value) + 1)
+                                        + ' in ' 
+                                        + strName 
+                                        + ' structure have been ' 
+                                        + msg.txt 
+                                        + currReprSettings.value.name 
+                                        + ' representation',
+                                life: 10000
+                            })
+                        }
                         // check if selection is empty
-                        if(selection === 'not(*)') {
+                        if(selection === 'not(*)' && toastSettings.value) {
                             toast.add({ severity: 'warn', summary: 'Empty structure', detail: 'Warning! The ' + strName + ' structure of the ' + currReprSettings.value.name + ' representation is currently empty.', life: 10000 })
                         }
                         // save selection representation

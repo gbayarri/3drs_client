@@ -30,6 +30,7 @@ import useSettings from '@/modules/settings/useSettings'
 import useSelections from '@/modules/representations/useSelections'
 import useRepresentations from '@/modules/representations/useRepresentations'
 import useActions from '@/modules/representations/useActions'
+import useProjectSettings from '@/modules/structure/useProjectSettings'
 export default {
     props: ['water', 'window', 'index', 'item', 'stage'],
     setup(props) {
@@ -38,12 +39,13 @@ export default {
 
         const { updateLegend } = useLegend()
         const { setFlagStatus } = useFlags()
-        const { currentStructure, getFileNames, checkIfMoleculeExists, updateMolecule, updateSetOfMolecules, getSetOfMolecules } = structureSettings()
+        const { currentStructure, getFileNames, checkIfMoleculeExists, /*updateMolecule, updateSetOfMolecules,*/ getSetOfMolecules } = structureSettings()
         //const { projectData } = structureStorage()
-        const { addMultipleResidues, getSelection } = useSelections()
-        const { currentRepresentation, getCurrentRepresentationSettings, setSelectionRepresentation } = useRepresentations()
-        const { setMoleculesSettings, setPositionSettings } = useSettings()
+        const { addMultipleResidues/*, getSelection*/ } = useSelections()
+        const { currentRepresentation, getCurrentRepresentationSettings/*, setSelectionRepresentation*/ } = useRepresentations()
+        const { /*setMoleculesSettings,*/ setPositionSettings } = useSettings()
         const { actionLeaveSingleMolecule, actionSelectSingleMolecule, actionSelectSetOfMolecules } = useActions()
+        const { getProjectSettings } = useProjectSettings()
 
         const filesList = computed(() => getFileNames())
         //const dataProject = computed(() => projectData.value)
@@ -51,6 +53,7 @@ export default {
         const component = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0])
         const currReprVal = computed(() => currentRepresentation.value)
         const currReprSettings = computed(() => getCurrentRepresentationSettings())
+        const toastSettings = computed(() => getProjectSettings().toasts) 
 
         const water =  computed(() => props.water)
         const window =  computed(() => props.window)
@@ -197,12 +200,14 @@ export default {
             // on second click
             if(!mr.status) {
                 if(mr.error) {
-                    toast.add({ 
-                        severity: 'error', 
-                        summary: 'Error selecting set of waters', 
-                        detail: 'Unable to select set of waters from different models / chains',
-                        life: 5000
-                    })
+                    if(toastSettings.value) {
+                        toast.add({ 
+                            severity: 'error', 
+                            summary: 'Error selecting set of waters', 
+                            detail: 'Unable to select set of waters from different models / chains',
+                            life: 5000
+                        })
+                    }
                 } else  {
                     let first, last
                     // sort first last properly

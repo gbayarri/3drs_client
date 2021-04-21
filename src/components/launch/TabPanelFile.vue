@@ -30,12 +30,34 @@ export default {
 
         let disableFileUpload = ref(false)
 
-        const selector = () => {
+        const selector = (e) => {
+            
+            //console.log(e.originalEvent)
+            //console.log(e.files.length)
             setTimeout(function(){
-                const rows = document.getElementsByClassName("p-fileupload-row")
-                for(var item of rows){
-                    //item.getElementsByTagName("div")[0].innerHTML = '<img role="presentation" src="' + require(`@/assets/img/pdb.png`) + '" width="100">'
-                    item.querySelector("div").innerHTML = '<img role="presentation" src="' + require(`@/assets/img/pdb.png`) + '" width="100">'
+                //let ext = ''
+
+                if(e.originalEvent.path[3].innerText.indexOf('.gro') !== -1 || e.originalEvent.path[3].innerText.indexOf('.pdb') !== -1)  {
+                    
+                    //console.log(e.files.length)
+                    //console.log(img)
+                    const rows = document.getElementsByClassName("p-fileupload-row")
+                    for(var item of rows){
+                        //console.log(item.getElementsByTagName("div")[1].innerText)
+                        let img = ''
+                        if(item.getElementsByTagName("div")[1].innerText.indexOf('.gro') != -1) img = 'gro'
+                        if(item.getElementsByTagName("div")[1].innerText.indexOf('.pdb') != -1) img = 'pdb'
+                        //item.getElementsByTagName("div")[0].innerHTML = '<img role="presentation" src="' + require(`@/assets/img/pdb.png`) + '" width="100">'
+                        item.querySelector("div").innerHTML = '<img role="presentation" src="' + require(`@/assets/img/` + img + `.png`) + '" width="100">'
+                    }
+                }else {
+                    const msg = {
+                            severity: 'warn',
+                            content: 'Error: only pdb or gro formats allowed. Please try again.',
+                            show: true
+                        }
+                    setMessage('launch', msg)
+                    disableFileUpload.value = true
                 }
             }, 20);
         }

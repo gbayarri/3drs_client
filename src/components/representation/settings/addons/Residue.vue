@@ -50,6 +50,7 @@ import useSettings from '@/modules/settings/useSettings'
 import useSelections from '@/modules/representations/useSelections'
 import useRepresentations from '@/modules/representations/useRepresentations'
 import useActions from '@/modules/representations/useActions'
+import useProjectSettings from '@/modules/structure/useProjectSettings'
 //import useZoomWindow from '@/modules/representations/useZoomWindow'
 export default {
     props: ['residue', 'sheets', 'helixes', 'window', 'index', 'stage'],
@@ -63,12 +64,13 @@ export default {
 
         const { updateLegend } = useLegend()
         const { setFlagStatus } = useFlags()
-        const { currentStructure, getFileNames, checkIfMoleculeExists, updateMolecule, updateSetOfMolecules, getSetOfMolecules } = structureSettings()
+        const { currentStructure, getFileNames, checkIfMoleculeExists, /*updateMolecule, updateSetOfMolecules,*/ getSetOfMolecules } = structureSettings()
         //const { projectData } = structureStorage()
-        const { addMultipleResidues, getSelection } = useSelections()
-        const { currentRepresentation, getCurrentRepresentationSettings, setSelectionRepresentation } = useRepresentations()
-        const { setMoleculesSettings, setPositionSettings } = useSettings()
+        const { addMultipleResidues/*, getSelection*/ } = useSelections()
+        const { currentRepresentation, getCurrentRepresentationSettings/*, setSelectionRepresentation*/ } = useRepresentations()
+        const { /*setMoleculesSettings,*/ setPositionSettings } = useSettings()
         const { actionLeaveSingleMolecule, actionSheetLeave, actionHelixLeave, actionSelectSingleMolecule, actionSelectSetOfMolecules } = useActions()
+        const { getProjectSettings } = useProjectSettings()
         
         const filesList = computed(() => getFileNames())
         //const dataProject = computed(() => projectData.value)
@@ -76,6 +78,7 @@ export default {
         const component = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0])
         const currReprVal = computed(() => currentRepresentation.value)
         const currReprSettings = computed(() => getCurrentRepresentationSettings())
+        const toastSettings = computed(() => getProjectSettings().toasts) 
 
         const residue =  computed(() => props.residue)
         //const sheets =  computed(() => props.sheets)
@@ -224,12 +227,14 @@ export default {
             if(!mr.status) {
                 // check if error
                 if(mr.error) {
-                    toast.add({ 
-                        severity: 'error', 
-                        summary: 'Error selecting set of residues', 
-                        detail: 'Unable to select set of residues from different models / chains',
-                        life: 5000
-                    })
+                    if(toastSettings.value) {
+                        toast.add({ 
+                            severity: 'error', 
+                            summary: 'Error selecting set of residues', 
+                            detail: 'Unable to select set of residues from different models / chains',
+                            life: 5000
+                        })
+                    }
                 } else  {
 
                     let first, last

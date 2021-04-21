@@ -6,6 +6,7 @@ import useRepresentations from '@/modules/representations/useRepresentations'
 import drawRepresentation from '@/modules/ngl/drawRepresentation'
 import useTrajectories from '@/modules/ngl/useTrajectories'
 import useStage from '@/modules/ngl/useStage'
+import useModals from '@/modules/common/useModals'
 //import useAPI from '@/modules/api/useAPI'
 // Stage interactions
 export default function useComponents() {
@@ -16,10 +17,11 @@ export default function useComponents() {
         setVisibilityRepresentation,
         setOpacityRepresentation
     } = useRepresentations()
-    const { currentStructure, updateTrajectorySettings } = structureSettings()
+    const { currentStructure, updateTrajectorySettings, updateTrajectory } = structureSettings()
     const { addRepresentationToComponent } = drawRepresentation()
-    const { createTrajectoryPlayer } = useStage()
+    const { createTrajectoryPlayer, getStage } = useStage()
     const { checkTrajectory, setTrajectoryPlayer, updateCurrentFrame, setTrajectorySettings } = useTrajectories()
+    const { closeModal } = useModals()
     //const { updateTrajectoryData } = useAPI()
 
     const dataProject = computed(() => projectData.value)
@@ -67,8 +69,6 @@ export default function useComponents() {
                 component.addRepresentation( "ball+stick", { name: def_repr.value + "-" + id + "-water", sele: "/0 and (water and not sol)",  radius: .3 } )
                 component.addRepresentation( "ball+stick", { name: def_repr.value + "-" + id + "-ion", sele: "/0 and ion",  radius: .3 } )
 
-                // *************************************************
-                // *************************************************
                 if(traj !== null) {
                     console.log('loading', traj.path, 'size', traj.size)
                     const t = component.addTrajectory( '3dRS/trajectories/' + traj.path, {centerPdb: true, removePbc: true, superpose: true, initialFrame: 0} )
@@ -79,33 +79,36 @@ export default function useComponents() {
                         .then((trajectory) => {
                             //console.log(trajectory.frameCount)
                             const settings = traj.settings
+
+                            // close BlockUI
+                            //closeModal('block')
+
+                            if(trajectory.frameCount === 0) console.error('Ooops! Trajectory not loaded yet!')
                             // if no settings.end (first time): default settings
-                            // *************************************************
-                            // THIS SHOULDN'T BE HERE (addtrajectory FUNCTION OR SIMILAR)
-                            if(traj.settings.end === null) {
+                            // LEAVING THAT HERE JUST IN CASE SOMETHING WENT WRONG IN THE INITIAL LOADING
+                            if(traj.settings.end === null || traj.settings.end === -1) {
                                 settings.end =  trajectory.frameCount - 1
                                 settings.range[1] =  trajectory.frameCount - 1
                                 updateTrajectorySettings(settings)
                                 setTrajectorySettings({ structure: currStr.value, settings: settings })
                                     .then((r) => {
-                                        //console.log(stage)
                                         if(r.code != 404) console.log(r.message)
                                         else console.error(r.message)
                                     })
                             }
-                            // *************************************************
                             const player = createTrajectoryPlayer(trajectory, settings)
                             setTrajectoryPlayer(player)
                             //console.log(player)
                             trajectory.signals.frameChanged.add((a) => {
-                                updateCurrentFrame(a);
-                            });
-                            if(traj.settings.autoplay) player.play()
+                                updateCurrentFrame(a)
+                            })
+                            /*trajectory.signals.parametersChanged.add((a) => {
+                                console.log(a)
+                            })*/
+                            if(settings.autoplay) player.play()
                         })
 
                 }
-                // *************************************************
-                // *************************************************
 
                 // set initial values for default representation
                 const re = new RegExp('(' + def_repr.value + '\-' + id + '\-[a-z]*)', 'g')
@@ -153,6 +156,46 @@ export default function useComponents() {
 
     }
 
+    const addNewTrajectory = (traj) => {
+        const stg = getStage()
+        const component = computed(() => stg.compList.filter(item => item.parameters.name === currStr.value)[0])
+        //console.log(stg)
+        //console.log(component)
+        
+        console.log('loading', traj.path, 'size', traj.size)
+        const t = component.value.addTrajectory( '3dRS/trajectories/' + traj.path, {centerPdb: true, removePbc: true, superpose: true, initialFrame: 0} )
+        //console.log(t)
+
+        // wait until trajectory parameters are completely loaded
+        checkTrajectory(t)
+            .then((trajectory) => {
+                //console.log(trajectory.frameCount)
+                const settings = traj.settings
+                if(trajectory.frameCount === 0) console.error('Ooops! Trajectory not loaded yet!')
+                // if no settings.end (first time): default settings
+                if(traj.settings.end === null) {
+                    settings.end =  trajectory.frameCount - 1
+                    settings.range[1] =  trajectory.frameCount - 1
+                    updateTrajectory(traj)
+                    setTrajectorySettings({ structure: currStr.value, settings: settings })
+                        .then((r) => {
+                            //console.log(stage)
+                            if(r.code != 404) console.log(r.message)
+                            else console.error(r.message)
+                        })
+                    // close BlockUI
+                    closeModal('block')
+                }
+                const player = createTrajectoryPlayer(trajectory, settings)
+                setTrajectoryPlayer(player)
+                //console.log(player)
+                trajectory.signals.frameChanged.add((a) => {
+                    updateCurrentFrame(a)
+                })
+            })
+
+    }
+
     const delRepresentation = (stage, representation_id) => {
 
         //stage.eachComponent()
@@ -179,6 +222,6 @@ export default function useComponents() {
 
     }
 
-  return { loadFileToStage, addRepresentation, delRepresentation }
+  return { loadFileToStage, addRepresentation, addNewTrajectory, delRepresentation }
 
 }

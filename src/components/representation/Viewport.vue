@@ -8,6 +8,7 @@
 
 <script>
 import { inject, computed, onMounted } from 'vue'
+import { useToast } from 'primevue/usetoast'
 import useFlags from '@/modules/common/useFlags'
 import useStage from '@/modules/ngl/useStage'
 import useModals from '@/modules/common/useModals'
@@ -18,6 +19,7 @@ import structureStorage from '@/modules/structure/structureStorage'
 import structureSettings from '@/modules/structure/structureSettings'
 import useRepresentations from '@/modules/representations/useRepresentations'
 import useSelections from '@/modules/representations/useSelections'
+import useProjectSettings from '@/modules/structure/useProjectSettings'
 import mouseObserver from '@/modules/ngl/mouseObserver'
 export default {
   props: ['project_id'],
@@ -35,8 +37,11 @@ export default {
     const { /*settings,*/ setCurrentStructure } = structureSettings()
     const { /*defaultRepresentation,*/ currentRepresentation, setCurrentRepresentation/*, getCurrentRepresentationSettings*/ } = useRepresentations()
     const { setSelection, checkSelectionType } = useSelections()
+    const { setProjectSettings, getProjectSettings } = useProjectSettings()
     const project_id = props.project_id
     const currReprVal = computed(() => currentRepresentation.value)
+    const prjSettings = computed(() => getProjectSettings())
+    const toast = useToast()
     //const currReprSettings = computed(() => getCurrentRepresentationSettings())
 
     const createViewport = () => {
@@ -59,7 +64,7 @@ export default {
       const structures = dataProject.value.files
       const array_promises = []
       for(const str of structures) {
-        //console.log(str)
+        //console.log(str.trajectory)
         array_promises
           .push(
             //loadFileToStage(stage, "https://files.rcsb.org/download/" + str.name + ".pdb", str.name, str.id)
@@ -149,8 +154,16 @@ export default {
             setFlagStatus('sidebarEnabled', false)
           }
 
-          console.log(stage)
+          // only show this toast if project status is 'w' (still not shared)
+          if(prjSettings.value.status === 'w')
+             toast.add({ 
+                  severity:'warn', 
+                  summary: 'Expiration date', 
+                  detail:'Remember that this project will expire on ' + new Date(prjSettings.value.expiration.date).toLocaleDateString("en-GB") + ' unlike you share it.', 
+                  life: 10000
+              });
           
+          console.log(stage)
 
           //stage.getRepresentationsByName('ligand_1').setVisibility(false)
 
@@ -212,7 +225,13 @@ export default {
           document.querySelector("#viewport").style.background = apiData.value.background
 
           // save apiData to structureStorage.projectData
+          // *************************************
+          // DOES NOT WORK???
           updateStructureProject(apiData.value)
+          // *************************************
+          // *************************************
+
+          setProjectSettings(apiData.value.projectSettings)
 
           // set selections global var
           setSelection(apiData.value.representations, apiData.value.defaultRepresentation)
