@@ -33,7 +33,7 @@ export default {
     const { dialog, openModal, closeModal, setBlockUI } = useModals()
     const { apiData, fetchProject, updateProjectData } = useAPI()
     const { loadFileToStage } = useComponents()
-    const { setInitOrientation, checkMouseSignals, zoomToResidue, selectResidue } = mouseObserver()
+    const { setInitOrientation, checkMouseSignals, checkMouseSignalsShared, zoomToResidue, selectResidue } = mouseObserver()
     const { /*processedStructure,*/ projectData, updateStructureProject, resetStructure, getFirstProjectData } = structureStorage()
     const { /*settings,*/ setCurrentStructure } = structureSettings()
     const { /*defaultRepresentation,*/ currentRepresentation, setCurrentRepresentation/*, getCurrentRepresentationSettings*/ } = useRepresentations()
@@ -45,6 +45,7 @@ export default {
     const currReprVal = computed(() => currentRepresentation.value)
     const prjSettings = computed(() => getProjectSettings())
     const toast = useToast()
+    const isShared = computed(() => flags.isShared)
     //const currReprSettings = computed(() => getCurrentRepresentationSettings())
 
     const createViewport = () => {
@@ -110,7 +111,8 @@ export default {
           }
 
           // init mouse observer
-          checkMouseSignals(stage)
+          if(!isShared.value) checkMouseSignals(stage)
+          else checkMouseSignalsShared(stage)
 
           // set current representation          
           setCurrentRepresentation(dataProject.value.currentRepresentation, false)
@@ -142,7 +144,7 @@ export default {
           })
 
           // open settings automatically if current representation is not default
-          if(currReprVal.value !== dataProject.value.defaultRepresentation) {
+          if(currReprVal.value !== dataProject.value.defaultRepresentation && !isShared.value) {
             setFlagStatus('sidebarEnabled', true)
             // according to dataProject.value.currentStructure, set flags.customEnabled
             const sel_type = checkSelectionType(dataProject.value.currentRepresentation, dataProject.value.currentStructure)

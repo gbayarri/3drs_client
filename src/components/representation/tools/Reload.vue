@@ -7,6 +7,7 @@ import { computed } from 'vue'
 import mouseObserver from '@/modules/ngl/mouseObserver'
 import structureStorage from '@/modules/structure/structureStorage'
 import useAPI from '@/modules/api/useAPI'
+import useFlags from '@/modules/common/useFlags'
 export default {
   props: ['stage'],
   setup(props) {
@@ -14,9 +15,11 @@ export default {
     const { initialOrientation } = mouseObserver()
     const { projectData } = structureStorage()
     const { updateProjectData } = useAPI()
+    const { flags } = useFlags()
 
     const initOr = computed(() => initialOrientation)
     const dataProject = computed(() => projectData.value)
+    const isShared = computed(() => flags.isShared)
 
     const ttp = "Reload representation"
 
@@ -34,7 +37,7 @@ export default {
       //console.log(initOr.value.value.elements)
       //stage.animationControls.orient(initOr.elements, 500);
       stage.animationControls.orient(initOr.value.value.elements, 500);
-      setTimeout(() => autoSaveOrientation(stage.viewerControls.getOrientation().elements), 1000)
+      if(!isShared.value) setTimeout(() => autoSaveOrientation(stage.viewerControls.getOrientation().elements), 1000)
     }
 
     return { ttp, handleClick }

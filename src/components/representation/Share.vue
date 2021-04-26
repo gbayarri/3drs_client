@@ -46,6 +46,7 @@ export default {
     -webkit-transition-timing-function: ease;
     -o-transition-timing-function: ease;
     transition-timing-function: ease;
+    user-select: none;
 }
 #share-box.open-settings { 
     right: 26%;

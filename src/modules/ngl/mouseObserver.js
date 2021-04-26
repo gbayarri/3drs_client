@@ -171,6 +171,49 @@ export default function mouseObserver() {
 
     }
 
+    const checkMouseSignalsShared = (stage) => {
+
+        // on hover actions: show atoms / bonds in legend
+        stage.signals.hovered.add( function(pickingProxy){ 
+            // update / show legend
+            if (pickingProxy && pickingProxy.atom) {
+                const name = filesList.value.filter(item => item.id === pickingProxy.atom.structure.name)[0].name
+                const model = pickingProxy.atom.modelIndex
+                const chain = pickingProxy.atom.chainname
+                const resname = pickingProxy.atom.resname
+                const resnum = pickingProxy.atom.resno
+                const atomname = pickingProxy.atom.atomname
+                updateLegend({
+                    name: name,
+                    model: model,
+                    chainname: chain,
+                    resname: resname,
+                    resno: resnum,
+                    atomname: atomname
+                })
+                setFlagStatus('legendEnabled', true)
+                
+            }
+            if (pickingProxy && pickingProxy.bond) {
+                const name = filesList.value.filter(item => item.id === pickingProxy.bond.structure.name)[0].name
+                updateLegend({
+                    name: name,
+                    model: pickingProxy.bond.atom1.modelIndex,
+                    chainname: pickingProxy.bond.atom1.chainname,
+                    resname: pickingProxy.bond.atom1.resname,
+                    resno: pickingProxy.bond.atom1.resno,
+                    atomname: pickingProxy.bond.atom1.atomname + '-' + pickingProxy.bond.atom2.atomname
+                })
+                setFlagStatus('legendEnabled', true)
+            }
+            // hide legend
+            if (!pickingProxy) {
+                setFlagStatus('legendEnabled', false)
+            }
+        })
+
+    }
+
     const zoomToResidue = (stage, pickingProxy) => {
         if (pickingProxy && pickingProxy.atom) {
 
@@ -234,6 +277,7 @@ export default function mouseObserver() {
       initialOrientation,
       setInitOrientation,
       checkMouseSignals, 
+      checkMouseSignalsShared, 
       zoomToResidue,
       selectResidue
     }

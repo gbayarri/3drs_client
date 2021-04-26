@@ -30,6 +30,20 @@ export default function useAPI() {
 
   }
 
+  const shareProject = async (id) => {
+      
+    const response = await fetch(process.env.VUE_APP_API_LOCATION + '/share/' + id, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    const resp = await response.json()
+
+    return resp
+
+  }
+
   const createRepresentation = async (id, data) => {
 
     const response = await fetch(process.env.VUE_APP_API_LOCATION + '/representation/' + id, {
@@ -95,6 +109,7 @@ export default function useAPI() {
     apiData, 
     fetchProject, 
     updateProjectData,
+    shareProject,
     createRepresentation,
     updateRepresentationData,
     eliminateRepresentation,

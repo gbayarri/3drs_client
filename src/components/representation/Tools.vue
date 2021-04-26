@@ -3,17 +3,19 @@
         <Reload :stage="stage" />
         <Rotate :stage="stage" />
         <Center :stage="stage" />
-        <Background :stage="stage" />
+        <Background />
         <FullScreen :stage="stage" />
         <Picture :stage="stage" />
-        <Align :stage="stage" />
+        <Align v-if="!isShared" :stage="stage" />
         <Help />
-        <ProjectSettings />
+        <ProjectSettings v-if="!isShared" />
     </div>
 </template>
 
 <script>
+import { computed } from 'vue'
 import useStage from "@/modules/ngl/useStage"
+import useFlags from '@/modules/common/useFlags'
 import Reload from '@/components/representation/tools/Reload'
 import Rotate from '@/components/representation/tools/Rotate'
 import Center from '@/components/representation/tools/Center'
@@ -27,8 +29,11 @@ export default {
     components: { Reload, Rotate, Center, Background, FullScreen, Picture, Help, Align, ProjectSettings },
     setup() {
         const { getStage } = useStage()
+        const { flags } = useFlags()
+        
+        const isShared = computed(() => flags.isShared)
         const stage = getStage()
-        return { stage }
+        return { stage, isShared }
     }
 }
 </script>

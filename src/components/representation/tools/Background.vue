@@ -9,14 +9,17 @@
 import { ref, watch, computed } from 'vue'
 import structureStorage from '@/modules/structure/structureStorage'
 import useAPI from '@/modules/api/useAPI'
+import useFlags from '@/modules/common/useFlags'
 export default {
-props: ['stage'],
-setup(props) {
+//props: ['stage'],
+setup(/*props*/) {
 
     const { projectData } = structureStorage()
     const { updateProjectData } = useAPI()
+    const { flags } = useFlags()
 
     const dataProject = computed(() => projectData.value)
+    const isShared = computed(() => flags.isShared)
 
     const ttp = computed(() => cpVisible.value ? "Click to close color picker" : "Change background color")
     const color = ref(dataProject.value.background)
@@ -44,8 +47,10 @@ setup(props) {
     watch(color, (color, prevColor) => {
         //document.getElementById("viewport").style.background = '#' + color
         document.querySelector("#viewport").style.background = '#' + color
-        clearTimeout(myTimeOut)
-        myTimeOut = setTimeout(() => autoSaveBackground('#' + color), 5000)
+        if(!isShared.value) {
+            clearTimeout(myTimeOut)
+            myTimeOut = setTimeout(() => autoSaveBackground('#' + color), 5000)
+        }
     })
 
     return { ttp, color, cpVisible, handleClick/*, closePicker*/ }
