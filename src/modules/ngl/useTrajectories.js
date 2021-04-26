@@ -1,10 +1,11 @@
-import { ref, computed } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import structureStorage from '@/modules/structure/structureStorage'
 import useAPI from '@/modules/api/useAPI'
 //import structureSettings from '@/modules/structure/structureSettings'
 
-const player = ref(null)
-const currentFrame = ref(0)
+const player = reactive([])
+//const currentFrame = reactive([])
+//const currentFrame = ref(0)
 
 // Stage interactions
 export default function useTrajectories() {
@@ -54,30 +55,99 @@ export default function useTrajectories() {
 
     // PLAYER 
 
-    // set player
-    const setTrajectoryPlayer = (p) => {
-        player.value = p
+    // init player with empty value
+    const setInitPlayer = (str) => {
+        //player.value = p
+        player.push({
+            str: str,
+            player: null,
+            frame: 0
+        })
+
+        /*currentFrame.push({
+            str: str,
+            frame: 0
+        })
+
+        console.log(currentFrame)*/
+    }
+
+    // load player
+    const setTrajectoryPlayer = (p, str) => {
+        //player.value = p
+        /*player.push({
+            str: str,
+            player: p,
+            currentFrame: 0
+        })*/
+
+        player.filter(item => item.str === str)[0].player = p
+
+        /*currentFrame.push({
+            str: str,
+            frame: 0
+        })
+
+        console.log(currentFrame)*/
+    }
+
+    const getTrajectoryPlayer = (str) => {
+        //console.log(str)
+        return player.filter(item => item.str === str)[0].player
+        //return player.value
     }
 
     // get player
-    const getTrajectoryPlayer = () => {
-        return player.value
+    const checkPlayersLoaded = async () => {
+
+        // if no players in project, nothing to check
+        if(player.length === 0) return true
+
+        //console.log(player[0].player)
+
+        //await waitFor(() => player[0].player !== null )
+        //await waitFor(() => player[1].player !== null )
+
+        const array_promises = []
+        for(const p of player) {
+            //console.log(str.trajectory)
+            array_promises
+            .push(
+                waitFor(() => p.player !== null )
+            )
+        }
+
+        await Promise.all(array_promises)
+
+        //console.log(player[0].player)
     }
 
     // update current frame
-    const updateCurrentFrame = (f) => {
-        currentFrame.value = parseInt(f)    
+    const updateCurrentFrame = (f, str) => {
+        player.filter(item => item.str === str)[0].frame = f
+        //currentFrame.value = parseInt(f)    
+        //currentFrame.filter(item => item.str === str)[0].frame = parseInt(f)    
+    }
+
+    const getCurrentFrame = (str) => {
+        return player.filter(item => item.str === str)[0].frame
+        //return currentFrame.value
+        //return currentFrame.filter(item => item.str === str)[0].frame
     }
 
     // set current frame 
-    const setCurrentFrame = (t, f) => {
+    const setCurrentFrame = (t, f, str) => {
+        //console.log(player)
+        const p = player.filter(item => item.str === str)[0]
+        if(p) p.player.frame = f
         t.setFrame(f)
-        updateCurrentFrame(f)
+        updateCurrentFrame(f, str)
     }
 
     // get player
     const updatePlayerSetting = (k, v) => {
-        player.value.parameters[k] = v
+        //player.value.parameters[k] = v
+        player.filter(item => item.str === str)[0].parameters[k] = v
     }
 
     // NGL / REST API
@@ -100,9 +170,9 @@ export default function useTrajectories() {
     }
 
     return { 
-        player, currentFrame, 
+        player, //currentFrame, 
         checkTrajectory, 
-        setTrajectoryPlayer, getTrajectoryPlayer,  updateCurrentFrame, setCurrentFrame, updatePlayerSetting,
+        setInitPlayer, setTrajectoryPlayer, getTrajectoryPlayer, checkPlayersLoaded, updateCurrentFrame, getCurrentFrame, setCurrentFrame, updatePlayerSetting,
         setTrajectorySettings, setTrajectorySettingsTimeout
     }
 }

@@ -30,6 +30,7 @@ import useRepresentations from '@/modules/representations/useRepresentations'
 import useSelections from '@/modules/representations/useSelections'
 import useAPI from '@/modules/api/useAPI'
 import useFlags from '@/modules/common/useFlags'
+import useTrajectories from '@/modules/ngl/useTrajectories'
 export default {
     props: ['stage'],
     setup(props) {
@@ -38,16 +39,19 @@ export default {
         const placeholder = "Select a File"
 
         const { currentRepresentation } = useRepresentations()
-        const { currentStructure, setCurrentStructure, getFileNames } = structureSettings()
+        const { currentStructure, setCurrentStructure, getFileNames, getTrajectorySettings } = structureSettings()
         const { projectData } = structureStorage()
         const { updateProjectData } = useAPI()
         const { checkSelectionType } = useSelections()
         const { setFlagStatus } = useFlags()
+        const { setCurrentFrame } = useTrajectories()
         
         const dataProject = computed(() => projectData.value)
         const filesList = computed(() => getFileNames())
         const currReprVal = computed(() => currentRepresentation.value)
         const currStr = computed(() => currentStructure.value)
+        const currTraj = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0].trajList[0])
+        const rangeSettings = computed(() => getTrajectorySettings().range[0])
 
         const doHover = ref(true)
 
@@ -71,6 +75,13 @@ export default {
             for(const item of stage.getRepresentationsByName(re).list) {
                 item.dispose()
             }
+
+            //********************************* */
+            // ??????????????????????????????
+            //console.log(currTraj.value, rangeSettings.value, currStr.value)
+            //setCurrentFrame(currTraj.value, rangeSettings.value, currStr.value)
+            // ??????????????????????????????
+            //********************************* */
         }
 
         const onShow = () => doHover.value = true

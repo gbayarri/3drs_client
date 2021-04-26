@@ -21,6 +21,7 @@ import useRepresentations from '@/modules/representations/useRepresentations'
 import useSelections from '@/modules/representations/useSelections'
 import useProjectSettings from '@/modules/structure/useProjectSettings'
 import mouseObserver from '@/modules/ngl/mouseObserver'
+import useTrajectories from '@/modules/ngl/useTrajectories'
 export default {
   props: ['project_id'],
   setup(props) {
@@ -38,6 +39,8 @@ export default {
     const { /*defaultRepresentation,*/ currentRepresentation, setCurrentRepresentation/*, getCurrentRepresentationSettings*/ } = useRepresentations()
     const { setSelection, checkSelectionType } = useSelections()
     const { setProjectSettings, getProjectSettings } = useProjectSettings()
+    const { checkPlayersLoaded } = useTrajectories()
+
     const project_id = props.project_id
     const currReprVal = computed(() => currentRepresentation.value)
     const prjSettings = computed(() => getProjectSettings())
@@ -121,12 +124,6 @@ export default {
             c.setVisibility(true)
           }
 
-          // set stage flag
-          setFlagStatus('stageLoaded', true)
-
-          // close BlockUI
-          closeModal('block')
-
           // disabling autocenter when clicking on an atom
           stage.mouseControls.remove('clickPick-left')
           // reset position on double click
@@ -154,46 +151,28 @@ export default {
             setFlagStatus('sidebarEnabled', false)
           }
 
-          // only show this toast if project status is 'w' (still not shared)
-          if(prjSettings.value.status === 'w')
-             toast.add({ 
-                  severity:'warn', 
-                  summary: 'Expiration date', 
-                  detail:'Remember that this project will expire on ' + new Date(prjSettings.value.expiration.date).toLocaleDateString("en-GB") + ' unlike you share it.', 
-                  life: 10000
-              });
-          
-          console.log(stage)
+          // set stage flag, await until players are completely loaded
+          //console.log('before')         
+          checkPlayersLoaded().then((r) =>  {
 
-          //stage.getRepresentationsByName('ligand_1').setVisibility(false)
+            //console.log('after')
 
-          //stage.getComponentsByName('first_str')[0].setVisibility(false)
+            setFlagStatus('stageLoaded', true)
 
-          //console.log(stage.getComponentsByName('first_str').list[0].structureView.getStructure())
+            // close BlockUI
+            closeModal('block')
 
-          /*stage.getComponentsByName('first_str').list[0].structure.eachResidue(function (rp) {
-            console.log(rp)
-          });*/
+            // only show this toast if project status is 'w' (still not shared)
+            if(prjSettings.value.status === 'w')
+              toast.add({ 
+                    severity:'warn', 
+                    summary: 'Expiration date', 
+                    detail:'Remember that this project will expire on ' + new Date(prjSettings.value.expiration.date).toLocaleDateString("en-GB") + ' unless you share it.', 
+                    life: 10000
+                })
 
-          /*setTimeout( () => {
-            stage.getComponentsByName('first_str').list[0].reprList.forEach( function( repre ){
-              //repre.setVisibility( false );
-              //repre.setParameters( { color: '#555'} );603e1a99f7aa6046c8103204
-              //repre.setParameters( { opacity: 0.6} );
-              //console.log(repre)
-              //repre.dispose()
-              
-            } )
-            //stage.getComponentsByName('first_str').list[0].dispose()
-            //console.log(stage.getComponentsByName('first_str'))
-            //stage.getComponentsByName('first_str').list[0].setVisibility( false )
-          }, 2000)*/
-
-          /*stage.getRepresentationsByName( "licorice" ).list.forEach( function( repre ){
-            repre.setVisibility( !repre.visible );
-          } );*/
-
-          //console.log(stage)
+            console.log(stage)
+          })
 
         })
     }

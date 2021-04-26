@@ -6,7 +6,8 @@ const flags = reactive({
     sidebarEnabled: false,
     legendEnabled: false, 
     zoomWindowEnabled: false, 
-    customEnabled: false
+    customEnabled: false,
+    trajectoryLoaded: false,
 })
 
 export default function useFlags() {

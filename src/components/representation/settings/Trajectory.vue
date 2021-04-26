@@ -19,6 +19,7 @@
 
 <script>
 import { ref, reactive, computed, toRefs, onUpdated } from 'vue'
+//import useFlags from '@/modules/common/useFlags'
 import useModals from '@/modules/common/useModals'
 import structureSettings from '@/modules/structure/structureSettings'
 import PlayerTrajectory from '@/components/representation/settings/addons/PlayerTrajectory'
@@ -35,7 +36,10 @@ export default {
         const { currentFrame, getTrajectoryPlayer, setCurrentFrame } = useTrajectories()*/
         const { checkIfTrajectory } = structureSettings()
         const { dialog, openModal } = useModals()
+        //const { flags, setFlagStatus } = useFlags()
 
+        // activate tools, sidebar and so on
+        //const trajectoryLoaded = computed(() => flags.trajectoryLoaded)
         /*const currStr = computed(() => currentStructure.value)
         const currFr = computed(() => currentFrame.value)*/
         const hasTrajectory = computed(() => checkIfTrajectory())
@@ -102,6 +106,7 @@ export default {
         }*/
 
         return { 
+            //trajectoryLoaded,
             ...toRefs(page), dialog, hasTrajectory, 
             openModalTrajectory/*,
             frames, isRunning, playTraj, frameStep,

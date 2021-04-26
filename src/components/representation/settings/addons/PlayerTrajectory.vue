@@ -43,18 +43,27 @@ export default {
         const stage = props.stage
 
         const { getTrajectorySettings, currentStructure } = structureSettings()
-        const { currentFrame, getTrajectoryPlayer, setCurrentFrame } = useTrajectories()
+        const { /*currentFrame, */getTrajectoryPlayer, getCurrentFrame, setCurrentFrame } = useTrajectories()
 
         const currStr = computed(() => currentStructure.value)
-        const currFr = computed(() => currentFrame.value)
+        //const currFr = computed(() => currentFrame.value)
+        const currFr = computed(() => getCurrentFrame(currStr.value))
         const trajSettings = computed(() => getTrajectorySettings())
-        const player =  computed(() => getTrajectoryPlayer())
+        let player = computed(() => getTrajectoryPlayer(currStr.value))
+
+        //let player = null
         
+        //console.log(player.value)
+
         const currTraj = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0].trajList[0])
 
-        setCurrentFrame(currTraj.value, trajSettings.value.range[0])
+        //console.log( trajSettings.value)
+        setCurrentFrame(currTraj.value, trajSettings.value.range[0], currStr.value)
 
         onUpdated(() => {
+
+            //player =  computed(() => getTrajectoryPlayer(currStr.value))
+            //setCurrentFrame(currTraj.value, trajSettings.value.range[0], currStr.value)
             // update isRunningValue once the player has been created
             isRunning.value = computed(() => player.value.isRunning).value
             // if no loop and player at end, set isRunning to false
@@ -77,7 +86,7 @@ export default {
         //console.log(stage)
 
         const changeFrame = (frame) => {
-            setCurrentFrame(currTraj.value, frame)
+            setCurrentFrame(currTraj.value, frame, currStr.value)
         }
 
         const frames = computed({
@@ -103,7 +112,7 @@ export default {
             if(f > end) f = start
             //console.log(f)
             player.value.pause()
-            setCurrentFrame(currTraj.value, f)
+            setCurrentFrame(currTraj.value, f, currStr.value)
 
         }
 

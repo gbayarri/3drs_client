@@ -6,6 +6,7 @@ import useRepresentations from '@/modules/representations/useRepresentations'
 import drawRepresentation from '@/modules/ngl/drawRepresentation'
 import useTrajectories from '@/modules/ngl/useTrajectories'
 import useStage from '@/modules/ngl/useStage'
+//import useFlags from '@/modules/common/useFlags'
 import useModals from '@/modules/common/useModals'
 //import useAPI from '@/modules/api/useAPI'
 // Stage interactions
@@ -20,9 +21,11 @@ export default function useComponents() {
     const { currentStructure, updateTrajectorySettings, updateTrajectory } = structureSettings()
     const { addRepresentationToComponent } = drawRepresentation()
     const { createTrajectoryPlayer, getStage } = useStage()
-    const { checkTrajectory, setTrajectoryPlayer, updateCurrentFrame, setTrajectorySettings } = useTrajectories()
+    const { checkTrajectory, setInitPlayer, setTrajectoryPlayer, updateCurrentFrame, setTrajectorySettings } = useTrajectories()
     const { closeModal } = useModals()
     //const { updateTrajectoryData } = useAPI()
+    //const { setFlagStatus } = useFlags()
+
 
     const dataProject = computed(() => projectData.value)
     //const curr_repr = computed(() => projectData.value.currentRepresentation) 
@@ -73,7 +76,8 @@ export default function useComponents() {
                     console.log('loading', traj.path, 'size', traj.size)
                     const t = component.addTrajectory( '3dRS/trajectories/' + traj.path, {centerPdb: true, removePbc: true, superpose: true, initialFrame: 0} )
                     //console.log(t)
-
+                    // initialising players
+                    setInitPlayer(id)
                     // wait until trajectory parameters are completely loaded
                     checkTrajectory(t)
                         .then((trajectory) => {
@@ -97,10 +101,12 @@ export default function useComponents() {
                                     })
                             }
                             const player = createTrajectoryPlayer(trajectory, settings)
-                            setTrajectoryPlayer(player)
+                            setTrajectoryPlayer(player, id)
                             //console.log(player)
+                            //setFlagStatus('trajectoryLoaded', true)
+                            // SET SOME FLAG HERE FOR ACTIVATE Trajectory.vue
                             trajectory.signals.frameChanged.add((a) => {
-                                updateCurrentFrame(a)
+                                updateCurrentFrame(a, id)
                             })
                             /*trajectory.signals.parametersChanged.add((a) => {
                                 console.log(a)
@@ -187,7 +193,8 @@ export default function useComponents() {
                     closeModal('block')
                 }
                 const player = createTrajectoryPlayer(trajectory, settings)
-                setTrajectoryPlayer(player)
+                
+                setTrajectoryPlayer(player, currStr.value)
                 //console.log(player)
                 trajectory.signals.frameChanged.add((a) => {
                     updateCurrentFrame(a)
