@@ -161,6 +161,8 @@ export default {
 
             setFlagStatus('stageLoaded', true)
 
+            window.addEventListener("resize", () => stage.viewer.handleResize())
+
             // close BlockUI
             closeModal('block')
 
@@ -219,10 +221,13 @@ export default {
 
           // create viewport
           createViewport()
+
         })
 
         //******************
         //createViewport()
+
+        
 
     })
     

@@ -22,23 +22,27 @@ export default function useProjectSettings() {
         return projectSettings.value
     }
 
-    const updateProjectSettings = async (k, v) => {
+    const updateProjectSettings = async (k, v, update = true) => {
         if(prjID === undefined) prjID = dataProject.value._id
         projectSettings.value[k] = v
-        return await updateProjectData(prjID, { projectSettings: projectSettings.value })
+        if(update) {
+            return await updateProjectData(prjID, { projectSettings: projectSettings.value })
+        }
     }
 
     let myTimeOut = null
-    const updateProjectSettingsTimeout = async (k, v) => {
-        return await new Promise((resolve) => {
-            clearTimeout(myTimeOut)
-            myTimeOut = setTimeout(() => {
-                if(prjID === undefined) prjID = dataProject.value._id
-                projectSettings.value[k] = v
-                const response = updateProjectData(prjID, { projectSettings: projectSettings.value })
-                resolve(response)
-            }, shortTimeOut)
-        })
+    const updateProjectSettingsTimeout = async (k, v, update = true) => {
+        if(update) {
+            return await new Promise((resolve) => {
+                clearTimeout(myTimeOut)
+                myTimeOut = setTimeout(() => {
+                    if(prjID === undefined) prjID = dataProject.value._id
+                    projectSettings.value[k] = v
+                    const response = updateProjectData(prjID, { projectSettings: projectSettings.value })
+                    resolve(response)
+                }, shortTimeOut)
+            })
+        }
     }
 
     return {

@@ -1,5 +1,6 @@
 <template>
     <Dialog v-model:visible="dialog.share" 
+            @hide="hideDialog"
             :closable="!sharing"
             :closeOnEscape="!sharing" 
             :dismissableMask="!sharing" 
@@ -9,6 +10,8 @@
         <template #header>
             <i class="fas fa-share-square"></i> <h3>{{ header }}</h3>
         </template>
+
+        <h2 class="modal-share">Sharing instructions</h2>
 
         <p>If your project is ready for sharing, <strong>please follow the next steps</strong>:</p>
 
@@ -29,9 +32,21 @@
         <p><Button :label="labelShare" :icon="sharing ? 'fas fa-spinner fa-pulse' : 'fas fa-share'" @click="launchShareProject" :disabled="sharing" /></p>
 
         <!-- TODO: IT WILL APPEAR ONCE REST API HAS CREATED THE SHARED PROJECT -->
-        <div v-if="shared">
+        <div v-show="shared">
+            <h2>Share project</h2>
             <p>For sharing it, <strong>you just need to copy and share the address below</strong>:</p>
-            <p class="shared-address">{{ sharedAddress }}</p>
+            <div class="p-inputgroup">
+                <Button icon="fas fa-copy" :label="labelCopy" @click="copyShared" />
+                <InputText v-model="sharedAddress" id="copytextarea" />
+                <Button icon="fas fa-share-square" :label="labelOpen" @click="openShared" />
+            </div>
+
+            <h2>Embed project</h2>
+            <p>For embed it as a widget, <strong>you just need to copy the HTML code below</strong> and paste it into your website:</p>
+            <div class="p-inputgroup">
+                <Textarea v-model="embedCode" rows="3"  id="embedtextarea" />
+                <Button icon="fas fa-copy" :label="labelCopy" @click="copyEmbed" />
+            </div>
         </div>
 
         <template #footer>
@@ -62,6 +77,8 @@ export default {
             header:'Share representation',
             labelClose: 'Close',
             labelDraft: 'View draft',
+            labelCopy: 'Copy',
+            labelOpen: 'Open',
             labelShare: computed(() => sharing.value ? "Sharing project, please don't close the tab" : "Share project"),
             status_fork: computed(() => forkable.value ? "Forkability enabled" : "Forkability disabled")
         })
@@ -70,9 +87,13 @@ export default {
             closeModal('share')
         }
 
+        const hideDialog = () => {
+            shared.value = false
+        }
+
         /* DRAFT */
         const openDraft = () => {
-            window.open(process.env.BASE_URL + 'draft/' + project_id, '_blank')
+            window.open(process.env.BASE_URL + 'draft/' + project_id, '_blank')  
         }
 
         /* SHARE */
@@ -94,36 +115,81 @@ export default {
         const shared = ref(false)
         const sharing = ref(false)
         let sharedAddress = ref(null)
+        let sharedProject = ref(null)
         const launchShareProject = () => {
             sharing.value = true
             // API call to share project
             shareProject(project_id)
               .then((r) => {
                 if(r.code != 404) {
-                    // TODO: UPDATE PROJECT SETTINGS VAR (STATUS AND DATES(??))
                     console.log(r.message)
+                    // set shared and embed to readonly
+                    document.querySelector('#copytextarea').setAttribute('readonly', 'true')
+                    document.querySelector('#embedtextarea').setAttribute('readonly', 'true')
+                    // update flahs
                     sharing.value = false
                     shared.value = true
-                    sharedAddress.value =  window.location.origin + process.env.BASE_URL + 'shared/' + r.project
-                    window.open(process.env.BASE_URL + 'shared/' + r.project, '_blank')
+                    // update models
+                    sharedProject.value = r.project
+                    sharedAddress.value =  window.location.origin + process.env.BASE_URL + 'shared/' + sharedProject.value
+                    embedCode.value = '<iframe width="500" height="500" src="' + window.location.origin + process.env.BASE_URL + 'embed/' + sharedProject.value + '" title="Title" frameborder="0" allowfullscreen></iframe>'   
+                    // update project status
+                    updateProjectSettings('status', 'ws', false)
+                    // go to modal bottom
+                    var element = document.querySelector('.p-dialog-content')
+                    element.scrollTop = element.scrollHeight - element.clientHeight;
+                    //window.open(process.env.BASE_URL + 'shared/' + r.project, '_blank')
                 }
                 else console.error(r.message)
               })
+        }
 
+        const copyShared = () => {
+            const copyTextarea = document.querySelector('#copytextarea')
+            copyTextarea.focus();
+            copyTextarea.select();
+            try {
+                document.execCommand('copy')
+                console.log('Text successfully copied into clipboard')
+            } catch (err) {
+                console.log('Oops, unable to copy')
+            }
+        }
+
+        const openShared = () => {
+            window.open(process.env.BASE_URL + 'shared/' + sharedProject.value, '_blank')
+        }
+
+        // embedding
+        let embedCode = ref(null)
+        const copyEmbed = () => {
+            const copyTextarea = document.querySelector('#embedtextarea')
+            copyTextarea.focus();
+            copyTextarea.select();
+            try {
+                document.execCommand('copy')
+                console.log('Text successfully copied into clipboard')
+            } catch (err) {
+                console.log('Oops, unable to copy')
+            }
         }
 
         return { 
             ...toRefs(page), 
-            dialog, closeThisModal,
+            dialog, closeThisModal, hideDialog,
             openDraft,
-            forkable, shared, sharing, launchShareProject, sharedAddress
+            forkable, shared, sharing, launchShareProject, sharedAddress, copyShared, openShared, 
+            embedCode, copyEmbed
         }
     }
 }
 </script>
 
 <style>
+    h2.modal-share { margin-top:0;}
     .num-list { font-weight: bold; color: #6f96a9; }
     .shared-address { border:solid 1px #6f96a9; padding:5px; background: #f0f8ff; }
     .label-switch { margin-left: 10px; vertical-align:super; font-size:14px; }
+    #copytextarea { user-select: none; }
+    #embedtextarea { resize: none;}
 </style>

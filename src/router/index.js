@@ -3,7 +3,7 @@ import About from '@/views/About.vue'
 import Launch from '@/views/Launch.vue'
 import Contact from '@/views/Contact.vue'
 import Representation from '@/views/Representation.vue'
-import Draft from '@/views/Draft.vue'
+import Shared from '@/views/Shared.vue'
 import NotFound from '@/views/NotFound.vue'
 
 const routes = [
@@ -31,8 +31,37 @@ const routes = [
   {
     path: '/draft/:id',
     name: 'Draft',
-    component: Draft,
-    props: true
+    component: Shared,
+    props(route) { 
+      return {
+        id: route.params.id,
+        hasFork: true,
+        isDraft: true
+      }
+    }
+  },
+  {
+    path: '/shared/:id',
+    name: 'Shared',
+    component: Shared,
+    props(route) { 
+      return {
+        id: route.params.id,
+        hasFork: true,
+        isDraft: false
+      }
+    }
+  },
+  {
+    path: '/embed/:id',
+    name: 'Embed',
+    component: Shared,
+    props(route) { 
+      return {
+        id: route.params.id,
+        hasFork: false
+      }
+    }
   },
   {
     path: '/:catchAll(.*)',
