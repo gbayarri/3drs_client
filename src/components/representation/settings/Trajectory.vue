@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { ref, reactive, computed, toRefs, onUpdated } from 'vue'
+import { /*ref,*/ reactive, computed, toRefs/*, onUpdated*/ } from 'vue'
 //import useFlags from '@/modules/common/useFlags'
 import useModals from '@/modules/common/useModals'
 import structureSettings from '@/modules/structure/structureSettings'
@@ -28,9 +28,9 @@ import SettingsTrajectory from '@/components/representation/settings/addons/Sett
 export default {
     components: { PlayerTrajectory, SettingsTrajectory },
     props: ['stage'],
-    setup(props) {
+    setup() {
 
-        const stage = props.stage
+        //const stage = props.stage
 
         /*const { checkIfTrajectory, getTrajectorySettings, currentStructure } = structureSettings()
         const { currentFrame, getTrajectoryPlayer, setCurrentFrame } = useTrajectories()*/

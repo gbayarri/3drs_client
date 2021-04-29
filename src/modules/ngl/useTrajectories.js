@@ -56,12 +56,13 @@ export default function useTrajectories() {
     // PLAYER 
 
     // init player with empty value
-    const setInitPlayer = (str) => {
+    const setInitPlayer = (str, traj) => {
         //player.value = p
         player.push({
             str: str,
             player: null,
-            frame: 0
+            frame: 0,
+            autoplay: traj.settings.autoplay
         })
 
         /*currentFrame.push({
@@ -122,6 +123,32 @@ export default function useTrajectories() {
         //console.log(player[0].player)
     }
 
+    // play / pause all players (shared)
+    const togglePlayAll = (flag) => {
+        if(flag) {
+            for(const p of player) {
+                p.player.play()
+            }
+        } else { 
+            for(const p of player) {
+                p.player.pause()
+            }
+        }
+    }
+
+    const checkAutoplay = () => {
+        let autoplay = false
+        for(const p of player) {
+            if(p.autoplay) autoplay = true
+        }
+        return autoplay
+    }    
+
+    // get total number of players in representation (shared)
+    const getNumberOfPlayers = () => {
+        return player.length   
+    }
+
     // update current frame
     const updateCurrentFrame = (f, str) => {
         player.filter(item => item.str === str)[0].frame = f
@@ -172,7 +199,7 @@ export default function useTrajectories() {
     return { 
         player, //currentFrame, 
         checkTrajectory, 
-        setInitPlayer, setTrajectoryPlayer, getTrajectoryPlayer, checkPlayersLoaded, updateCurrentFrame, getCurrentFrame, setCurrentFrame, updatePlayerSetting,
+        setInitPlayer, setTrajectoryPlayer, getTrajectoryPlayer, checkPlayersLoaded, togglePlayAll, checkAutoplay, getNumberOfPlayers, updateCurrentFrame, getCurrentFrame, setCurrentFrame, updatePlayerSetting,
         setTrajectorySettings, setTrajectorySettingsTimeout
     }
 }

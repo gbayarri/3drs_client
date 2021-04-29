@@ -7,12 +7,12 @@
 </template>
 
 <script>
-import { inject, computed, onMounted } from 'vue'
+import { /*inject,*/ computed, onMounted } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import useFlags from '@/modules/common/useFlags'
 import useStage from '@/modules/ngl/useStage'
 import useModals from '@/modules/common/useModals'
-import useMessages from '@/modules/common/useMessages'
+//import useMessages from '@/modules/common/useMessages'
 import useAPI from '@/modules/api/useAPI'
 import useComponents from '@/modules/ngl/useComponents'
 import structureStorage from '@/modules/structure/structureStorage'
@@ -26,9 +26,9 @@ export default {
   props: ['project_id'],
   setup(props) {
 
-    const $router = inject('$router')
+    //const $router = inject('$router')
     const { flags, setFlagStatus } = useFlags()
-    const { setMessage } = useMessages()
+    //const { setMessage } = useMessages()
     const stageLoaded = computed(() => flags.stageLoaded)
     const { dialog, openModal, closeModal, setBlockUI } = useModals()
     const { apiData, fetchProject, updateProjectData } = useAPI()
@@ -192,7 +192,7 @@ export default {
       fetchProject(project_id)
         .then(() => {
           //  project doesn't exist, redirect to launch and show warning
-          if(apiData.value.code === 404) {
+          /*if(apiData.value.code === 404) {
             const msg = {
                 severity: 'warn',
                 content: 'You tried to access to an unexisting project, please check your project id or create a new one',
@@ -202,7 +202,7 @@ export default {
             closeModal('block')
             $router.push({ name: 'Launch' }) 
             return false
-          }
+          }*/
 
           // set background color
           document.querySelector("#viewport").style.background = apiData.value.background

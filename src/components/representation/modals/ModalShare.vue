@@ -44,7 +44,7 @@
             <h2>Embed project</h2>
             <p>For embed it as a widget, <strong>you just need to copy the HTML code below</strong> and paste it into your website:</p>
             <div class="p-inputgroup">
-                <Textarea v-model="embedCode" rows="3"  id="embedtextarea" />
+                <Textarea v-model="embedCode" rows="2"  id="embedtextarea" />
                 <Button icon="fas fa-copy" :label="labelCopy" @click="copyEmbed" />
             </div>
         </div>
@@ -57,6 +57,7 @@
 
 <script>
 import { ref, computed, reactive, toRefs } from 'vue'
+import globals from '@/globals'
 import useModals from '@/modules/common/useModals'
 import useAPI from '@/modules/api/useAPI'
 import useProjectSettings from '@/modules/structure/useProjectSettings'
@@ -87,8 +88,11 @@ export default {
             closeModal('share')
         }
 
+        // when closing modal, hide shared block and clean copytextarea and embedtextarea
         const hideDialog = () => {
             shared.value = false
+            sharedAddress.value = null
+            embedCode.value = null
         }
 
         /* DRAFT */
@@ -126,13 +130,15 @@ export default {
                     // set shared and embed to readonly
                     document.querySelector('#copytextarea').setAttribute('readonly', 'true')
                     document.querySelector('#embedtextarea').setAttribute('readonly', 'true')
-                    // update flahs
+                    // update flags
                     sharing.value = false
                     shared.value = true
                     // update models
                     sharedProject.value = r.project
                     sharedAddress.value =  window.location.origin + process.env.BASE_URL + 'shared/' + sharedProject.value
-                    embedCode.value = '<iframe width="500" height="500" src="' + window.location.origin + process.env.BASE_URL + 'embed/' + sharedProject.value + '" title="Title" frameborder="0" allowfullscreen></iframe>'   
+                    //embedCode.value = '<iframe width="500" height="500" src="' + window.location.origin + process.env.BASE_URL + 'embed/' + sharedProject.value + '" title="Title" frameborder="0" allowfullscreen></iframe>'   
+                    var url = window.location.origin + process.env.BASE_URL + 'embed/' + sharedProject.value
+                    embedCode.value = ecGlobal(url)
                     // update project status
                     updateProjectSettings('status', 'ws', false)
                     // go to modal bottom
@@ -161,6 +167,9 @@ export default {
         }
 
         // embedding
+        const ecGlobal = globals.embedCode
+        /*var url = window.location.origin + process.env.BASE_URL + 'embed/' + project_id
+        const embedCode = ecGlobal(url)*/
         let embedCode = ref(null)
         const copyEmbed = () => {
             const copyTextarea = document.querySelector('#embedtextarea')

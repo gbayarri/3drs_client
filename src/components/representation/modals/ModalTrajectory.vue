@@ -115,7 +115,14 @@ export default {
             formData.append('structure', currStr.value);
 
             $axios
-                .post(process.env.VUE_APP_API_LOCATION + '/upload/traj/', formData)
+                .post(process.env.VUE_APP_API_LOCATION + '/upload/traj/', formData,
+                {
+                    onUploadProgress: (e) => {
+                        if (e.lengthComputable) {
+                            document.querySelector(".p-progressbar-value.p-progressbar-value-animate").style.width = Math.floor((e.loaded/e.total) * 100) + "%"
+                        }
+                    }
+                })
                 .then(function (response) {
                     //console.log(response);
                     resp = response.data

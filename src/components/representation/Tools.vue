@@ -9,6 +9,7 @@
         <Picture :stage="stage" />
         <Align v-if="!isShared" :stage="stage" />
         <Player v-if="isShared" :stage="stage" />
+        <Embed v-if="isShared" :isDraft="isDraft" />
         <Help />
         <ProjectSettings v-if="!isShared" />
         </div>
@@ -27,11 +28,13 @@ import FullScreen from '@/components/representation/tools/FullScreen'
 import Picture from '@/components/representation/tools/Picture'
 import Help from '@/components/representation/tools/Help'
 import Player from '@/components/representation/tools/Player'
+import Embed from '@/components/representation/tools/Embed'
 import Align from '@/components/representation/tools/Align'
 import ProjectSettings from '@/components/representation/tools/ProjectSettings'
 export default {
-    components: { Reload, Rotate, Center, Background, FullScreen, Picture, Help, Player, Align, ProjectSettings },
-    setup() {
+    components: { Reload, Rotate, Center, Background, FullScreen, Picture, Help, Player, Embed, Align, ProjectSettings },
+    props: ['isDraft'],
+    setup(props) {
         const { getStage } = useStage()
         const { flags } = useFlags()
         

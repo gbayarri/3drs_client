@@ -1,12 +1,14 @@
 <template>
 
-    <Tools v-if="stageLoaded" />
+    <Tools v-if="stageLoaded" :isDraft="isDraft" />
 
-    <Fork v-if="stageLoaded && hasFork" :isDraft="isDraft" />
+    <Fork v-if="stageLoaded && hasFork && !disableComponents" :isDraft="isDraft" :project_id="project_id" />
 
     <Legend v-if="stageLoaded" />
 
     <Viewport :project_id="project_id" />
+
+    <ModalEmbed v-if="stageLoaded" :project_id="project_id" />
 
 </template>
 
@@ -17,27 +19,23 @@ import Tools from '@/components/representation/Tools'
 import Fork from '@/components/representation/Fork'
 import Legend from '@/components/representation/Legend'
 import Viewport from '@/components/representation/Viewport'
-import useProjectSettings from '@/modules/structure/useProjectSettings'
+import ModalEmbed from '@/components/representation/modals/ModalEmbed'
 export default {
     components: { 
         Tools,
         Fork, Legend, 
-        Viewport
+        Viewport,
+        ModalEmbed
     },
     props: ['id', 'hasFork', 'isDraft'],
     setup(props) {
 
         const { flags, setFlagStatus } = useFlags()
-        const { getProjectSettings, updateProjectSettings, updateProjectSettingsTimeout } = useProjectSettings()
 
-        const settings = computed(() => getProjectSettings())
         // activate tools, sidebar and so on
         const stageLoaded = computed(() => flags.stageLoaded)
-
-        /*let hasFork = ref(null)
-        console.log(settings.value)
-        if(!settings.value.forkable) hasFork.value = false
-        else hasFork.value = props.hasFork*/
+        const width = ref(window.innerWidth)
+        const disableComponents = computed(() => width.value < 768 )
         
         setFlagStatus('menuEnabled', false)
         setFlagStatus('stageLoaded', false)
@@ -47,7 +45,9 @@ export default {
 
         const project_id = props.id
 
-        return { stageLoaded, /*hasFork,*/ project_id }
+        window.addEventListener("resize", () => width.value = window.innerWidth )
+
+        return { stageLoaded, project_id, disableComponents }
     }
 }
 </script>

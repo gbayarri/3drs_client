@@ -49,7 +49,7 @@ export default {
         //const currFr = computed(() => currentFrame.value)
         const currFr = computed(() => getCurrentFrame(currStr.value))
         const trajSettings = computed(() => getTrajectorySettings())
-        let player = computed(() => getTrajectoryPlayer(currStr.value))
+        const player = computed(() => getTrajectoryPlayer(currStr.value))
 
         //let player = null
         
@@ -57,7 +57,7 @@ export default {
 
         const currTraj = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0].trajList[0])
 
-        //console.log( trajSettings.value)
+        console.log( trajSettings.value)
         setCurrentFrame(currTraj.value, trajSettings.value.range[0], currStr.value)
 
         onUpdated(() => {

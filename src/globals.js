@@ -59,5 +59,6 @@ module.exports = {
         { name: 'None', id: '' },
         { name: 'Linear', id: 'linear' },
         { name: 'Spline', id: 'spline' }
-    ]
+    ],
+    embedCode: (url) => `<iframe width="500" height="500" src="${url}" title="3dRS" frameborder="0" allowfullscreen></iframe>`
 }

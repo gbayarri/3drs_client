@@ -8,6 +8,7 @@ const dialog = reactive({
   tips: false,
   block: false,
   hierarchy: false,
+  embed: false
 })
 
 const tips = ref('')
@@ -37,6 +38,11 @@ const blockProperties = [
     status: 'traj',
     header: 'Loading trajectory',
     message: 'The new trajectory is being loaded to the server, please don\'t close the tab.'
+  },
+  {
+    status: 'fork',
+    header: 'Forking project',
+    message: 'The new project is being created, please don\'t close the tab.'
   }
 ]
 

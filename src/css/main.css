@@ -149,6 +149,7 @@ body, html { scrollbar-color: #858f98 #f1f1f1; scrollbar-width: thin; }
 /* file upload */
 .p-fileupload-row > div { width: 33%; word-break: break-word; }
 .p-fileupload-row > div:last-child { padding: 0!important;  width: auto; }
+.p-progressbar .p-progressbar-value { background: #6f96a9; }
 
 /* progress spinner 
 @keyframes p-progress-spinner-color {

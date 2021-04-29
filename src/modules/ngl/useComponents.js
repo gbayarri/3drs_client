@@ -77,7 +77,7 @@ export default function useComponents() {
                     const t = component.addTrajectory( '3dRS/trajectories/' + traj.path, {centerPdb: true, removePbc: true, superpose: true, initialFrame: 0} )
                     //console.log(t)
                     // initialising players
-                    setInitPlayer(id)
+                    setInitPlayer(id, traj)
                     // wait until trajectory parameters are completely loaded
                     checkTrajectory(t)
                         .then((trajectory) => {
@@ -171,7 +171,8 @@ export default function useComponents() {
         console.log('loading', traj.path, 'size', traj.size)
         const t = component.value.addTrajectory( '3dRS/trajectories/' + traj.path, {centerPdb: true, removePbc: true, superpose: true, initialFrame: 0} )
         //console.log(t)
-
+        // initialising players
+        setInitPlayer(currStr.value, traj)
         // wait until trajectory parameters are completely loaded
         checkTrajectory(t)
             .then((trajectory) => {
@@ -193,11 +194,10 @@ export default function useComponents() {
                     closeModal('block')
                 }
                 const player = createTrajectoryPlayer(trajectory, settings)
-                
                 setTrajectoryPlayer(player, currStr.value)
                 //console.log(player)
                 trajectory.signals.frameChanged.add((a) => {
-                    updateCurrentFrame(a)
+                    updateCurrentFrame(a, currStr.value)
                 })
             })
 
