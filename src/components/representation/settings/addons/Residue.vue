@@ -227,14 +227,14 @@ export default {
             if(!mr.status) {
                 // check if error
                 if(mr.error) {
-                    if(toastSettings.value) {
+                    //if(toastSettings.value) {
                         toast.add({ 
                             severity: 'error', 
                             summary: 'Error selecting set of residues', 
                             detail: 'Unable to select set of residues from different models / chains',
                             life: 5000
                         })
-                    }
+                    //}
                 } else  {
 
                     let first, last

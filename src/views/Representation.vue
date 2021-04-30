@@ -91,6 +91,7 @@ export default {
             setMessage('launch', msg)
             closeModal('block')
             $router.push({ name: 'Launch' }) 
+            setFlagStatus('menuEnabled', true)
             return false
           }
           // project exists, but is read only (not representation)

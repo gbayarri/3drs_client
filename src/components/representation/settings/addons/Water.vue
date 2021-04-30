@@ -200,14 +200,14 @@ export default {
             // on second click
             if(!mr.status) {
                 if(mr.error) {
-                    if(toastSettings.value) {
+                    //if(toastSettings.value) {
                         toast.add({ 
                             severity: 'error', 
                             summary: 'Error selecting set of waters', 
                             detail: 'Unable to select set of waters from different models / chains',
                             life: 5000
                         })
-                    }
+                    //}
                 } else  {
                     let first, last
                     // sort first last properly

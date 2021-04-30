@@ -86,7 +86,8 @@ export default function UseActions() {
     
         const [molecules, msg, status] = updateMolecule(p.residue, p.type, p.currRepr)
         // update representations selections
-        const [selection, structures] = getSelection(molecules, status, p.currRepr, p.currStr)
+        const [selection, structures] = getSelection(molecules, status, p.currRepr, p.currStr, p.stage)
+        //console.log(structures)
         // remove mouseover representation
         let txt_type = ''
         let res = null
@@ -158,7 +159,7 @@ export default function UseActions() {
 
         const [status, msg] = updateSetOfMolecules(p.type, p.currRepr, p.setOfMolecules, p.residue.chain, p.set_type)
         // update representations selections
-        const [selection, structures] = getSelection(p.setOfMolecules, status, p.currRepr, p.currStr)
+        const [selection, structures] = getSelection(p.setOfMolecules, status, p.currRepr, p.currStr, p.stage)
         let txt_type = ''
         // remove mouseover representation
         if( p.set_type === 'multiple' ) {
@@ -225,7 +226,7 @@ export default function UseActions() {
         }
 
         // update representations selections
-        const [selection, structures] = getSelection(p.model, status, p.currRepr, p.currStr)
+        const [selection, structures] = getSelection(p.model, status, p.currRepr, p.currStr, p.stage)
         // TODO: CLEAN residue, structure
         setMoleculesSettings(null, null, p.currRepr)
             .then((r) => {

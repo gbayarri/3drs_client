@@ -31,12 +31,10 @@ export default {
         let disableFileUpload = ref(false)
 
         const selector = (e) => {
-            
-            //console.log(e.originalEvent)
-            //console.log(e.files.length)
+            //files.value = e.files
             setTimeout(function(){
                 //let ext = ''
-
+                //console.log(e)
                 if(e.originalEvent.path[3].innerText.indexOf('.gro') !== -1 || e.originalEvent.path[3].innerText.indexOf('.pdb') !== -1)  {
                     
                     //console.log(e.files.length)

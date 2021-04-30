@@ -159,7 +159,7 @@ export default {
 
             const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
             // update representations selections
-            const [selection, structures] = getSelection(getTotalContent(modelResidues.value), status, currReprVal.value, currStr.value)
+            const [selection, structures] = getSelection(getTotalContent(modelResidues.value), status, currReprVal.value, currStr.value, stage)
             // TODO: CLEAN residue, structure
             setMoleculesSettings(null, null, currReprVal.value)
                 .then((r) => {

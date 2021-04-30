@@ -1,4 +1,6 @@
 module.exports = {
+    shortName: '3dRS',
+    longName: '3-dimensional structure Representation Sharing',
     aminoacids: {
         ala: { name: 'alanine', id: 'A' },
         arg: { name: 'arginine', id: 'R' },

@@ -158,8 +158,8 @@ export default {
             const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
             // update representations selections
             let selection, structures
-            if(windowType.value === 'residues') [selection, structures] = getSelection(getTotalContent(modelResidues.value, 'residues'), status, currReprVal.value, currStr.value)
-            else [selection, structures] = getSelection(getTotalContent(modelWaters.value, 'waters'), status, currReprVal.value, currStr.value)
+            if(windowType.value === 'residues') [selection, structures] = getSelection(getTotalContent(modelResidues.value, 'residues'), status, currReprVal.value, currStr.value, stage)
+            else [selection, structures] = getSelection(getTotalContent(modelWaters.value, 'waters'), status, currReprVal.value, currStr.value, stage)
             // TODO: CLEAN residue, structure
             setMoleculesSettings(null, null, currReprVal.value)
                 .then((r) => {

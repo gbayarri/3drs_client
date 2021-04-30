@@ -1,4 +1,5 @@
 import { ref, reactive } from 'vue'
+import useRepresentations from '@/modules/representations/useRepresentations'
 
 const multipleResidues = reactive({
   status: false,
@@ -10,6 +11,8 @@ const multipleResidues = reactive({
 const selection = ref([])
 
 export default function useSelections() {
+
+  const { setSelectionRepresentation } = useRepresentations()
 
   const addMultipleResidues = function (residue) {
     multipleResidues.status = !multipleResidues.status
@@ -43,16 +46,35 @@ export default function useSelections() {
   }
 
   // updates selection object and returns selection string
-  const getSelection = function (molecules, status, currReprVal, currStr) {
+  const getSelection = function (molecules, status, currReprVal, currStr, stage) { 
+
     // use only chain, num, model, name
     const m = molecules.map(({ chain, num, model, name }) => ({ chain, num, model, name }))
     // selection according to currReprVal and currStr
-    const sel = selection.value
+    /*const sel = selection.value
       .filter(item => item.id === currReprVal)[0].structures
-      .filter(item => item.id === currStr)[0].selection
+      .filter(item => item.id === currStr)[0].selection*/
+
+    const strs = selection.value
+      .filter(item => item.id === currReprVal)[0].structures
+
+    const sel = strs.filter(item => item.id === currStr)[0].selection
 
     let string_sel = null
     if (status === 'add') { 
+
+      // **********************
+      // TRICK SOLUTION FOR DISABLE ALL THE STRUCTURES THAT ARE SELECTED BY DEFAULT
+      for(const s of strs) {
+        if(s.id !== currStr && s.selection.string === '*') {
+          s.selection.string = 'not(*)'
+          const re = new RegExp('(' + currReprVal + '\-' + s.id + '\-[a-z]*)', 'g')
+          //console.log(re)
+          setSelectionRepresentation(stage, 'not(*)', strs, re, false)
+        }
+      }
+      // **********************
+
       // add new molecules to selection
       sel.molecules.push(...m)
       // set array unique removing repeated items
@@ -79,7 +101,7 @@ export default function useSelections() {
 
     //console.log(selection.value)
 
-    return [string_sel, selection.value.filter(item => item.id === currReprVal)[0].structures]
+    return [string_sel, /*selection.value.filter(item => item.id === currReprVal)[0].structures*/strs]
 
   }
 

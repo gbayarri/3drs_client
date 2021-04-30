@@ -7,7 +7,7 @@
         <Background v-if="!isShared" />
         <FullScreen :stage="stage" />
         <Picture :stage="stage" />
-        <Align v-if="!isShared" :stage="stage" />
+        <Align v-if="!isShared && isAlignable" :stage="stage" />
         <Player v-if="isShared" :stage="stage" />
         <Embed v-if="isShared" :isDraft="isDraft" />
         <Help />
@@ -20,6 +20,7 @@
 import { computed } from 'vue'
 import useStage from "@/modules/ngl/useStage"
 import useFlags from '@/modules/common/useFlags'
+import structureSettings from '@/modules/structure/structureSettings'
 import Reload from '@/components/representation/tools/Reload'
 import Rotate from '@/components/representation/tools/Rotate'
 import Center from '@/components/representation/tools/Center'
@@ -37,10 +38,12 @@ export default {
     setup(props) {
         const { getStage } = useStage()
         const { flags } = useFlags()
+        const { getNumStructures } = structureSettings()
         
         const isShared = computed(() => flags.isShared)
+        const isAlignable = computed(() => getNumStructures() > 1)
         const stage = getStage()
-        return { stage, isShared }
+        return { stage, isShared, isAlignable }
     }
 }
 </script>

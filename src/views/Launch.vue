@@ -29,6 +29,7 @@
 
 <script>
 import { computed } from 'vue'
+import globals from '@/globals'
 import useMessages from '@/modules/common/useMessages'
 import TabPanelPDB from '@/components/launch/TabPanelPDB'
 import TabPanelFile from '@/components/launch/TabPanelFile'
@@ -48,7 +49,7 @@ export default {
     const msg = computed(() => messages.launch)
 
     const launchPanel = {
-      header: " Launch new 3DRS project",
+      header: "Launch new " + globals.shortName + " project",
       description: `<p>Please start uploading one or more structure files from your computer or with a Protein Data Bank ID and the structure will be atomatically uploaded to our server:</p>`
     }
 
