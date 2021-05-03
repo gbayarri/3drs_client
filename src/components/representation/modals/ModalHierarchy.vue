@@ -11,7 +11,7 @@
         </template>
         <Tree :value="nodes" :expandedKeys="expandedKeys" ></Tree>
         <template #footer>
-            <Button :label="labelClose" icon="pi pi-times" @click="closeThisModal" />
+            <Button :label="labelClose" icon="pi pi-times" class="p-button-outlined" @click="closeThisModal" />
         </template>
     </Dialog>
 </template>

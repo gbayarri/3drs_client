@@ -22,6 +22,7 @@
     <!--<ModalStructure v-if="stageLoaded" />-->
     <ModalShare v-if="stageLoaded && !disableComponents" :project_id="project_id" />
     <ModalTips v-if="stageLoaded && !disableComponents" />
+    <ModalAlign v-if="stageLoaded && !disableComponents" />
     <ModalSettings v-if="stageLoaded && !disableComponents" />
     <ModalHierarchy v-if="stageLoaded && !disableComponents" />
 
@@ -45,6 +46,7 @@ import ModalTrajectory from '@/components/representation/modals/ModalTrajectory'
 //import ModalStructure from '@/components/representation/modals/ModalStructure'
 import ModalShare from '@/components/representation/modals/ModalShare'
 import ModalTips from '@/components/representation/modals/ModalTips'
+import ModalAlign from '@/components/representation/modals/ModalAlign'
 import ModalSettings from '@/components/representation/modals/ModalSettings'
 import ModalHierarchy from '@/components/representation/modals/ModalHierarchy'
 export default {
@@ -54,7 +56,7 @@ export default {
         RepresentationSettings, Settings, 
         Share, Legend, 
         Viewport, 
-        ModalTrajectory, /*ModalStructure,*/ ModalShare, ModalTips, ModalSettings, ModalHierarchy },
+        ModalTrajectory, /*ModalStructure,*/ ModalShare, ModalTips, ModalAlign, ModalSettings, ModalHierarchy },
     props: ['id'],
     setup(props) {
 

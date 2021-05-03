@@ -61,4 +61,15 @@ export default {
 }
 #legend span { text-transform: uppercase; font-weight: 600;}
 #legend span.lowercase-legend { text-transform: lowercase!important;}
+@media (max-width: 600px) {
+    #legend { 
+        right:auto; 
+        bottom:auto; 
+        top:1.5%; 
+        position: relative;
+        text-align: center;
+        display: table;
+        margin: 1.5% auto;
+    }
+}
 </style>

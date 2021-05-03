@@ -1,5 +1,5 @@
 import { reactive } from 'vue'
-import { Stage, Selection, DatasourceRegistry, MdsrvDatasource, setListingDatasource, setTrajectoryDatasource, TrajectoryPlayer } from 'ngl'
+import { Stage, Selection, DatasourceRegistry, MdsrvDatasource, /*setListingDatasource,*/ setTrajectoryDatasource, TrajectoryPlayer } from 'ngl'
 
 let stage = reactive({})
 let selection = reactive({})

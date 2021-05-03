@@ -11,6 +11,7 @@
         <Player v-if="isShared" :stage="stage" />
         <Embed v-if="isShared" :isDraft="isDraft" />
         <Help />
+        <Visit v-if="isShared" :isDraft="isDraft" />
         <ProjectSettings v-if="!isShared" />
         </div>
     </div>
@@ -30,10 +31,11 @@ import Picture from '@/components/representation/tools/Picture'
 import Help from '@/components/representation/tools/Help'
 import Player from '@/components/representation/tools/Player'
 import Embed from '@/components/representation/tools/Embed'
+import Visit from '@/components/representation/tools/Visit'
 import Align from '@/components/representation/tools/Align'
 import ProjectSettings from '@/components/representation/tools/ProjectSettings'
 export default {
-    components: { Reload, Rotate, Center, Background, FullScreen, Picture, Help, Player, Embed, Align, ProjectSettings },
+    components: { Reload, Rotate, Center, Background, FullScreen, Picture, Help, Player, Embed, Visit, Align, ProjectSettings },
     props: ['isDraft'],
     setup(props) {
         const { getStage } = useStage()

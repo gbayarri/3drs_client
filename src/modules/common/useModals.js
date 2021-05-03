@@ -8,7 +8,8 @@ const dialog = reactive({
   tips: false,
   block: false,
   hierarchy: false,
-  embed: false
+  embed: false,
+  align: false
 })
 
 const tips = ref('')

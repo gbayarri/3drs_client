@@ -71,7 +71,7 @@
         </div>
 
         <template #footer>
-            <Button label="Close" icon="pi pi-times" @click="closeThisModal" />
+            <Button label="Close" icon="pi pi-times" class="p-button-outlined" @click="closeThisModal" />
         </template>
     </Dialog>
 </template>

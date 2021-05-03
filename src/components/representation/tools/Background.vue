@@ -46,10 +46,13 @@ setup(/*props*/) {
     let myTimeOut = null
     watch(color, (color, prevColor) => {
         //document.getElementById("viewport").style.background = '#' + color
-        document.querySelector("#viewport").style.background = '#' + color
+        document.querySelector("#viewport").style.backgroundColor = '#' + color
         if(!isShared.value) {
             clearTimeout(myTimeOut)
-            myTimeOut = setTimeout(() => autoSaveBackground('#' + color), 5000)
+            myTimeOut = setTimeout(() => {
+                autoSaveBackground('#' + color)
+                cpVisible.value = false
+            }, 5000)
         }
     })
 

@@ -50,7 +50,7 @@
         </div>
 
         <template #footer>
-            <Button :label="labelClose" icon="pi pi-times" @click="closeThisModal" :disabled="sharing" />
+            <Button :label="labelClose" icon="pi pi-times" class="p-button-outlined" @click="closeThisModal" :disabled="sharing" />
         </template>
     </Dialog>
 </template>

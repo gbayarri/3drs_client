@@ -92,7 +92,9 @@ body, html { scrollbar-color: #858f98 #f1f1f1; scrollbar-width: thin; }
 
 /* buttons */
 .p-button { background: #6f96a9; border: 1px solid #6f96a9; }
+.p-button.p-button-outlined { border: 1px solid #6f96a9; color: #6f96a9; }
 .p-button:enabled:hover, .p-fileupload-choose:not(.p-disabled):hover { background: #546974; border-color: #546974; }
+.p-button.p-button-outlined:enabled:hover { border-color: #546974; color: #546974; }
 .p-button:focus { box-shadow: none!important;}
 
 /* forms */

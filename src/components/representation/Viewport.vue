@@ -1,6 +1,6 @@
 <template>
   <div id="stage">
-      <div id="viewport">
+      <div id="viewport" :class="hasBg ? 'bg-viewport': ''">
           <!--<ProgressSpinner v-if="!stageLoaded" strokeWidth="6" animationDuration=".8s"/>-->
       </div>
   </div>
@@ -23,7 +23,7 @@ import useProjectSettings from '@/modules/structure/useProjectSettings'
 import mouseObserver from '@/modules/ngl/mouseObserver'
 import useTrajectories from '@/modules/ngl/useTrajectories'
 export default {
-  props: ['project_id'],
+  props: ['project_id', 'hasBg'],
   setup(props) {
 
     //const $router = inject('$router')
@@ -132,16 +132,22 @@ export default {
           stage.mouseControls.add('doubleClick+left', function( stage, delta ){
               stage.autoView(300)
           } )
+          
           // remove previous action of clickPick+left-ctrl
           stage.mouseControls.remove('clickPick+left-ctrl')
-          // zoom to residue
-          stage.mouseControls.add('clickPick+left-ctrl', function( stage, pickingProxy ){
-            zoomToResidue(stage, pickingProxy)
-          })
-          // select residue
-          stage.mouseControls.add('clickPick+left', function( stage, pickingProxy ){
-            selectResidue(stage, pickingProxy)
-          })
+
+          // ONLY IN REPRESENTATION MODE
+          if(currReprVal.value !== dataProject.value.defaultRepresentation && !isShared.value) {
+           
+            // zoom to residue
+            stage.mouseControls.add('clickPick+left-ctrl', function( stage, pickingProxy ){
+              zoomToResidue(stage, pickingProxy)
+            })
+            // select residue
+            stage.mouseControls.add('clickPick+left', function( stage, pickingProxy ){
+              selectResidue(stage, pickingProxy)
+            })
+          }
 
           // open settings automatically if current representation is not default
           if(currReprVal.value !== dataProject.value.defaultRepresentation && !isShared.value) {
@@ -205,7 +211,7 @@ export default {
           }*/
 
           // set background color
-          document.querySelector("#viewport").style.background = apiData.value.background
+          document.querySelector("#viewport").style.backgroundColor = apiData.value.background
 
           // save apiData to structureStorage.projectData
           // *************************************
@@ -237,8 +243,18 @@ export default {
 </script>
 
 <style>
-    #stage { position:absolute; left:0; top:0; width:100%; height: 100%; z-index: 1; background: #f1f1f1; }
-    #viewport { width:100%; height:100%; background: #f1f1f1; }
+    #stage { position:absolute; left:0; top:0; width:100%; height: 100%; z-index: 1; /*background: #f1f1f1; */ }
+    #viewport { 
+      width:100%; 
+      height:100%; 
+      background-color: #f1f1f1; 
+    }
+    .bg-viewport { 
+      background-size:20% auto; 
+      background-repeat: no-repeat; 
+      background-image: url("~@/assets/img/logo_alpha.png"); 
+      background-position: bottom right; 
+    }
     #viewport div canvas { background: transparent!important; }
     #viewport .p-progress-spinner { 
       width:100px;height:100px; position: absolute;

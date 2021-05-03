@@ -9,12 +9,12 @@ import { computed } from 'vue'
 import useFlags from '@/modules/common/useFlags'
 import useModals from '@/modules/common/useModals'
 export default {
-
     setup() {
-        const ttp = 'Ready to share?<br>Click here!'
+        
         const { openModal } = useModals()
-
         const { flags } = useFlags()
+
+        const ttp = 'Ready to share?<br>Click here!'
         const sidebarEnabled = computed(() => flags.sidebarEnabled)
 
         const openShareModal = () => {

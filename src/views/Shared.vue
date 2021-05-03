@@ -6,7 +6,7 @@
 
     <Legend v-if="stageLoaded" />
 
-    <Viewport :project_id="project_id" />
+    <Viewport :project_id="project_id" :hasBg="true" />
 
     <ModalEmbed v-if="stageLoaded" :project_id="project_id" />
 
