@@ -88,6 +88,14 @@
                     @click="editRepresentation"
                     v-tooltip.right="ttper"
                     :style="enabledRename ? 'background: #546974;' : 'background: transparent;'" />
+
+                    <Button 
+                    v-if="representationSelected.id != defaultRepresentation"
+                    icon="fas fa-tag" 
+                    class="p-button-rounded p-button-outlined repr-button" 
+                    @click="addAnnotation"
+                    v-tooltip.right="ttplb"
+                    :style="enabledAnnotation ? 'background: #546974;' : 'background: transparent;'" />
                 </div>
 
                 <div class="p-col-1">
@@ -260,6 +268,7 @@ export default {
             label_hierarchy: "Hierarchy",
             ttpvs: "View hierarchy map",
             ttper: "Edit representation name",
+            ttplb: "Add label to representation",
             ttphr: computed(() => isVisible.value ? 'Hide representation' : 'Show representation'),
             placeholderRenSel: "Insert new name",
             placeholderNewSel: "Insert new name",
@@ -606,8 +615,9 @@ export default {
                                             + ' has been renamed to '
                                             + newName + '.', 
                                     life: 5000
-                                });
+                                })
                             }
+                            enabledRename.value = false
                             console.log(r.message)
                         } else console.error(r.message)
                     })
@@ -616,6 +626,14 @@ export default {
 
         const visualizeStructure = () => {
             openModal('hierarchy')
+        }
+
+
+        const enabledAnnotation = ref(false)
+        const addAnnotation = () => {
+            enabledAnnotation.value = !enabledAnnotation.value
+            if(enabledAnnotation.value) console.log('add label to representation')
+            else console.log('remove label from representation')
         }
 
         onUpdated(() => {
@@ -635,7 +653,7 @@ export default {
             radius, min_radius, max_radius, hasRadius, /*onChangeRadius,*/
             colorScheme, mainStructureColor, /*onChangeColorScheme,*/ colorUniform, color,
             opacity, /*onChangeOpacity,*/
-            removeRepresentation, visualizeStructure, enabledRename, editRepresentation, renameRepresentation, modelRenSel, rrbDisabled
+            removeRepresentation, visualizeStructure, enabledRename, editRepresentation, renameRepresentation, enabledAnnotation, addAnnotation, modelRenSel, rrbDisabled
         }
     }
 }
@@ -709,6 +727,7 @@ export default {
         font-size: 12px;
         margin: .3rem 0 0 .6rem;
         background:transparent;
+        border-color:#fff;
         /*border:none;*/
     }
     #minisettings .repr-button.danger { position:absolute; right:.8rem; }

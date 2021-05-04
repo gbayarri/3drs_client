@@ -7,7 +7,7 @@
         <Background v-if="!isShared" />
         <FullScreen :stage="stage" />
         <Picture :stage="stage" />
-        <Align v-if="!isShared && isAlignable" :stage="stage" />
+        <Align v-if="!isShared && isAlignable" />
         <Player v-if="isShared" :stage="stage" />
         <Embed v-if="isShared" :isDraft="isDraft" />
         <Help />

@@ -10,7 +10,7 @@ export default {
         const ttp = 'Visit ' + globals.shortName + ' website'
 
         const handleClick = () => {
-            window.open(process.env.VUE_APP_URL, '_blank')
+            window.open(window.location.origin + process.env.BASE_URL, '_blank')
         }
 
         return { ttp, handleClick }

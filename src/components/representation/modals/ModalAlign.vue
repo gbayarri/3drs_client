@@ -20,7 +20,7 @@
                 <label :for="file.id" class="label-checkbox">{{file.name}}</label>
             </div>
             <div class="p-col-4">
-                <InputText v-model="selections[index]" :placeholder="placeholderSel"/>
+                <InputText v-model="selections[file.id]" :placeholder="placeholderSel"/>
             </div>
         </div>
 
@@ -32,24 +32,34 @@
 </template>
 
 <script>
-import { computed, ref, watch, reactive, toRefs } from 'vue'
-import * as NGL from 'ngl'
+import { computed, ref, reactive, toRefs } from 'vue'
+import { useToast } from 'primevue/usetoast'
+import structureStorage from '@/modules/structure/structureStorage'
 import useStage from '@/modules/ngl/useStage'
 import structureSettings from '@/modules/structure/structureSettings'
 import useModals from '@/modules/common/useModals'
+import useAPI from '@/modules/api/useAPI'
+import useProjectSettings from '@/modules/structure/useProjectSettings'
 export default {
     components: {  },
     setup() {
 
-        const { getStage } = useStage()
+        const { projectData } = structureStorage()
+        const { createSuperposition } = useStage()
         const { getFileNames } = structureSettings()
         const { dialog, closeModal } = useModals()
+        const { updateProjectData } = useAPI()
+        const { getProjectSettings } = useProjectSettings()
         
-        const stage = getStage()
+        const dataProject = computed(() => projectData.value)
         const filesList = computed(() => getFileNames())
+        const toastSettings = computed(() => getProjectSettings().toasts) 
+        const toast = useToast()
 
         const structures = ref([])
         const selections = ref([])
+
+        const superpositions = dataProject.value.superpositions
 
         const applyDisabled = computed(() => structures.value.length !== 2)
 
@@ -59,7 +69,7 @@ export default {
             header:'Superpose structures',
             labelClose: 'Close',
             labelApply: 'Apply Superposition',
-            placeholderSel: 'e.g. :A',
+            placeholderSel: 'Selection, e.g. :A',
             nglHelp: process.env.VUE_APP_NGL_HELP_URL
         })
 
@@ -76,32 +86,42 @@ export default {
         /* SUPERPOSITION */
 
         const applySuperposition = () => {
-            //console.log(structures.value[0].name, selections.value)
 
-            const c1 = stage.getComponentsByName(structures.value[0].id).list[0]
-            const c2 = stage.getComponentsByName(structures.value[1].id).list[0]
+            const str1 = structures.value[0].id
+            const str2 = structures.value[1].id
+            const sele1 = selections.value[str1] ? selections.value[str1].toUpperCase() : ''
+            const sele2 = selections.value[str2] ? selections.value[str2].toUpperCase() : ''
 
-            const s1 = c1.structure
-            const s2 = c2.structure
+            createSuperposition(str1, str2, sele1, sele2)
 
-            NGL.superpose(s1, s2, true, selections.value[0], selections.value[1])
-            c1.updateRepresentations({ position: true })
-            c1.autoView()
+            if(toastSettings.value) {
+                toast.add({ 
+                    severity: 'info', 
+                    summary: 'New superposition', 
+                    detail: 'The structures ' 
+                             + structures.value[0].name 
+                             + ' and '
+                             +  structures.value[1].name 
+                             + ' have been superposed',
+                    life: 10000
+                })
+            }
 
-            // SAVE SUPERPOSITIONS TO DB:
-            /* 
-            superpositions: [
-                { 
-                    st1: "STRUCTUREID",
-                    st2: "STRUCTUREID",
-                    sl1: "SELECTION",
-                    sl2: "SELECTION",
-                }
-            ]
-            */
-           // THEN, IN VIEWPORT, FOREACH superpositions, DO THE CODE ABOVE
-           // MOVE THE CODE ABOVE TO ngl/useSuperposition.js AND REUSE IN VIEWPORT
-           // CHECK WITH 4 STRUCTURES: 1GZM, 1U19, 3DQB, 3SN6
+            superpositions.push({
+                st1: str1,
+                st2: str2,
+                sl1: sele1,
+                sl2: sele2
+            })
+            
+            updateProjectData(dataProject.value._id, { superpositions: superpositions })
+                .then((r) => {
+                    if(r.code != 404) console.log(r.message)
+                    else console.error(r.message)
+                })
+
+            structures.value = []
+            selections.value = []
 
         }
 

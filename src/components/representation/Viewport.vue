@@ -49,7 +49,7 @@ export default {
     //const currReprSettings = computed(() => getCurrentRepresentationSettings())
 
     const createViewport = () => {
-      const { createStage } = useStage()
+      const { createStage, createSuperposition } = useStage()
       const stage = createStage("viewport")
       const dataProject = computed(() => projectData.value)
 
@@ -78,10 +78,6 @@ export default {
 
       Promise.all(array_promises)
       .then(function (ol) {
-          /*ol[ 0 ].superpose(ol[ 1 ], false)
-          ol[ 0 ].autoView(":A")*/
-
-          //console.log(ol)
 
           setBlockUI('update')
 
@@ -108,6 +104,13 @@ export default {
               elements: dataProject.value.orientation
             }
             setInitOrientation(orientation)
+          }
+
+          // superpositions???
+          if(dataProject.value.superpositions) {
+            for(const s of dataProject.value.superpositions) {
+              createSuperposition(s.st1, s.st2, s.sl1, s.sl2)
+            }
           }
 
           // init mouse observer
