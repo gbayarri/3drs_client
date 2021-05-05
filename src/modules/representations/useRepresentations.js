@@ -156,7 +156,7 @@ export default function useRepresentations() {
 
     const setColorSchemeRepresentation = async (stage, color_scheme, color, re, update) => {
         for(const item of stage.getRepresentationsByName(re).list) {
-            console.log(color_scheme)
+            //console.log(color_scheme)
             if(color_scheme === 'uniform') item.setColor( color )
             else item.setColor( color_scheme )
         }

@@ -1,4 +1,5 @@
 import { computed } from 'vue'
+import globals from '@/globals'
 import processStructure from '@/modules/ngl/processStructure'
 import structureStorage from '@/modules/structure/structureStorage'
 import structureSettings from '@/modules/structure/structureSettings'
@@ -14,13 +15,11 @@ export default function useComponents() {
 
     const { getStructure } = processStructure()
     const { projectData, updateStructure, updateStructureFirst } = structureStorage()
-    const { 
-        setVisibilityRepresentation,
-        setOpacityRepresentation
+    const {  setVisibilityRepresentation, setOpacityRepresentation
     } = useRepresentations()
     const { currentStructure, updateTrajectorySettings, updateTrajectory } = structureSettings()
     const { addRepresentationToComponent } = drawRepresentation()
-    const { createTrajectoryPlayer, getStage } = useStage()
+    const { createTrajectoryPlayer, getStage, createSelection } = useStage()
     const { checkTrajectory, setInitPlayer, setTrajectoryPlayer, updateCurrentFrame, setTrajectorySettings } = useTrajectories()
     const { closeModal } = useModals()
     //const { updateTrajectoryData } = useAPI()
@@ -32,6 +31,18 @@ export default function useComponents() {
     const currStr = computed(() => currentStructure.value)
     const def_repr = computed(() => projectData.value.defaultRepresentation) 
     const representations = computed(() => dataProject.value.representations) 
+
+    const hex2rgba = (hex, alpha) => {
+        const validHEXInput = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+        if (!validHEXInput) return false
+        const  output = {
+            r: parseInt(validHEXInput[1], 16),
+            g: parseInt(validHEXInput[2], 16),
+            b: parseInt(validHEXInput[3], 16),
+            a: alpha
+        }
+        return `rgba(${output.r}, ${output.g}, ${output.b}, ${output.a})`;
+    }
 
     const loadFileToStage = (stage, url, name, ext, id, traj) => {
         const extension = (ext === undefined) ? 'pdb' : ext
@@ -138,6 +149,36 @@ export default function useComponents() {
                             representation.structures.filter(item => item.id === id)[0].selection.custom
                         // add new representation to component
                         const generatedRepresentations = addRepresentationToComponent(representation, component, name_new, selection)
+
+                        // labels
+                        if(selection !== 'not(*)') {
+                            // TODO!!!! CHECK HERE IF selection.label
+                            // CHECK AS WELL IF THERE IS A SINGLE STRUCTURE (IN THIS CASE, DON'T SHOW STRUCTURE NAME IN ANNOTATION)
+                            // ON CHANGE COLOR SCHEME, MODIFY COLOR (??)
+                            // ON ACTIVATE / DEACTIVATE, CREATE / DESTROY ANNOTATION (SEE REMOVE ANNOTATION)
+                            //console.log(name, component.name, representation.name)
+                            //console.log(representation)
+                            const ap = component.getCenterUntransformed(selection)
+                            //var ap = component.structure.getAtomProxy(0)
+                            /*const sele = createSelection(selection)
+                            const idx = component.structure.getAtomIndices(sele)[ 0 ]
+                            const ap = component.structure.getAtomProxy(idx)*/
+                            //console.log(ap2)
+                            const color = representation.color_scheme === 'uniform' ? 
+                                            representation.color : 
+                                            globals.colorScheme.filter(item => item.id === representation.color_scheme)[0].color
+                            const elm = document.createElement("div")
+                                elm.innerText = name + ' - ' + representation.name
+                                elm.style.color = "#fff"
+                                elm.style.backgroundColor = hex2rgba(color, .5)
+                                elm.style.padding = "15px"
+                                elm.style.fontSize = "25px"
+                                elm.style.textShadow =  '-1px 1px 0 #000, 1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000'
+                            //component.addAnnotation(ap.positionToVector3(), elm)
+                            const ann = component.addAnnotation(ap, elm)
+                            ann.id = representation.id
+                            console.log(ann)
+                        }
                     }
                 }
             }

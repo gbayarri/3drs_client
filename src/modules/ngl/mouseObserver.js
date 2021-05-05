@@ -20,14 +20,14 @@ export default function mouseObserver() {
     const { actionSelectSingleMolecule } = useActions()
 
     const filesList = computed(() => getFileNames())
-    const currStr = computed(() => currentStructure.value)
+    //const currStr = computed(() => currentStructure.value)
     const currReprVal = computed(() => currentRepresentation.value)
     const currReprSettings = computed(() => getCurrentRepresentationSettings())
     const dataProject = computed(() => projectData.value)
     const shortTimeOut = 1000
     const timeOut = 5000
 
-    const re = computed(() => new RegExp('(' + currReprVal.value + '\-' + currStr.value + '\-[a-z]*)', 'g'))
+    //const re = computed(() => new RegExp('(' + currReprVal.value + '\-' + currStr.value + '\-[a-z]*)', 'g'))
 
     /*onMounted(() => {
         console.log(currentStructure.value)
@@ -70,12 +70,16 @@ export default function mouseObserver() {
 
     const checkMouseSignals = (stage) => {
 
-        const component = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0])
+        //const component = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0])
+        let component = null
 
         // on hover actions: show atoms / bonds in legend
         stage.signals.hovered.add( function(pickingProxy){ 
             // update / show legend
             if (pickingProxy && pickingProxy.atom) {
+
+                component = stage.compList.filter(item => item.parameters.name === pickingProxy.atom.structure.name)[0]
+
                 const name = filesList.value.filter(item => item.id === pickingProxy.atom.structure.name)[0].name
                 const model = pickingProxy.atom.modelIndex
                 const chain = pickingProxy.atom.chainname
@@ -104,6 +108,7 @@ export default function mouseObserver() {
                 let radius = 1
                 // nor residues neither waters ( === hetero && ions )
                 //if(selResidues.length === 0) {
+                    // NOT WORKING FOR MULTI STRUCTURES!!!!
                 if(pickingProxy.atom.isHetero() || pickingProxy.atom.isIon()) {
                     radius = 2
                     //console.log(pickingProxy)
@@ -117,10 +122,13 @@ export default function mouseObserver() {
 
                 // NGL representation
                 const sele = resnum + ':' + chain + '/' + model
-                const new_name = currStr.value + '-' + sele + '-hover'
-                const re = new RegExp('(' + currStr.value + '\-[0-9A-Z\:\/]*\-hover)', 'g')
+                //const new_name = currStr.value + '-' + sele + '-hover'
+                //const re = new RegExp('(' + currStr.value + '\-[0-9A-Z\:\/]*\-hover)', 'g')
+                const new_name = pickingProxy.atom.structure.name + '-' + sele + '-hover'
+                //const re = new RegExp('(' + pickingProxy.atom.structure.name + '\-[0-9A-Z\:\/]*\-hover)', 'g')
+                const re = new RegExp('([0-9A-Z\:\/]*\-[0-9A-Z\:\/]*\-hover)', 'g')
                 cleanRepresentation(stage, re)
-                component.value.addRepresentation( "spacefill", { 
+                component.addRepresentation( "spacefill", { 
                     name: new_name,
                     sele: '(' + sele + ')', 
                     opacity:.5, 
@@ -145,7 +153,8 @@ export default function mouseObserver() {
                 setFlagStatus('legendEnabled', false)
                 cleanSequences()
                 cleanHeteroIons()
-                const re = new RegExp('(' + currStr.value + '\-[0-9A-Z\:\/]*\-hover)', 'g')
+                //const re = new RegExp('(' + currStr.value + '\-[0-9A-Z\:\/]*\-hover)', 'g')
+                const re = new RegExp('([0-9A-Z\:\/]*\-[0-9A-Z\:\/]*\-hover)', 'g')
                 cleanRepresentation(stage, re)
             }
         })
@@ -218,14 +227,15 @@ export default function mouseObserver() {
         if (pickingProxy && pickingProxy.atom) {
 
             let myTimeOut = null
-            const component = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0])
+            //const component = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0])
+            const component = stage.compList.filter(item => item.parameters.name === pickingProxy.atom.structure.name)[0]
             const model = pickingProxy.atom.modelIndex
             const chain = pickingProxy.atom.chainname
             const resnum = pickingProxy.atom.resno
 
             const sele = resnum + ':' + chain + '/' + model
 
-            component.value.autoView(sele, 500)
+            component.autoView(sele, 500)
 
             clearTimeout(myTimeOut)
             myTimeOut = setTimeout(() => autoSaveOrientation(stage.viewerControls.getOrientation().elements), shortTimeOut)
@@ -249,9 +259,12 @@ export default function mouseObserver() {
                 resname: resname,
                 currRepr: currReprVal.value,
                 currReprSettings: currReprSettings.value,
-                currStr: currStr.value,
-                strName: filesList.value.filter(item => item.id === currStr.value)[0].name,
-                re: re.value
+                //currStr: currStr.value,
+                currStr: pickingProxy.atom.structure.name,
+                //strName: filesList.value.filter(item => item.id === currStr.value)[0].name,
+                strName: filesList.value.filter(item => item.id === pickingProxy.atom.structure.name)[0].name,
+                //re: re.value
+                re: computed(() => new RegExp('(' + currReprVal.value + '\-' + pickingProxy.atom.structure.name + '\-[a-z]*)', 'g')).value
             }
 
             let type = ''

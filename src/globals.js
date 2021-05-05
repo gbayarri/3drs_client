@@ -44,18 +44,18 @@ module.exports = {
         { name: 'Ribbon', id: 'ribbon' }
     ],
     colorScheme: [
-        { name: 'Atom index', id: 'atomindex' },
-        { name: 'B-factor', id: 'bfactor' },
-        { name: 'Chain id', id: 'chainid' },
-        { name: 'Chain index', id: 'chainindex' },
-        { name: 'Element', id: 'element' },
-        { name: 'Hydrophobicity', id: 'hydrophobicity' },
-        { name: 'Model index', id: 'modelindex' },
-        { name: 'Random', id: 'random' },
-        { name: 'Residue index', id: 'residueindex' },
-        { name: 'Residue name', id: 'resname' },
-        { name: 'Secondary structure', id: 'sstruc' },
-        { name: 'Uniform', id: 'uniform' }
+        { name: 'Atom index', id: 'atomindex', color:'#0384fc' },
+        { name: 'B-factor', id: 'bfactor', color: '#fcce03' },
+        { name: 'Chain id', id: 'chainid', color:'#b00505' },
+        { name: 'Chain index', id: 'chainindex', color:'#b00505' },
+        { name: 'Element', id: 'element', color:'#757575' },
+        { name: 'Hydrophobicity', id: 'hydrophobicity', color:'#f9facd' },
+        { name: 'Model index', id: 'modelindex', color:'#ff2929' },
+        { name: 'Random', id: 'random', color:'#29ff5f' },
+        { name: 'Residue index', id: 'residueindex', color:'#007dfa' },
+        { name: 'Residue name', id: 'resname', color:'#007dfa' },
+        { name: 'Secondary structure', id: 'sstruc', color:'#9600fa' },
+        { name: 'Uniform', id: 'uniform', color:'#000000' }
     ],
     interpolation: [
         { name: 'None', id: '' },

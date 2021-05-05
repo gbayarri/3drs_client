@@ -89,13 +89,13 @@
                     v-tooltip.right="ttper"
                     :style="enabledRename ? 'background: #546974;' : 'background: transparent;'" />
 
-                    <Button 
+                    <!--<Button 
                     v-if="representationSelected.id != defaultRepresentation"
                     icon="fas fa-tag" 
                     class="p-button-rounded p-button-outlined repr-button" 
                     @click="addAnnotation"
                     v-tooltip.right="ttplb"
-                    :style="enabledAnnotation ? 'background: #546974;' : 'background: transparent;'" />
+                    :style="enabledAnnotation ? 'background: #546974;' : 'background: transparent;'" />-->
                 </div>
 
                 <div class="p-col-1">
@@ -629,12 +629,12 @@ export default {
         }
 
 
-        const enabledAnnotation = ref(false)
+        /*const enabledAnnotation = ref(false)
         const addAnnotation = () => {
             enabledAnnotation.value = !enabledAnnotation.value
             if(enabledAnnotation.value) console.log('add label to representation')
             else console.log('remove label from representation')
-        }
+        }*/
 
         onUpdated(() => {
             if(enabledRename.value && newName !== currReprSettings.value.name) enabledRename.value = false
@@ -653,7 +653,7 @@ export default {
             radius, min_radius, max_radius, hasRadius, /*onChangeRadius,*/
             colorScheme, mainStructureColor, /*onChangeColorScheme,*/ colorUniform, color,
             opacity, /*onChangeOpacity,*/
-            removeRepresentation, visualizeStructure, enabledRename, editRepresentation, renameRepresentation, enabledAnnotation, addAnnotation, modelRenSel, rrbDisabled
+            removeRepresentation, visualizeStructure, enabledRename, editRepresentation, renameRepresentation, /*enabledAnnotation, addAnnotation, */modelRenSel, rrbDisabled
         }
     }
 }

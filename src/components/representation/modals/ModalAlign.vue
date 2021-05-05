@@ -40,17 +40,20 @@ import structureSettings from '@/modules/structure/structureSettings'
 import useModals from '@/modules/common/useModals'
 import useAPI from '@/modules/api/useAPI'
 import useProjectSettings from '@/modules/structure/useProjectSettings'
+import useSettings from '@/modules/settings/useSettings'
 export default {
     components: {  },
     setup() {
 
         const { projectData } = structureStorage()
-        const { createSuperposition } = useStage()
+        const { getStage, createSuperposition } = useStage()
         const { getFileNames } = structureSettings()
         const { dialog, closeModal } = useModals()
         const { updateProjectData } = useAPI()
         const { getProjectSettings } = useProjectSettings()
+        const { setPositionSettings } = useSettings()
         
+        const stage = getStage()
         const dataProject = computed(() => projectData.value)
         const filesList = computed(() => getFileNames())
         const toastSettings = computed(() => getProjectSettings().toasts) 
@@ -89,23 +92,12 @@ export default {
 
             const str1 = structures.value[0].id
             const str2 = structures.value[1].id
+            const name1 = structures.value[0].name
+            const name2 = structures.value[1].name
             const sele1 = selections.value[str1] ? selections.value[str1].toUpperCase() : ''
             const sele2 = selections.value[str2] ? selections.value[str2].toUpperCase() : ''
 
             createSuperposition(str1, str2, sele1, sele2)
-
-            if(toastSettings.value) {
-                toast.add({ 
-                    severity: 'info', 
-                    summary: 'New superposition', 
-                    detail: 'The structures ' 
-                             + structures.value[0].name 
-                             + ' and '
-                             +  structures.value[1].name 
-                             + ' have been superposed',
-                    life: 10000
-                })
-            }
 
             superpositions.push({
                 st1: str1,
@@ -116,7 +108,26 @@ export default {
             
             updateProjectData(dataProject.value._id, { superpositions: superpositions })
                 .then((r) => {
-                    if(r.code != 404) console.log(r.message)
+                    if(r.code != 404) {
+                        setPositionSettings(stage)
+                            .then((r) => {
+                                if(r.code != 404) console.log(r.message)
+                                else console.error(r.message)
+                            })
+                        if(toastSettings.value) {
+                            toast.add({ 
+                                severity: 'info', 
+                                summary: 'New superposition', 
+                                detail: 'The structures ' 
+                                        + name1
+                                        + ' and '
+                                        +  name2
+                                        + ' have been superposed',
+                                life: 10000
+                            })
+                        }
+                        console.log(r.message)
+                    }
                     else console.error(r.message)
                 })
 

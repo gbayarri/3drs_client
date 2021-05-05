@@ -106,12 +106,21 @@ export default {
             setInitOrientation(orientation)
           }
 
-          // superpositions???
+          // superpositions
           if(dataProject.value.superpositions) {
             for(const s of dataProject.value.superpositions) {
               createSuperposition(s.st1, s.st2, s.sl1, s.sl2)
             }
           }
+
+          // labels??
+          //console.log(ol)
+          /*stage.eachRepresentation( (rp) => {
+            const params = rp.parameters
+            if(params.name.indexOf(dataProject.value.defaultRepresentation) === -1 && params.sele !== 'not(*)') {
+              console.log(rp.getParameters())
+            }
+          })*/
 
           // init mouse observer
           if(!isShared.value) checkMouseSignals(stage)
