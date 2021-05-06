@@ -55,7 +55,7 @@ module.exports = {
         { name: 'Residue index', id: 'residueindex', color:'#007dfa' },
         { name: 'Residue name', id: 'resname', color:'#007dfa' },
         { name: 'Secondary structure', id: 'sstruc', color:'#9600fa' },
-        { name: 'Uniform', id: 'uniform', color:'#000000' }
+        { name: 'Uniform', id: 'uniform', color:'#f1f1f1' }
     ],
     interpolation: [
         { name: 'None', id: '' },

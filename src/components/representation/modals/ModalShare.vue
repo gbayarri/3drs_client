@@ -25,7 +25,7 @@
 
         <p><InputSwitch v-model="forkable" class="margin-top-5" :disabled="sharing" /> <span class="label-switch">{{ status_fork }}</span></p>
         
-        <p><span class="num-list">3)</span> Finally, clicking the button below <strong>the shared project will be generated</strong> and you will be redirected to this shared project. 
+        <p><span class="num-list">3)</span> Finally, clicking the button below <strong>the shared project will be generated</strong>. 
         Remember that <strong>you can share the same project as many times as you want</strong>, but once a project is shared, the subsequent updates in the current representation <strong> won't
         be reflected </strong> in the previous shared projects. </p>
 

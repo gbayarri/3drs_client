@@ -23,12 +23,14 @@ export default function useStage() {
         NGL.setTrajectoryDatasource(mdsrvDatasource)*/
 
         // measurements
-        NGL.setMeasurementDefaultParams({ 
-            color: '#000', 
-            labelColor: 0x000, 
+        /*NGL.setMeasurementDefaultParams({ 
+            color: '#ff0000',
+            labelColor: 0xFF0000, 
             labelSize: 6,
-            arcVisible: true
-            /*labelAttachment: 'bottom-center', 
+            arcVisible: true,
+            labelBorder: true, 
+            labelBorderColor: 0xf00, 
+            labelAttachment: 'bottom-center', 
             labelSize: 0.7, 
             labelZOffset: 0.5, 
             labelYOffset: 0.1, 
@@ -41,8 +43,8 @@ export default function useStage() {
            
             labelUnit: 'angstrom', 
             arcVisible: true, 
-            planeVisible: false */
-          })
+            planeVisible: false 
+          })*/
 
         stage = new NGL.Stage(layer, { tooltip:false })
         //console.log('stage created')
@@ -83,7 +85,13 @@ export default function useStage() {
         c1.updateRepresentations({ position: true })
         c1.autoView()
     }
+
+    const calculateDistance = function (atom1, atom2) {
+        const outer = new NGL.Vector3(atom1.x, atom1.y, atom1.z)
+        const inner = new NGL.Vector3(atom2.x, atom2.y, atom2.z)
+        return outer.distanceTo(inner)
+    }
   
-    return { stage, selection, createStage, getStage, createSelection, createTrajectoryPlayer, createSuperposition }
+    return { stage, selection, createStage, getStage, createSelection, createTrajectoryPlayer, createSuperposition, calculateDistance }
   
   }

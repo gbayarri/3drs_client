@@ -175,7 +175,7 @@ export default function useRepresentations() {
             if(color_scheme === 'uniform') item.setColor( color )
             else item.setColor( color_scheme )
         }
-        updateAnnotationColor(stage, representation)
+        if(representation.label) updateAnnotationColor(stage, representation)
         if(update) {
             return await updateRepresentationData(prjID, currentRepresentation.value, { color_scheme: color_scheme })
         }
@@ -190,7 +190,7 @@ export default function useRepresentations() {
             return await new Promise((resolve) => {
                 clearTimeout(myTimeOutColor)
                 myTimeOutColor = setTimeout(() => {
-                    updateAnnotationColor(stage, representation)
+                    if(representation.label) updateAnnotationColor(stage, representation)
                     const response = updateRepresentationData(prjID, currentRepresentation.value, { color: color })
                     resolve(response)
                 }, shortTimeOut)

@@ -1,4 +1,4 @@
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed/*, onMounted*/ } from 'vue'
 import useLegend from '@/modules/viewport/useLegend'
 import structureStorage from '@/modules/structure/structureStorage'
 import useFlags from '@/modules/common/useFlags'
@@ -6,7 +6,10 @@ import useAPI from '@/modules/api/useAPI'
 import structureSettings from '@/modules/structure/structureSettings'
 import useRepresentations from '@/modules/representations/useRepresentations'
 import useActions from '@/modules/representations/useActions'
+import useStage from '@/modules/ngl/useStage'
+import useMeasurements from '@/modules/structure/useMeasurements'
 const initialOrientation = ref([])
+//const distances = ref([])
 
 // Stage interactions
 export default function mouseObserver() {
@@ -15,9 +18,11 @@ export default function mouseObserver() {
     const { setFlagStatus } = useFlags()
     const { projectData } = structureStorage()
     const { updateProjectData } = useAPI()
-    const { currentStructure, getFileNames, getMolecule } = structureSettings()
+    const { /*currentStructure,*/ getFileNames, getMolecule } = structureSettings()
     const { currentRepresentation, getCurrentRepresentationSettings } = useRepresentations()
     const { actionSelectSingleMolecule } = useActions()
+    const { calculateDistance } = useStage()
+    const { getMeasurements, updateMeasurements } = useMeasurements()
 
     const filesList = computed(() => getFileNames())
     //const currStr = computed(() => currentStructure.value)
@@ -26,6 +31,8 @@ export default function mouseObserver() {
     const dataProject = computed(() => projectData.value)
     const shortTimeOut = 1000
     const timeOut = 5000
+    let atomPair = []
+    let atomTriple = []
 
     //const re = computed(() => new RegExp('(' + currReprVal.value + '\-' + currStr.value + '\-[a-z]*)', 'g'))
 
@@ -286,13 +293,148 @@ export default function mouseObserver() {
         }
     }
 
+    const getDistance = (stage, pickingProxy) => {
+        if (pickingProxy && pickingProxy.atom) {
+
+            const model = pickingProxy.atom.modelIndex
+            const chain = pickingProxy.atom.chainname
+            const resnum = pickingProxy.atom.resno
+            const atomname = pickingProxy.atom.atomname
+
+            atomPair.push({
+                sele: `${resnum}:${chain}.${atomname}/${model}`,
+                coords: {
+                    x: pickingProxy.atom.x,
+                    y: pickingProxy.atom.y,
+                    z: pickingProxy.atom.z
+                }
+            })
+
+            if(atomPair.length === 2) {
+                console.log(atomPair)           
+
+                const component = stage.compList.filter(item => item.parameters.name === pickingProxy.atom.structure.name)[0]
+                const atom1 = atomPair[0]
+                const atom2 = atomPair[1]
+
+                const dist = calculateDistance(atom1.coords, atom2.coords)
+                const size = (dist <= 4) ? 4 : (dist / 5)
+
+                component.addRepresentation("distance", {
+                    // TODO!!!!
+                    // ******************************
+                    // define name for removing!!! pickingProxy.atom.structure.name - dist - generate key / id unique in array distances???
+                    // *******************************
+                    atomPair: [ [ atom1.sele, atom2.sele ] ],
+                    labelSize: size,
+                    labelColor: 0xffffff, 
+                    color: 0x000,
+                    labelBorder: true,
+                    labelBorderColor: 0x000,
+                    labelBorderWidth: .3,
+                    labelBackground: true,
+                    labelBackgroundColor: 0x000000,
+                    labelBackgroundMargin: 2,
+                    labelBackgroundOpacity: .5,
+                    labelUnit: 'angstrom',
+                    labelAttachment: 'middle-right',
+                    linewidth: 10
+                })
+
+                const distances = getMeasurements('distances')
+                distances.filter(item => item.id === pickingProxy.atom.structure.name)[0].atomPairs.push([ atom1.sele, atom2.sele ])
+
+                // modify structure for saving distance
+                // put all measurements in one structure in DB?
+                // put addRepresentation to useMeasurements
+                // create removeMeasurement in useMeasurements as well
+
+                updateMeasurements('distances', distances)
+                    .then((r) => {
+                        if(r.code != 404) console.log(r.message)
+                        else console.error(r.message)
+                    })
+
+                /*getMeasurements,
+        updateMeasurements,*/
+
+                //console.log(component)
+
+                // TODO: save by component
+
+                atomPair = []
+            }
+
+        }
+    }
+
+
+    const getAngle = (stage, pickingProxy) => {
+        if (pickingProxy && pickingProxy.atom) {
+
+            const model = pickingProxy.atom.modelIndex
+            const chain = pickingProxy.atom.chainname
+            const resnum = pickingProxy.atom.resno
+            const atomname = pickingProxy.atom.atomname
+
+            atomTriple.push({
+                sele: `${resnum}:${chain}.${atomname}/${model}`,
+                coords: {
+                    x: pickingProxy.atom.x,
+                    y: pickingProxy.atom.y,
+                    z: pickingProxy.atom.z
+                }
+            })
+
+            if(atomTriple.length === 3) {
+                console.log(atomTriple)           
+
+                const component = stage.compList.filter(item => item.parameters.name === pickingProxy.atom.structure.name)[0]
+                const atom1 = atomTriple[0]
+                const atom2 = atomTriple[1]
+                const atom3 = atomTriple[2]
+
+                //const dist = calculateDistance(atom1.coords, atom2.coords)
+                //const size = (dist <= 4) ? 4 : (dist / 5)
+
+                component.addRepresentation("angle", {
+                    atomTriple: [ [ atom1.sele, atom2.sele, atom3.sele ] ],
+                    labelSize: 5,
+                    labelColor: 0xffffff, 
+                    color: 0x546974,
+                    labelBorder: true,
+                    labelBorderColor: 0x546974,
+                    labelBorderWidth: .3,
+                    labelBackground: true,
+                    labelBackgroundColor: 0x546974,
+                    labelBackgroundMargin: 2,
+                    labelBackgroundOpacity: .5,
+                    labelUnit: 'angstrom',
+                    labelAttachment: 'middle-right',
+                    arcVisible: true,
+                    linewidth: 10
+                    //sdf: false
+                })
+
+                console.log(component)
+
+                // TODO: save by component
+
+                atomTriple = []
+            }
+
+        }        
+    }
+
   return { 
       initialOrientation,
       setInitOrientation,
       checkMouseSignals, 
       checkMouseSignalsShared, 
       zoomToResidue,
-      selectResidue
+      selectResidue,
+      getDistance,
+      getAngle
     }
 
 }

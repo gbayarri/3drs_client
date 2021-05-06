@@ -2,11 +2,11 @@
     <div id="tools" >
         <div>
         <Reload :stage="stage" />
-        <Rotate :stage="stage" />
+        <Rotate v-if="isShared" :stage="stage" />
         <Center :stage="stage" />
         <Background v-if="!isShared" />
         <FullScreen :stage="stage" />
-        <Picture :stage="stage" />
+        <Picture v-if="isShared" :stage="stage" />
         <Align v-if="!isShared && isAlignable" />
         <Player v-if="isShared" :stage="stage" />
         <Embed v-if="isShared" :isDraft="isDraft" />
@@ -37,7 +37,7 @@ import ProjectSettings from '@/components/representation/tools/ProjectSettings'
 export default {
     components: { Reload, Rotate, Center, Background, FullScreen, Picture, Help, Player, Embed, Visit, Align, ProjectSettings },
     props: ['isDraft'],
-    setup(props) {
+    setup() {
         const { getStage } = useStage()
         const { flags } = useFlags()
         const { getNumStructures } = structureSettings()

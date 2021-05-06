@@ -20,6 +20,7 @@ import structureSettings from '@/modules/structure/structureSettings'
 import useRepresentations from '@/modules/representations/useRepresentations'
 import useSelections from '@/modules/representations/useSelections'
 import useProjectSettings from '@/modules/structure/useProjectSettings'
+import useMeasurements from '@/modules/structure/useMeasurements'
 import mouseObserver from '@/modules/ngl/mouseObserver'
 import useTrajectories from '@/modules/ngl/useTrajectories'
 export default {
@@ -33,12 +34,13 @@ export default {
     const { dialog, openModal, closeModal, setBlockUI } = useModals()
     const { apiData, fetchProject, updateProjectData } = useAPI()
     const { loadFileToStage } = useComponents()
-    const { setInitOrientation, checkMouseSignals, checkMouseSignalsShared, zoomToResidue, selectResidue } = mouseObserver()
+    const { setInitOrientation, checkMouseSignals, checkMouseSignalsShared, zoomToResidue, selectResidue, getDistance, getAngle } = mouseObserver()
     const { /*processedStructure,*/ projectData, updateStructureProject, resetStructure, getFirstProjectData } = structureStorage()
     const { /*settings,*/ setCurrentStructure } = structureSettings()
     const { /*defaultRepresentation,*/ currentRepresentation, setCurrentRepresentation/*, getCurrentRepresentationSettings*/ } = useRepresentations()
     const { setSelection, checkSelectionType } = useSelections()
     const { setProjectSettings, getProjectSettings } = useProjectSettings()
+    const { setMeasurements } = useMeasurements()
     const { checkPlayersLoaded } = useTrajectories()
 
     const project_id = props.project_id
@@ -66,13 +68,17 @@ export default {
 
       //const structures = [{ name:"1pik", id: "1" }, { name:"2kod", id: "3" }, { name:"2rgp", id: "4" }/*{ name:"6ACC", id: "4" }, { name:"2rgp", id: "1" }, /*{ name:"1mbs", id: "2" }, { name:"1pik", id: "3" }, { name:"2kod", id: "4" }, { name:"2vgb", id: "5" },*/  ]
       const structures = dataProject.value.files
+      const measurements = { distances: dataProject.value.distances, angles: dataProject.value.angles }
+      console.log(measurements)
       const array_promises = []
       for(const str of structures) {
         //console.log(str.trajectory)
+        const dst = measurements.distances.filter(item => item.id === str.id)[0]
+        const ang = measurements.angles.filter(item => item.id === str.id)[0]
         array_promises
           .push(
             //loadFileToStage(stage, "https://files.rcsb.org/download/" + str.name + ".pdb", str.name, str.id)
-            loadFileToStage(stage, process.env.VUE_APP_API_LOCATION + '/download/' + str.id, str.name, str.ext, str.id, str.trajectory)
+            loadFileToStage(stage, process.env.VUE_APP_API_LOCATION + '/download/' + str.id, str.name, str.ext, str.id, str.trajectory, dst, ang)
           )
       }
 
@@ -148,18 +154,33 @@ export default {
           // remove previous action of clickPick+left-ctrl
           stage.mouseControls.remove('clickPick+left-ctrl')
 
+          // remove previous action of clickPick+right
+          stage.mouseControls.remove('clickPick+right')
+
+          //console.log(currReprVal.value, dataProject.value.defaultRepresentation, !isShared.value)
+          const reprMode = computed(() => (currReprVal.value !== dataProject.value.defaultRepresentation && !isShared.value))
+
           // ONLY IN REPRESENTATION MODE
-          if(currReprVal.value !== dataProject.value.defaultRepresentation && !isShared.value) {
+          //if(reprMode.value) {
            
             // zoom to residue
             stage.mouseControls.add('clickPick+left-ctrl', function( stage, pickingProxy ){
-              zoomToResidue(stage, pickingProxy)
+              if(reprMode.value) zoomToResidue(stage, pickingProxy)
             })
             // select residue
             stage.mouseControls.add('clickPick+left', function( stage, pickingProxy ){
-              selectResidue(stage, pickingProxy)
+              if(reprMode.value) selectResidue(stage, pickingProxy)
             })
-          }
+            // get distance 
+            stage.mouseControls.add('clickPick+right', function( stage, pickingProxy ){
+              //console.log(reprMode.value)
+              if(reprMode.value) getDistance(stage, pickingProxy)
+            })
+            // get angle
+            stage.mouseControls.add('clickPick+right-ctrl', function( stage, pickingProxy ){
+              if(reprMode.value) getAngle(stage, pickingProxy)
+            })
+          //}
 
           // open settings automatically if current representation is not default
           if(currReprVal.value !== dataProject.value.defaultRepresentation && !isShared.value) {
@@ -233,6 +254,7 @@ export default {
           // *************************************
 
           setProjectSettings(apiData.value.projectSettings)
+          setMeasurements(apiData.value.distances, apiData.value.angles)
 
           // set selections global var
           setSelection(apiData.value.representations, apiData.value.defaultRepresentation)

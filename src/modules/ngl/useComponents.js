@@ -10,6 +10,7 @@ import useStage from '@/modules/ngl/useStage'
 //import useFlags from '@/modules/common/useFlags'
 import useModals from '@/modules/common/useModals'
 //import useAPI from '@/modules/api/useAPI'
+import useMeasurements from '@/modules/structure/useMeasurements'
 // Stage interactions
 export default function useComponents() {
 
@@ -18,7 +19,7 @@ export default function useComponents() {
     const {  setVisibilityRepresentation, setOpacityRepresentation, createAnnotation } = useRepresentations()
     const { currentStructure, updateTrajectorySettings, updateTrajectory } = structureSettings()
     const { addRepresentationToComponent } = drawRepresentation()
-    const { createTrajectoryPlayer, getStage, createSelection } = useStage()
+    const { createTrajectoryPlayer, getStage/*, createSelection*/ } = useStage()
     const { checkTrajectory, setInitPlayer, setTrajectoryPlayer, updateCurrentFrame, setTrajectorySettings } = useTrajectories()
     const { closeModal } = useModals()
     //const { updateTrajectoryData } = useAPI()
@@ -43,7 +44,7 @@ export default function useComponents() {
         return `rgba(${output.r}, ${output.g}, ${output.b}, ${output.a})`;
     }*/
 
-    const loadFileToStage = (stage, url, name, ext, id, traj) => {
+    const loadFileToStage = (stage, url, name, ext, id, traj, distances, angles) => {
         const extension = (ext === undefined) ? 'pdb' : ext
         return stage.loadFile(url, { defaultRepresentation: false, ext: extension, name:id })
             .then(function (component) {
@@ -152,32 +153,36 @@ export default function useComponents() {
                         // labels
                         if(selection !== 'not(*)' && representation.label) {
                             createAnnotation(component, selection, representation, name)
-                            // TODO!!!! CHECK HERE IF selection.label
-                            // CHECK AS WELL IF THERE IS A SINGLE STRUCTURE (IN THIS CASE, DON'T SHOW STRUCTURE NAME IN ANNOTATION)
-                            // ON CHANGE COLOR SCHEME, MODIFY COLOR (??)
-                            // ON ACTIVATE / DEACTIVATE, CREATE / DESTROY ANNOTATION (SEE REMOVE ANNOTATION)
-                            //console.log(name, component.name, representation.name)
-                            //const ap = component.getCenterUntransformed(selection)
-                            //var ap = component.structure.getAtomProxy(0)
-                            /*const sele = createSelection(selection)
-                            const idx = component.structure.getAtomIndices(sele)[ 0 ]
-                            const ap = component.structure.getAtomProxy(idx)*/
-                            //console.log(ap2)
-                            /*const color = representation.color_scheme === 'uniform' ? 
-                                            representation.color : 
-                                            globals.colorScheme.filter(item => item.id === representation.color_scheme)[0].color
-                            const elm = document.createElement("div")
-                                elm.innerText = name + ' - ' + representation.name
-                                elm.style.color = "#fff"
-                                elm.style.backgroundColor = hex2rgba(color, .5)
-                                elm.style.padding = "15px"
-                                elm.style.fontSize = "25px"
-                                elm.style.textShadow =  '-1px 1px 0 #000, 1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000'
-                            //component.addAnnotation(ap.positionToVector3(), elm)
-                            const ann = component.addAnnotation(ap, elm)
-                            ann.id = representation.id
-                            console.log(ann)*/
                         }
+
+                        // distances
+                        if(distances.atomPairs.length > 0) {
+                            for(const ap of distances.atomPairs) {
+                                component.addRepresentation("distance", {
+                                    // TODO!!!!
+                                    // ******************************
+                                    // define name for removing!!! pickingProxy.atom.structure.name - dist - generate key / id unique in array distances???
+                                    // *******************************
+                                    atomPair: [ [ ap[0], ap[1] ] ],
+                                    labelSize: 5,
+                                    labelColor: 0xffffff, 
+                                    color: 0x000,
+                                    labelBorder: true,
+                                    labelBorderColor: 0x000,
+                                    labelBorderWidth: .3,
+                                    labelBackground: true,
+                                    labelBackgroundColor: 0x000000,
+                                    labelBackgroundMargin: 2,
+                                    labelBackgroundOpacity: .5,
+                                    labelUnit: 'angstrom',
+                                    labelAttachment: 'middle-right',
+                                    linewidth: 10
+                                })
+                            }
+                        }
+
+                        // angles
+                        //console.log(angles)
                     }
                 }
             }
@@ -185,30 +190,6 @@ export default function useComponents() {
             return component
         })
     }
-
-    /*const createAnnotation = (component, selection, representation, name) => {
-
-        //console.log(component, selection, representation, name)
-
-        const ap = component.getCenterUntransformed(selection)
-
-        const color = representation.color_scheme === 'uniform' ? 
-                        representation.color : 
-                        globals.colorScheme.filter(item => item.id === representation.color_scheme)[0].color
-
-        const elm = document.createElement("div")
-            elm.innerText = name + ' - ' + representation.name
-            elm.style.color = "#fff"
-            elm.style.backgroundColor = hex2rgba(color, .5)
-            elm.style.padding = "15px"
-            elm.style.fontSize = "25px"
-            elm.style.textShadow =  '-1px 1px 0 #000, 1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000'
-
-        const ann = component.addAnnotation(ap, elm)
-        ann.id = representation.id
-        //console.log(ann)
-
-    }*/
 
     const addRepresentation = (stage, representation) => {
 
