@@ -1,4 +1,5 @@
 import { ref, computed } from 'vue'
+import globals from '@/globals'
 import structureStorage from '@/modules/structure/structureStorage'
 import useAPI from '@/modules/api/useAPI'
 import drawRepresentation from '@/modules/ngl/drawRepresentation'
@@ -154,19 +155,34 @@ export default function useRepresentations() {
         }
     }
 
-    const setColorSchemeRepresentation = async (stage, color_scheme, color, re, update) => {
+    const updateAnnotationColor = (stage, representation) => {
+        stage.eachComponent( ( component ) => {
+            component.eachAnnotation( (annotation) => {
+                if(annotation.id === currentRepresentation.value) {
+                    component.removeAnnotation(annotation)
+                }
+            })
+            const re = new RegExp('(' + currentRepresentation.value + '\-' + component.parameters.name + '\-[a-z]*)', 'g')
+            for(const item of stage.getRepresentationsByName(re).list) {
+                if(item.parameters.sele !== 'not(*)') createAnnotation(component, item.parameters.sele, representation, component.structure.id)
+            }
+        })
+    }
+
+    const setColorSchemeRepresentation = async (stage, color_scheme, color, re, representation, update) => {
         for(const item of stage.getRepresentationsByName(re).list) {
             //console.log(color_scheme)
             if(color_scheme === 'uniform') item.setColor( color )
             else item.setColor( color_scheme )
         }
+        updateAnnotationColor(stage, representation)
         if(update) {
             return await updateRepresentationData(prjID, currentRepresentation.value, { color_scheme: color_scheme })
         }
     }
 
     let myTimeOutColor = null
-    const setColorRepresentation = async (stage, color, re, update) => {
+    const setColorRepresentation = async (stage, color, re, representation, update) => {
         for(const item of stage.getRepresentationsByName(re).list) {
             item.setColor( color )
         }
@@ -174,6 +190,7 @@ export default function useRepresentations() {
             return await new Promise((resolve) => {
                 clearTimeout(myTimeOutColor)
                 myTimeOutColor = setTimeout(() => {
+                    updateAnnotationColor(stage, representation)
                     const response = updateRepresentationData(prjID, currentRepresentation.value, { color: color })
                     resolve(response)
                 }, shortTimeOut)
@@ -195,6 +212,61 @@ export default function useRepresentations() {
                     resolve(response)
                 }, shortTimeOut)
             })
+        }
+    }
+
+    const hex2rgba = (hex, alpha) => {
+        const validHEXInput = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+        if (!validHEXInput) return false
+        const  output = {
+            r: parseInt(validHEXInput[1], 16),
+            g: parseInt(validHEXInput[2], 16),
+            b: parseInt(validHEXInput[3], 16),
+            a: alpha
+        }
+        return `rgba(${output.r}, ${output.g}, ${output.b}, ${output.a})`;
+    }
+
+    const createAnnotation = (component, selection, representation, name) => {
+
+        const ap = component.getCenterUntransformed(selection)
+
+        const color = representation.color_scheme === 'uniform' ? 
+                        representation.color : 
+                        globals.colorScheme.filter(item => item.id === representation.color_scheme)[0].color
+
+        const elm = document.createElement("div")
+            elm.innerText = name + ' - ' + representation.name
+            elm.style.color = "#fff"
+            elm.style.backgroundColor = hex2rgba(color, .5)
+            elm.style.padding = "15px"
+            elm.style.fontSize = "25px"
+            elm.style.textShadow =  '-1px 1px 0 #000, 1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000'
+
+        const ann = component.addAnnotation(ap, elm)
+        ann.id = representation.id
+
+    }
+
+    const setLabelRepresentation = async (stage, label, representation, update) => {
+        if(label) {
+            stage.eachComponent( ( component ) => {
+                const re = new RegExp('(' + currentRepresentation.value + '\-' + component.parameters.name + '\-[a-z]*)', 'g')
+                for(const item of stage.getRepresentationsByName(re).list) {
+                    if(item.parameters.sele !== 'not(*)') createAnnotation(component, item.parameters.sele, representation, component.structure.id)
+                }
+            })
+        } else {
+            stage.eachComponent( ( component ) => {
+                component.eachAnnotation( (annotation) => {
+                    if(annotation.id === currentRepresentation.value) {
+                        component.removeAnnotation(annotation)
+                    }
+                })
+            })
+        }
+        if(update) {
+            return await updateRepresentationData(prjID, currentRepresentation.value, { label: label })
         }
     }
 
@@ -285,12 +357,14 @@ export default function useRepresentations() {
         setVisibilityRepresentation,
         setMolecularRepresentation,
         setOpacityRepresentation,
+        setLabelRepresentation,
         createNewRepresentation,
         setRadiusRepresentation,
         setColorSchemeRepresentation,
         setColorRepresentation,
         deleteRepresentation,
-        getHierarchy
+        getHierarchy,
+        createAnnotation
     }
 
 }

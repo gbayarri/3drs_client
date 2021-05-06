@@ -84,18 +84,16 @@
                     <Button 
                     v-if="representationSelected.id != defaultRepresentation"
                     icon="fas fa-edit" 
-                    class="p-button-rounded p-button-outlined repr-button" 
+                    :class="'p-button-rounded p-button-outlined repr-button' + (enabledRename ? ' highlighted-btn-minisettings' : '')" 
                     @click="editRepresentation"
-                    v-tooltip.right="ttper"
-                    :style="enabledRename ? 'background: #546974;' : 'background: transparent;'" />
+                    v-tooltip.right="ttper" />
 
-                    <!--<Button 
+                    <Button 
                     v-if="representationSelected.id != defaultRepresentation"
                     icon="fas fa-tag" 
-                    class="p-button-rounded p-button-outlined repr-button" 
+                    :class="'p-button-rounded p-button-outlined repr-button' + (enabledAnnotation ? ' highlighted-btn-minisettings' : '')" 
                     @click="addAnnotation"
-                    v-tooltip.right="ttplb"
-                    :style="enabledAnnotation ? 'background: #546974;' : 'background: transparent;'" />-->
+                    v-tooltip.right="ttplb" />
                 </div>
 
                 <div class="p-col-1">
@@ -224,7 +222,7 @@ export default {
     setup() {
 
         const { stage } = useStage()
-        const { addRepresentation, delRepresentation } = useComponents()
+        const { addLabelToRepresentation, removeLabelFromRepresentation, addRepresentation, delRepresentation } = useComponents()
         const { projectData, updateStructureProject, removeRepresentationFromStructure } = structureStorage()
         const { setFlagStatus } = useFlags()
         const { 
@@ -240,6 +238,7 @@ export default {
             setColorSchemeRepresentation,
             setColorRepresentation,
             setOpacityRepresentation,
+            setLabelRepresentation,
             setRadiusRepresentation,
             createNewRepresentation,
             deleteRepresentation
@@ -268,7 +267,7 @@ export default {
             label_hierarchy: "Hierarchy",
             ttpvs: "View hierarchy map",
             ttper: "Edit representation name",
-            ttplb: "Add label to representation",
+            ttplb: computed(() => enabledAnnotation.value ? 'Remove label from representation' : 'Add label to representation (it can take a few seconds)'),
             ttphr: computed(() => isVisible.value ? 'Hide representation' : 'Show representation'),
             placeholderRenSel: "Insert new name",
             placeholderNewSel: "Insert new name",
@@ -438,7 +437,7 @@ export default {
                 updateRepresentationProperty('color', col)
                 //console.log(stage)
                 //setColorRepresentation(stage, col, re.value, true)
-                setColorRepresentation(stage, col, re.value, true)
+                setColorRepresentation(stage, col, re.value, currReprSettings.value, true)
                 .then((r) => {
                     if(r.code != 404) console.log(r.message)
                     else console.error(r.message)
@@ -459,7 +458,7 @@ export default {
         const changeColorScheme = (value) => {
             if(currReprVal.value !== defaultRepresentation) {
                 updateRepresentationProperty('color_scheme', value.id)
-                setColorSchemeRepresentation(stage, value.id, color.value, re.value, true)
+                setColorSchemeRepresentation(stage, value.id, color.value, re.value, currReprSettings.value, true)
                     .then((r) => {
                         //console.log(stage)
                         if(r.code != 404) console.log(r.message)
@@ -629,15 +628,23 @@ export default {
         }
 
 
-        /*const enabledAnnotation = ref(false)
+        //const enabledAnnotation = ref(false)
+        const enabledAnnotation = computed(() => currReprSettings.value.label)
         const addAnnotation = () => {
-            enabledAnnotation.value = !enabledAnnotation.value
-            if(enabledAnnotation.value) console.log('add label to representation')
-            else console.log('remove label from representation')
-        }*/
+            const newVal = !enabledAnnotation.value
+            updateRepresentationProperty('label', newVal)
+            setLabelRepresentation(stage, newVal, currReprSettings.value, true)
+                .then((r) => {
+                    if(r.code != 404) console.log(r.message)
+                    else console.error(r.message)
+                })
+        }
 
         onUpdated(() => {
+            // reset enabledRename
             if(enabledRename.value && newName !== currReprSettings.value.name) enabledRename.value = false
+            //console.log(currReprSettings.value)
+            //enabledAnnotation.value = currReprSettings.value.label
             newName = currReprSettings.value.name
         })
 
@@ -653,7 +660,7 @@ export default {
             radius, min_radius, max_radius, hasRadius, /*onChangeRadius,*/
             colorScheme, mainStructureColor, /*onChangeColorScheme,*/ colorUniform, color,
             opacity, /*onChangeOpacity,*/
-            removeRepresentation, visualizeStructure, enabledRename, editRepresentation, renameRepresentation, /*enabledAnnotation, addAnnotation, */modelRenSel, rrbDisabled
+            removeRepresentation, visualizeStructure, enabledRename, editRepresentation, renameRepresentation, enabledAnnotation, addAnnotation, modelRenSel, rrbDisabled
         }
     }
 }
@@ -733,5 +740,7 @@ export default {
     #minisettings .repr-button.danger { position:absolute; right:.8rem; }
     #minisettings .repr-button:hover { background: #546974!important;}
     #minisettings .repr-button.danger:hover { background: #c75959!important;}
+    #minisettings .repr-button.highlighted-btn-minisettings { background:#fff!important; color:#546974; }
+    #minisettings .repr-button.highlighted-btn-minisettings:hover { background:#fff!important; color:#1a1e20; }
 
 </style>
