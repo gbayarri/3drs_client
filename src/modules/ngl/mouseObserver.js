@@ -1,4 +1,5 @@
 import { ref, computed/*, onMounted*/ } from 'vue'
+import { useToast } from 'primevue/usetoast'
 import useLegend from '@/modules/viewport/useLegend'
 import structureStorage from '@/modules/structure/structureStorage'
 import useFlags from '@/modules/common/useFlags'
@@ -8,6 +9,7 @@ import useRepresentations from '@/modules/representations/useRepresentations'
 import useActions from '@/modules/representations/useActions'
 import useStage from '@/modules/ngl/useStage'
 import useMeasurements from '@/modules/structure/useMeasurements'
+import useProjectSettings from '@/modules/structure/useProjectSettings'
 const initialOrientation = ref([])
 //const distances = ref([])
 
@@ -21,14 +23,17 @@ export default function mouseObserver() {
     const { /*currentStructure,*/ getFileNames, getMolecule } = structureSettings()
     const { currentRepresentation, getCurrentRepresentationSettings } = useRepresentations()
     const { actionSelectSingleMolecule } = useActions()
-    const { calculateDistance } = useStage()
-    const { getMeasurements, updateMeasurements } = useMeasurements()
+    const { calculateDistance, calculateAngle } = useStage()
+    const { getMeasurements, updateMeasurements, createDistance, createAngle } = useMeasurements()
+    const { getProjectSettings } = useProjectSettings()
 
+    const toast = useToast()
     const filesList = computed(() => getFileNames())
     //const currStr = computed(() => currentStructure.value)
     const currReprVal = computed(() => currentRepresentation.value)
     const currReprSettings = computed(() => getCurrentRepresentationSettings())
     const dataProject = computed(() => projectData.value)
+    const toastSettings = computed(() => getProjectSettings().toasts) 
     const shortTimeOut = 1000
     const timeOut = 5000
     let atomPair = []
@@ -174,6 +179,8 @@ export default function mouseObserver() {
         })
 
         stage.mouseObserver.signals.scrolled.add(function (scroll) {
+            //console.log(stage.viewer.camera.far)
+            //console.log(stage.viewerControls.position)
             clearTimeout(myTimeOut)
             myTimeOut = setTimeout(() => autoSaveOrientation(stage.viewerControls.getOrientation().elements), timeOut)
         })
@@ -310,57 +317,41 @@ export default function mouseObserver() {
                 }
             })
 
-            if(atomPair.length === 2) {
-                console.log(atomPair)           
+            if(atomPair.length === 2) {        
 
                 const component = stage.compList.filter(item => item.parameters.name === pickingProxy.atom.structure.name)[0]
                 const atom1 = atomPair[0]
                 const atom2 = atomPair[1]
 
                 const dist = calculateDistance(atom1.coords, atom2.coords)
-                const size = (dist <= 4) ? 4 : (dist / 5)
+                const uuid = Math.random().toString(36).slice(-6)
+                const ap = {
+                    id: uuid,
+                    sele: [ atom1.sele, atom2.sele ],
+                    dist: dist,
+                    color: '#000000',
+                    size: 5
+                }
 
-                component.addRepresentation("distance", {
-                    // TODO!!!!
-                    // ******************************
-                    // define name for removing!!! pickingProxy.atom.structure.name - dist - generate key / id unique in array distances???
-                    // *******************************
-                    atomPair: [ [ atom1.sele, atom2.sele ] ],
-                    labelSize: size,
-                    labelColor: 0xffffff, 
-                    color: 0x000,
-                    labelBorder: true,
-                    labelBorderColor: 0x000,
-                    labelBorderWidth: .3,
-                    labelBackground: true,
-                    labelBackgroundColor: 0x000000,
-                    labelBackgroundMargin: 2,
-                    labelBackgroundOpacity: .5,
-                    labelUnit: 'angstrom',
-                    labelAttachment: 'middle-right',
-                    linewidth: 10
-                })
+                createDistance(ap, component, pickingProxy.atom.structure.name)
 
                 const distances = getMeasurements('distances')
-                distances.filter(item => item.id === pickingProxy.atom.structure.name)[0].atomPairs.push([ atom1.sele, atom2.sele ])
-
-                // modify structure for saving distance
-                // put all measurements in one structure in DB?
-                // put addRepresentation to useMeasurements
-                // create removeMeasurement in useMeasurements as well
+                distances.filter(item => item.id === pickingProxy.atom.structure.name)[0].atomPairs.push(ap)
 
                 updateMeasurements('distances', distances)
                     .then((r) => {
-                        if(r.code != 404) console.log(r.message)
-                        else console.error(r.message)
+                        if(r.code != 404) {
+                            if(toastSettings.value) {
+                                toast.add({ 
+                                    severity:'info', 
+                                    summary: 'New distance', 
+                                    detail:`A new distance of ${dist} Å has been added.`, 
+                                    life: 5000
+                                })
+                            }
+                            console.log(r.message)
+                        } else console.error(r.message)
                     })
-
-                /*getMeasurements,
-        updateMeasurements,*/
-
-                //console.log(component)
-
-                // TODO: save by component
 
                 atomPair = []
             }
@@ -394,31 +385,35 @@ export default function mouseObserver() {
                 const atom2 = atomTriple[1]
                 const atom3 = atomTriple[2]
 
-                //const dist = calculateDistance(atom1.coords, atom2.coords)
-                //const size = (dist <= 4) ? 4 : (dist / 5)
+                const angle = calculateAngle(atom1.coords, atom2.coords, atom3.coords)
+                const uuid = Math.random().toString(36).slice(-6)
+                const at = {
+                    id: uuid,
+                    sele: [ atom1.sele, atom2.sele, atom3.sele ],
+                    angle: angle,
+                    color: '#546974',
+                    size: 5
+                }
 
-                component.addRepresentation("angle", {
-                    atomTriple: [ [ atom1.sele, atom2.sele, atom3.sele ] ],
-                    labelSize: 5,
-                    labelColor: 0xffffff, 
-                    color: 0x546974,
-                    labelBorder: true,
-                    labelBorderColor: 0x546974,
-                    labelBorderWidth: .3,
-                    labelBackground: true,
-                    labelBackgroundColor: 0x546974,
-                    labelBackgroundMargin: 2,
-                    labelBackgroundOpacity: .5,
-                    labelUnit: 'angstrom',
-                    labelAttachment: 'middle-right',
-                    arcVisible: true,
-                    linewidth: 10
-                    //sdf: false
-                })
+                createAngle(at, component, pickingProxy.atom.structure.name)
 
-                console.log(component)
+                const angles = getMeasurements('angles')
+                angles.filter(item => item.id === pickingProxy.atom.structure.name)[0].atomTriples.push(at)
 
-                // TODO: save by component
+                updateMeasurements('angles', angles)
+                    .then((r) => {
+                        if(r.code != 404) {
+                            if(toastSettings.value) {
+                                toast.add({ 
+                                    severity:'info', 
+                                    summary: 'New angle', 
+                                    detail:`A new angle of ${angle}° has been added.`, 
+                                    life: 5000
+                                })
+                            }
+                            console.log(r.message)
+                        } else console.error(r.message)
+                    })
 
                 atomTriple = []
             }

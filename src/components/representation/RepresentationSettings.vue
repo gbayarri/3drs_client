@@ -222,7 +222,7 @@ export default {
     setup() {
 
         const { stage } = useStage()
-        const { addLabelToRepresentation, removeLabelFromRepresentation, addRepresentation, delRepresentation } = useComponents()
+        const { /*addLabelToRepresentation, removeLabelFromRepresentation,*/ addRepresentation, delRepresentation } = useComponents()
         const { projectData, updateStructureProject, removeRepresentationFromStructure } = structureStorage()
         const { setFlagStatus } = useFlags()
         const { 

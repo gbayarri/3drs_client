@@ -68,8 +68,8 @@ export default {
 
       //const structures = [{ name:"1pik", id: "1" }, { name:"2kod", id: "3" }, { name:"2rgp", id: "4" }/*{ name:"6ACC", id: "4" }, { name:"2rgp", id: "1" }, /*{ name:"1mbs", id: "2" }, { name:"1pik", id: "3" }, { name:"2kod", id: "4" }, { name:"2vgb", id: "5" },*/  ]
       const structures = dataProject.value.files
-      const measurements = { distances: dataProject.value.distances, angles: dataProject.value.angles }
-      console.log(measurements)
+      const measurements = { distances: dataProject.value.measurements.distances, angles: dataProject.value.measurements.angles }
+      //console.log(measurements)
       const array_promises = []
       for(const str of structures) {
         //console.log(str.trajectory)
@@ -254,7 +254,7 @@ export default {
           // *************************************
 
           setProjectSettings(apiData.value.projectSettings)
-          setMeasurements(apiData.value.distances, apiData.value.angles)
+          setMeasurements(apiData.value.measurements)
 
           // set selections global var
           setSelection(apiData.value.representations, apiData.value.defaultRepresentation)

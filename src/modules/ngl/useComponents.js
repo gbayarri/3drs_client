@@ -22,6 +22,7 @@ export default function useComponents() {
     const { createTrajectoryPlayer, getStage/*, createSelection*/ } = useStage()
     const { checkTrajectory, setInitPlayer, setTrajectoryPlayer, updateCurrentFrame, setTrajectorySettings } = useTrajectories()
     const { closeModal } = useModals()
+    const { createDistance, createAngle } = useMeasurements()
     //const { updateTrajectoryData } = useAPI()
     //const { setFlagStatus } = useFlags()
 
@@ -31,18 +32,6 @@ export default function useComponents() {
     const currStr = computed(() => currentStructure.value)
     const def_repr = computed(() => projectData.value.defaultRepresentation) 
     const representations = computed(() => dataProject.value.representations) 
-
-    /*const hex2rgba = (hex, alpha) => {
-        const validHEXInput = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-        if (!validHEXInput) return false
-        const  output = {
-            r: parseInt(validHEXInput[1], 16),
-            g: parseInt(validHEXInput[2], 16),
-            b: parseInt(validHEXInput[3], 16),
-            a: alpha
-        }
-        return `rgba(${output.r}, ${output.g}, ${output.b}, ${output.a})`;
-    }*/
 
     const loadFileToStage = (stage, url, name, ext, id, traj, distances, angles) => {
         const extension = (ext === undefined) ? 'pdb' : ext
@@ -158,31 +147,16 @@ export default function useComponents() {
                         // distances
                         if(distances.atomPairs.length > 0) {
                             for(const ap of distances.atomPairs) {
-                                component.addRepresentation("distance", {
-                                    // TODO!!!!
-                                    // ******************************
-                                    // define name for removing!!! pickingProxy.atom.structure.name - dist - generate key / id unique in array distances???
-                                    // *******************************
-                                    atomPair: [ [ ap[0], ap[1] ] ],
-                                    labelSize: 5,
-                                    labelColor: 0xffffff, 
-                                    color: 0x000,
-                                    labelBorder: true,
-                                    labelBorderColor: 0x000,
-                                    labelBorderWidth: .3,
-                                    labelBackground: true,
-                                    labelBackgroundColor: 0x000000,
-                                    labelBackgroundMargin: 2,
-                                    labelBackgroundOpacity: .5,
-                                    labelUnit: 'angstrom',
-                                    labelAttachment: 'middle-right',
-                                    linewidth: 10
-                                })
+                                createDistance(ap, component, id)
                             }
                         }
 
                         // angles
-                        //console.log(angles)
+                        if(angles.atomTriples.length > 0) {
+                            for(const ap of angles.atomTriples) {
+                                createAngle(ap, component, id)
+                            }
+                        }
                     }
                 }
             }

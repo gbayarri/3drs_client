@@ -11,6 +11,7 @@ hr { border: none; height: 1px; background-color: #dee2e6; margin:10px 0!importa
 hr.subsection { border-top: dashed 1px rgb(255 255 255 / 0.5); height: 0!important; background-color: transparent; }
 h1 { color: #5e738b; font-size: 30px; font-weight: 400; }
 h2 { color: #5e738b; font-size: 25px; font-weight: 400; }
+.bold { font-weight: 900;}
 
 #app {
     -webkit-font-smoothing: antialiased;

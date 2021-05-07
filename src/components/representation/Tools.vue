@@ -10,6 +10,7 @@
         <Align v-if="!isShared && isAlignable" />
         <Player v-if="isShared" :stage="stage" />
         <Embed v-if="isShared" :isDraft="isDraft" />
+        <Measurements v-if="!isShared" />
         <Help />
         <Visit v-if="isShared" :isDraft="isDraft" />
         <ProjectSettings v-if="!isShared" />
@@ -31,11 +32,12 @@ import Picture from '@/components/representation/tools/Picture'
 import Help from '@/components/representation/tools/Help'
 import Player from '@/components/representation/tools/Player'
 import Embed from '@/components/representation/tools/Embed'
+import Measurements from '@/components/representation/tools/Measurements'
 import Visit from '@/components/representation/tools/Visit'
 import Align from '@/components/representation/tools/Align'
 import ProjectSettings from '@/components/representation/tools/ProjectSettings'
 export default {
-    components: { Reload, Rotate, Center, Background, FullScreen, Picture, Help, Player, Embed, Visit, Align, ProjectSettings },
+    components: { Reload, Rotate, Center, Background, FullScreen, Picture, Help, Player, Embed, Measurements, Visit, Align, ProjectSettings },
     props: ['isDraft'],
     setup() {
         const { getStage } = useStage()

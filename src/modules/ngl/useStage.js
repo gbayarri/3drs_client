@@ -89,9 +89,19 @@ export default function useStage() {
     const calculateDistance = function (atom1, atom2) {
         const outer = new NGL.Vector3(atom1.x, atom1.y, atom1.z)
         const inner = new NGL.Vector3(atom2.x, atom2.y, atom2.z)
-        return outer.distanceTo(inner)
+        return parseFloat(outer.distanceTo(inner).toFixed(2))
+    }
+
+    const calculateAngle = function (atom1, atom2, atom3) {
+        const v1 = new NGL.Vector3(atom1.x - atom2.x, atom1.y - atom2.y, atom1.z - atom2.z)
+        const v2 = new NGL.Vector3(atom3.x - atom2.x, atom3.y - atom2.y, atom3.z - atom2.z)
+
+        const r = v1.angleTo(v2)
+        const d = (r*180) / Math.PI
+
+        return parseFloat(d.toFixed(2))
     }
   
-    return { stage, selection, createStage, getStage, createSelection, createTrajectoryPlayer, createSuperposition, calculateDistance }
+    return { stage, selection, createStage, getStage, createSelection, createTrajectoryPlayer, createSuperposition, calculateDistance, calculateAngle }
   
   }

@@ -25,6 +25,7 @@
     <ModalAlign v-if="stageLoaded && !disableComponents" />
     <ModalSettings v-if="stageLoaded && !disableComponents" />
     <ModalHierarchy v-if="stageLoaded && !disableComponents" />
+    <ModalMeasurements v-if="stageLoaded && !disableComponents" />
 
 </template>
 
@@ -49,6 +50,7 @@ import ModalTips from '@/components/representation/modals/ModalTips'
 import ModalAlign from '@/components/representation/modals/ModalAlign'
 import ModalSettings from '@/components/representation/modals/ModalSettings'
 import ModalHierarchy from '@/components/representation/modals/ModalHierarchy'
+import ModalMeasurements from '@/components/representation/modals/ModalMeasurements'
 export default {
     components: { 
         Disabled,
@@ -56,7 +58,7 @@ export default {
         RepresentationSettings, Settings, 
         Share, Legend, 
         Viewport, 
-        ModalTrajectory, /*ModalStructure,*/ ModalShare, ModalTips, ModalAlign, ModalSettings, ModalHierarchy },
+        ModalTrajectory, /*ModalStructure,*/ ModalShare, ModalTips, ModalAlign, ModalSettings, ModalHierarchy, ModalMeasurements },
     props: ['id'],
     setup(props) {
 
