@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { computed, reactive, toRefs } from 'vue'
+import { computed, reactive, toRefs, watch } from 'vue'
 import structureSettings from '@/modules/structure/structureSettings'
 import useMeasurements from '@/modules/structure/useMeasurements'
 export default {
@@ -60,6 +60,12 @@ export default {
             console.log(size)
             //distances.filter(item => item.id === pickingProxy.atom.structure.name)[0].atomPairs.push(ap)
         }
+
+        //http://jsfiddle.net/xb5h545w/1/
+        //https://github.com/vuejs/vue/issues/530
+        //https://stackoverflow.com/questions/45935003/vue-computed-setter-get-not-triggered-for-array-in-v-model
+
+        // MIRAR: https://jsfiddle.net/jamesbrndwgn/gkxq5rLs/16/
 
         const sizes = computed({
             get: () => {
@@ -93,6 +99,14 @@ export default {
         const removeMeasurement = (id) => {
             console.log(id)
         }
+
+        /* WATCHERS */
+
+        watch([sizes, colors], (newValues, prevValues) => {
+            console.log(newValues, prevValues)
+            //if (color.value !== 'undefined' && colorUniform.value) changeColor()
+            //if (color.value !== undefined && colorUniform.value) color.value = col
+        })
 
         return { 
             ...toRefs(page), distancesList, 
