@@ -1,6 +1,10 @@
 <template>
-    <p v-if="distancesList.length > 0" class="margin-bottom-30">The list below shows all the distances found in the current structure:</p>
-    <p v-else class="margin-bottom-30">There are no distances in the current structure</p>
+    <p v-if="distancesList.length > 0" class="margin-bottom-30">The list below shows all the distances found in the current structure. You can remove them and modify size and color. To create a new one, <strong>
+        you must click on two atoms with the mouse right button</strong>.
+    </p>
+    <p v-else class="margin-bottom-30">There are no distances in the current structure. To create a new one, <strong>
+        you must click on two atoms with the mouse right button</strong>.
+    </p>
 
     <div v-if="distancesList.length > 0" class="measurements-list">
         <div class="p-grid margin-bottom-10 bold">
@@ -18,10 +22,10 @@
                 {{ item.dist }} Å
             </div>
             <div class="p-col-2">
-                <InputNumber v-model="sizes[item.id]" showButtons :step="1" :min="1" :max="10" inputStyle="width:100%" />
+                <InputNumber :value="item.size" @input="changeSize(item.id, $event)" showButtons :step="1" :min="1" :max="10" inputStyle="width:100%" />
             </div>
             <div class="p-col-1" style="padding-top:.8rem">
-                <ColorPicker v-model="colors[item.id]" class="custom-panel" />
+                <ColorPicker v-model="item.color" class="custom-panel" @click="clickPicker(item.id)" />
             </div>
             <div class="p-col-1" style="padding-top:1rem">
                 <Button 
@@ -38,15 +42,17 @@ import { computed, reactive, toRefs, watch } from 'vue'
 import structureSettings from '@/modules/structure/structureSettings'
 import useMeasurements from '@/modules/structure/useMeasurements'
 export default {
+    props: ['stage'],
+    setup(props) {
 
-    setup() {
+        const stage = props.stage
+
         const { currentStructure } = structureSettings()
-        const { getMeasurements } = useMeasurements()
+        const { getMeasurements, updateMeasurementsTimeout } = useMeasurements()
 
         const currStr = computed(() => currentStructure.value)
         const distances = getMeasurements('distances')
         const distancesList = computed(() => distances.filter(item => item.id === currStr.value)[0].atomPairs)
-        //console.log(distancesList)
 
         /* MODAL */
 
@@ -56,62 +62,94 @@ export default {
 
         /* LABEL SIZE */
 
-        const changeSize = (size) => {
-            console.log(size)
-            //distances.filter(item => item.id === pickingProxy.atom.structure.name)[0].atomPairs.push(ap)
+        const changeSize = (id, e) => {
+            // update distances
+            distancesList.value.filter(item => item.id === id)[0].size = e.value
+            distances.filter(item => item.id === currStr.value)[0].atomPairs = distancesList.value
+            // get atom pair (NGL trick)
+            const ap = distancesList.value.filter(item => item.id === id)[0].sele
+            // update size
+            for(const item of stage.getRepresentationsByName(`${id}-${currStr.value}-dist`).list) {
+                item.setParameters( { atomPair: [ [ap[0], ap[1]] ], labelSize: e.value } )
+            }
+            // update DB
+            updateMeasurementsTimeout('distances', distances)
+                .then((r) => {
+                    if(r.code != 404) console.log(r.message)
+                    else console.error(r.message)
+                })
         }
 
-        //http://jsfiddle.net/xb5h545w/1/
-        //https://github.com/vuejs/vue/issues/530
-        //https://stackoverflow.com/questions/45935003/vue-computed-setter-get-not-triggered-for-array-in-v-model
-
-        // MIRAR: https://jsfiddle.net/jamesbrndwgn/gkxq5rLs/16/
-
-        const sizes = computed({
-            get: () => {
-                const s = []
-                for(const d of distancesList.value) {
-                    s[d.id] = d.size
-                }
-                return s
-            },
-            set: val => changeSize(val)
-        })
-
-        //console.log(sizes.value)
-
         /* COLOR */
+
+        let currentIndex = null
+
         const colors = computed({
             get: () => {
                 const c = []
                 for(const d of distancesList.value) {
-                    c[d.id] = d.color
+                    //c[d.id] = d.color
+                    c.push({ id: d.id, color: d.color})
                 }
                 return c
             },
             set: val => console.log(val)
         })
 
-        //console.log(colors.value)
+        const changeBackground = (color) => {
+            //console.log(currentIndex, `#${color}`)
+            const id = currentIndex
+            const nc = (!color.startsWith('#') && color.length < 7) ? `#${color}` : color
+            // update distances
+            distancesList.value.filter(item => item.id === id)[0].color = nc
+            distances.filter(item => item.id === currStr.value)[0].atomPairs = distancesList.value
+            // get atom pair (NGL trick)
+            const ap = distancesList.value.filter(item => item.id === id)[0].sele
+            // update size
+            for(const item of stage.getRepresentationsByName(`${id}-${currStr.value}-dist`).list) {
+                item.setParameters( { atomPair: [ [ap[0], ap[1]] ], labelBackgroundColor: nc, labelBorderColor: nc, color: nc } )
+            }
+            // update DB
+            updateMeasurementsTimeout('distances', distances)
+                .then((r) => {
+                    if(r.code != 404) console.log(r.message)
+                    else console.error(r.message)
+                })
+        }
+
+        const clickPicker = (id) => {
+            currentIndex = id
+        }
 
         /* REMOVE */
 
         const removeMeasurement = (id) => {
-            console.log(id)
+            const dl = distancesList.value.filter(item => item.id !== id)
+            distances.filter(item => item.id === currStr.value)[0].atomPairs = dl
+            for(const item of stage.getRepresentationsByName(`${id}-${currStr.value}-dist`).list) {
+                item.parent.removeRepresentation(item)
+            }
+
+            currentIndex = null
+            // update DB
+            updateMeasurementsTimeout('distances', distances)
+                .then((r) => {
+                    if(r.code != 404) console.log(r.message)
+                    else console.error(r.message)
+                })
+
         }
 
         /* WATCHERS */
 
-        watch([sizes, colors], (newValues, prevValues) => {
-            console.log(newValues, prevValues)
-            //if (color.value !== 'undefined' && colorUniform.value) changeColor()
-            //if (color.value !== undefined && colorUniform.value) color.value = col
+        watch(colors, (newValues, prevValues) => {
+            if( currentIndex !== null ) changeBackground(newValues.filter(item => item.id === currentIndex)[0].color)
         })
 
         return { 
             ...toRefs(page), distancesList, 
-            sizes,
-            colors,
+            changeSize,
+            colors, clickPicker,
             removeMeasurement 
         }
     }

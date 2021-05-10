@@ -15,7 +15,7 @@ export default function useMeasurements() {
 
     const dataProject = computed(() => projectData.value)
     let prjID = projectData.value._id
-    //const shortTimeOut = 2000
+    const shortTimeOut = 2000
 
     const setMeasurements = (m) => {
         measurements.distances = m.distances
@@ -34,8 +34,23 @@ export default function useMeasurements() {
         }
     }
 
+    let myTimeOut = null
+    const updateMeasurementsTimeout = async (k, v, update = true) => {
+        if(update) {
+            return await new Promise((resolve) => {
+                clearTimeout(myTimeOut)
+                myTimeOut = setTimeout(() => {
+                    if(prjID === undefined) prjID = dataProject.value._id
+                    measurements[k] = v
+                    const response = updateProjectData(prjID, { measurements: measurements })
+                    resolve(response)
+                }, shortTimeOut)
+            })
+        }
+    }
+
     const createDistance = (ap, component, structure) => {
-        const size = (ap.dist <= 4) ? 4 : (ap.dist / 5)
+        //const size = (ap.dist <= 4) ? 4 : (ap.dist / 5)
         component.addRepresentation("distance", {
             name: ap.id + '-' + structure + '-dist',
             atomPair: [ [ ap.sele[0], ap.sele[1] ] ],
@@ -77,28 +92,13 @@ export default function useMeasurements() {
         })
     }
 
-    /*let myTimeOut = null
-    const updateMeasurementsTimeout = async (k, v, update = true) => {
-        if(update) {
-            return await new Promise((resolve) => {
-                clearTimeout(myTimeOut)
-                myTimeOut = setTimeout(() => {
-                    if(prjID === undefined) prjID = dataProject.value._id
-                    projectSettings.value[k] = v
-                    const response = updateProjectData(prjID, { projectSettings: projectSettings.value })
-                    resolve(response)
-                }, shortTimeOut)
-            })
-        }
-    }*/
-
     return {
         setMeasurements,
         getMeasurements,
         updateMeasurements,
+        updateMeasurementsTimeout,
         createDistance,
         createAngle
-        //updateProjectSettingsTimeout
     }
 
 }

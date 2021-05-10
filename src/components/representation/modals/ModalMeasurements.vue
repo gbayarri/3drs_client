@@ -14,11 +14,11 @@
         <TabView>
 
             <TabPanel :header="headerDistances">
-                <DistancesList />
+                <DistancesList :stage ="stage" />
             </TabPanel>
 
             <TabPanel :header="headerAngles">
-                <AnglesList />
+                <AnglesList :stage ="stage" />
             </TabPanel>
             
         </TabView>
@@ -34,13 +34,13 @@ import { reactive, toRefs } from 'vue'
 import useModals from '@/modules/common/useModals'
 import DistancesList from '@/components/representation/modals/measurements/DistancesList'
 import AnglesList from '@/components/representation/modals/measurements/AnglesList'
-//import useStage from '@/modules/ngl/useStage'
+import useStage from '@/modules/ngl/useStage'
 export default {
     components: { DistancesList, AnglesList },
     setup() {
 
-        //const { getStage } = useStage()
-        //const stage = getStage()
+        const { getStage } = useStage()
+        const stage = getStage()
 
         /*
         put here 2 tabs with angles and distances
@@ -76,7 +76,7 @@ export default {
         }
 
         return { 
-            ...toRefs(page), dialog, closeThisModal
+            ...toRefs(page), dialog, stage, closeThisModal
         }
     }
 }
