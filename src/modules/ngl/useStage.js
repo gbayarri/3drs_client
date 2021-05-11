@@ -75,7 +75,7 @@ export default function useStage() {
         const r = v1.angleTo(v2)
         const d = (r*180) / Math.PI
 
-        return parseFloat(d.toFixed(2))
+        return parseFloat(d.toFixed(1))
     }
   
     return { stage, selection, createStage, getStage, createSelection, createTrajectoryPlayer, createSuperposition, calculateDistance, calculateAngle }

@@ -40,23 +40,45 @@ export default function processStructure() {
 
         let chains = []
         structureView.eachChain(function (rp) {
-            if(rp.chainname !== '') {
+            //if(rp.chainname !== '') {
                 chains.push(rp.chainname)
-            } else {
-                chains.push('Z')
-            }
+            //} else {
+                // ****************************************
+                // ****************************************
+                // ****************************************
+                // FIX AND ONLY DO THAT WHEN MIX OF CHAINS AND NOT CHAINS
+                // IF ALL STRUCTURE WITH NO CHAINS, PUT 'A'
+                // TRY WITH ligSAS.dry.pdb
+                // ****************************************
+                // ****************************************
+                // ****************************************
+                //chains.push('@')
+            //}
         })
+
+        // array chains unique
         chains = Array.from(new Set(chains))
+        
+        // trick for fix empty chains
+        // if only one empty chain, convert to 'A'
+        if(chains.length === 1 && chains[0] === "") chains[0] = 'A'
+        // if part of structure is empty, convert to '@'
+        const emptyChain = chains.indexOf("")
+        if(emptyChain !== -1) chains[emptyChain] = '@'
+
         return chains
     }
 
-    const getHelixes = (component, model, chain) => {
+    const getHelixes = (component, model, chain, chain_sele) => {
 
         let selection_helixes
-        if(chain)
+        /*if(chain)
             selection_helixes = createSelection('/' + model + ' and :' + chain + ' and not ( water or ion or hetero )')
         else
-            selection_helixes = createSelection('/' + model + ' and not ( water or ion or hetero )')
+            selection_helixes = createSelection('/' + model + ' and not ( water or ion or hetero )')*/
+    
+        selection_helixes = createSelection('/' + model + ' and ' + chain_sele + ' and not ( water or ion or hetero )')
+
         const structureView = component.structure.getView(selection_helixes)
 
         let helixes = []
@@ -68,7 +90,7 @@ export default function processStructure() {
                     arraux.push({
                         num: rp.resno,
                         label: rp.resname.toUpperCase(),
-                        chain: rp.chainname,
+                        chain: (chain) ? rp.chainname : '@',
                         model: rp.modelIndex
                     })
                 }
@@ -82,13 +104,16 @@ export default function processStructure() {
         return helixes
     }
 
-    const getSheets = (component, model, chain) => {
+    const getSheets = (component, model, chain, chain_sele) => {
 
         let selection_sheets
-        if(chain)
+        /*if(chain)
             selection_sheets = createSelection('/' + model + ' and :' + chain + ' and not ( water or ion or hetero )')
         else
-            selection_sheets = createSelection('/' + model + ' and not ( water or ion or hetero )')
+            selection_sheets = createSelection('/' + model + ' and not ( water or ion or hetero )')*/
+        
+        selection_sheets = createSelection('/' + model + ' and ' + chain_sele + ' and not ( water or ion or hetero )')
+        
         const structureView = component.structure.getView(selection_sheets)
 
         let sheets = []
@@ -100,7 +125,7 @@ export default function processStructure() {
                     arraux.push({
                         num: rp.resno,
                         label: rp.resname.toUpperCase(),
-                        chain: rp.chainname,
+                        chain: (chain) ? rp.chainname : '@',
                         model: rp.modelIndex
                     })
                 }
@@ -115,13 +140,16 @@ export default function processStructure() {
         return sheets
     }
 
-    const getResidues = (component, model, chain) => {
+    const getResidues = (component, model, chain, chain_sele) => {
 
         let selection_residues
-        if(chain)
+        /*if(chain)
             selection_residues = createSelection('/' + model + ' and :' + chain + ' and not ( water or ion or hetero )')
         else
-            selection_residues = createSelection('/' + model + ' and not ( water or ion or hetero )')
+            selection_residues = createSelection('/' + model + ' and not ( water or ion or hetero )')*/
+
+        selection_residues = createSelection('/' + model + ' and ' + chain_sele + ' and not ( water or ion or hetero )')
+
         const structureView = component.structure.getView(selection_residues)
 
         const res_numbers = []
@@ -181,8 +209,8 @@ export default function processStructure() {
                     id: res_id,
                     num: rp.resno,
                     label: rp.resname.toUpperCase(),
-                    name: rp.chainname + ': ' + rp.resname.toUpperCase() + ' ' + rp.resno,
-                    chain: rp.chainname,
+                    name: (chain) ? rp.chainname + ': ' + rp.resname.toUpperCase() + ' ' + rp.resno : rp.resname.toUpperCase() + ' ' + rp.resno,
+                    chain: (chain) ? rp.chainname : '@',
                     model: rp.modelIndex,
                     last_sheet: false,
                     sheet: sheet,
@@ -197,13 +225,16 @@ export default function processStructure() {
         return sequence
     }
 
-    const getHeteroatoms = (component, model, chain) => {
+    const getHeteroatoms = (component, model, chain, chain_sele) => {
 
         let selection_heteroatoms
-        if(chain)
+        /*if(chain)
             selection_heteroatoms = createSelection('/' + model + ' and :' + chain + ' and hetero and not (water or ion)')
         else
-        selection_heteroatoms = createSelection('/' + model + ' and hetero and not (water or ion)')
+        selection_heteroatoms = createSelection('/' + model + ' and hetero and not (water or ion)')*/
+
+        selection_heteroatoms = createSelection('/' + model + ' and ' + chain_sele + ' and hetero and not (water or ion)')
+
         const structureView = component.structure.getView(selection_heteroatoms)
 
         let heteros = []
@@ -213,7 +244,7 @@ export default function processStructure() {
                 let res = {
                     num: rp.resno,
                     name: rp.resname.toUpperCase(),
-                    chain: rp.chainname,
+                    chain: (chain) ? rp.chainname : '@',
                     model: rp.modelIndex,
                     description: desc
                 }
@@ -223,13 +254,17 @@ export default function processStructure() {
         return heteros
     }
 
-    const getIons = (component, model, chain) => {
+    const getIons = (component, model, chain, chain_sele) => {
 
         let selection_ions
-        if(chain)
+        /*if(chain)
             selection_ions = createSelection('/' + model + ' and :' + chain + ' and ion')
         else
-            selection_ions = createSelection('/' + model + ' and ion')
+            selection_ions = createSelection('/' + model + ' and ion')*/
+
+        selection_ions = createSelection('/' + model + ' and ' + chain_sele + ' and ion')
+        //console.log(selection_ions)
+
         const structureView = component.structure.getView(selection_ions)
 
         let ions = []
@@ -238,7 +273,7 @@ export default function processStructure() {
                 let res = {
                     num: rp.resno,
                     name: rp.resname.toUpperCase(),
-                    chain: rp.chainname,
+                    chain: (chain) ? rp.chainname : '@',
                     model: rp.modelIndex
                 }
                 ions.push(res)
@@ -247,14 +282,17 @@ export default function processStructure() {
         return ions
     }
 
-    const getWaters = (component, model, chain) => {
+    const getWaters = (component, model, chain, chain_sele) => {
 
         let selection_waters
-        if(chain)
-            selection_waters = createSelection('/' + model + ' and :' + chain + ' and (water and not sol)')
+        /*if(chain)
+            selection_waters = createSelection('/' + model + ' and :' + chain + ' and (water)')
         else 
-            selection_waters = createSelection('/' + model + ' and (water and not sol)')
+            selection_waters = createSelection('/' + model + ' and (water)')*/
+        
+        selection_waters = createSelection('/' + model + ' and ' + chain_sele + ' and water')
         //console.log(selection_waters)
+
         const structureView = component.structure.getView(selection_waters)
 
         const wat_numbers = []
@@ -276,8 +314,8 @@ export default function processStructure() {
                 let res = {
                     num: rp.resno,
                     //name: rp.resname.toUpperCase(),
-                    name: rp.chainname + ': ' + rp.resname.toUpperCase() + ' ' + rp.resno,
-                    chain: rp.chainname,
+                    name: (chain) ? rp.chainname + ': ' + rp.resname.toUpperCase() + ' ' + rp.resno : rp.resname.toUpperCase() + ' ' + rp.resno,
+                    chain: (chain) ? rp.chainname : '@',
                     model: rp.modelIndex
                 }
                 waters.push(res)
@@ -285,6 +323,17 @@ export default function processStructure() {
             //} else console.log(rp.resname)
         })
         return waters
+    }
+
+    const getOtherChains = (chains, impostor) => {
+        let sele = `not (`
+        for(const chain of chains) { 
+            if(chain !== impostor) sele += `:${chain} or `
+        }
+        sele = sele.slice(0, -4)
+        sele += `)`
+
+        return sele
     }
 
     const getStructure = (component, name, extension) => {
@@ -301,23 +350,44 @@ export default function processStructure() {
                 id: model,
                 chains: []
             })
-            for(const chain of getChains(component, model)) {
+            const arrayChains = getChains(component, model)
+            for(const chain of arrayChains) {
                 let ch = null
-                if(chain === 'Z') ch = ''
-                else ch = chain
+                let ch_sele = null
+                if(chain === '@') {
+                    ch = ''
+                    ch_sele = getOtherChains(arrayChains, '@')
+                } else {
+                    ch = chain
+                    ch_sele = `:${chain}`
+                }
                 structure.models[model].chains.push({
                     id: chain,
-                    helixes: getHelixes(component, model, ch),
-                    sheets:  getSheets(component, model, ch),
-                    residues: getResidues(component, model, ch),
-                    heteroatoms: getHeteroatoms(component, model, ch),
-                    ions: getIons(component, model, ch),
-                    waters: getWaters(component, model, ch)
+                    helixes: getHelixes(component, model, ch, ch_sele),
+                    sheets:  getSheets(component, model, ch, ch_sele),
+                    residues: getResidues(component, model, ch, ch_sele),
+                    heteroatoms: getHeteroatoms(component, model, ch, ch_sele),
+                    ions: getIons(component, model, ch, ch_sele),
+                    waters: getWaters(component, model, ch, ch_sele)
                 })
+                // ****************************************
+                // ****************************************
+                // ****************************************
+                // if chain === '@', get not (all others) and pass it to 
+                //console.log(getWaters(component, model, ch, ch_sele))
+                // ****************************************
+                // ****************************************
+                // ****************************************
+
             }
         }
 
+        //return []
+        // *******************
+        // *******************
         return structure
+        // *******************
+        // *******************
 
     }
 

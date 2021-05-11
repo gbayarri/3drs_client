@@ -31,7 +31,6 @@
 
         <p><Button :label="labelShare" :icon="sharing ? 'fas fa-spinner fa-pulse' : 'fas fa-share'" @click="launchShareProject" :disabled="sharing" /></p>
 
-        <!-- TODO: IT WILL APPEAR ONCE REST API HAS CREATED THE SHARED PROJECT -->
         <div v-show="shared">
             <h2>Share project</h2>
             <p>For sharing it, <strong>you just need to copy and share the address below</strong>:</p>
@@ -49,8 +48,8 @@
             </div>
 
             <h2>QR code</h2>
-            <p>Below you can find a QR code for sharing the new generated address:</p>
-            <div style="text-align:center">
+            <p>Below you can find a <strong>QR code for sharing the new generated address</strong>:</p>
+            <div id="qr-container">
                 <img v-bind:src="qrImage" /> 
             </div>
         </div>
@@ -126,7 +125,7 @@ export default {
         const qrImage = ref(null)
         const generateQR = async (url) => {
             try {
-                qrImage.value = await QRCode.toDataURL(url)
+                qrImage.value = await QRCode.toDataURL(url, { width: 400 })
             } catch (err) {
                 console.error(err)
             }
@@ -156,14 +155,16 @@ export default {
                     //embedCode.value = '<iframe width="500" height="500" src="' + window.location.origin + process.env.BASE_URL + 'embed/' + sharedProject.value + '" title="Title" frameborder="0" allowfullscreen></iframe>'   
                     var url = window.location.origin + process.env.BASE_URL + 'embed/' + sharedProject.value
                     embedCode.value = ecGlobal(url)
-                    // generate QR
-                    generateQR(sharedAddress.value)
                     // update project status
                     updateProjectSettings('status', 'ws', false)
-                    // go to modal bottom
-                    var element = document.querySelector('.p-dialog-content')
-                    element.scrollTop = element.scrollHeight - element.clientHeight;
-                    //window.open(process.env.BASE_URL + 'shared/' + r.project, '_blank')
+                    // generate QR
+                    generateQR(sharedAddress.value)
+                        .then(() =>  {
+                            // go to modal bottom
+                            var element = document.querySelector('.p-dialog-content')
+                            element.scrollTop = element.scrollHeight - element.clientHeight
+                            console.log(element.scrollHeight, element.clientHeight)
+                        })                    
                 }
                 else console.error(r.message)
               })
@@ -220,4 +221,6 @@ export default {
     .label-switch { margin-left: 10px; vertical-align:super; font-size:14px; }
     #copytextarea { user-select: none; }
     #embedtextarea { resize: none;}
+    #qr-container { text-align: center;}
+    #qr-container img { max-width: 100%; }
 </style>
