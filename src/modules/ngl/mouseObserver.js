@@ -258,12 +258,12 @@ export default function mouseObserver() {
 
     const selectResidue = (stage, pickingProxy) => {
         if (pickingProxy && pickingProxy.atom) {
-            const name = filesList.value.filter(item => item.id === pickingProxy.atom.structure.name)[0].name
+            //const name = filesList.value.filter(item => item.id === pickingProxy.atom.structure.name)[0].name
             const model = pickingProxy.atom.modelIndex
             const chain = pickingProxy.atom.chainname
             const resname = pickingProxy.atom.resname
             const resnum = pickingProxy.atom.resno
-            const atomname = pickingProxy.atom.atomname
+            //const atomname = pickingProxy.atom.atomname
 
             const properties = {
                 stage: stage,
@@ -281,6 +281,7 @@ export default function mouseObserver() {
                 re: computed(() => new RegExp('(' + currReprVal.value + '\-' + pickingProxy.atom.structure.name + '\-[a-z]*)', 'g')).value
             }
 
+            //console.log(pickingProxy.atom.isWater(), pickingProxy.atom.isHetero())
             let type = ''
             if(pickingProxy.atom.isPolymer()) {
                 type = 'residues'
@@ -290,7 +291,7 @@ export default function mouseObserver() {
                 type = 'waters'
                 properties.css_type = 'water'
             }
-            if(pickingProxy.atom.isHetero()) type = 'heteroatoms'
+            if(pickingProxy.atom.isHetero() && !pickingProxy.atom.isWater()) type = 'heteroatoms'
             if(pickingProxy.atom.isIon()) type = 'ions'
 
             properties.residue = getMolecule(currReprVal.value, type, model, chain, resnum)

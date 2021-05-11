@@ -6,9 +6,12 @@
 
     <Legend v-if="stageLoaded" />
 
+    <Caption v-if="stageLoaded" />
+
     <Viewport :project_id="project_id" :hasBg="true" />
 
     <ModalEmbed v-if="stageLoaded" :project_id="project_id" />
+    <ModalQR v-if="stageLoaded" :project_id="project_id" />
 
 </template>
 
@@ -18,14 +21,16 @@ import useFlags from '@/modules/common/useFlags'
 import Tools from '@/components/representation/Tools'
 import Fork from '@/components/representation/Fork'
 import Legend from '@/components/representation/Legend'
+import Caption from '@/components/representation/Caption'
 import Viewport from '@/components/representation/Viewport'
 import ModalEmbed from '@/components/representation/modals/ModalEmbed'
+import ModalQR from '@/components/representation/modals/ModalQR'
 export default {
     components: { 
         Tools,
-        Fork, Legend, 
+        Fork, Legend, Caption,
         Viewport,
-        ModalEmbed
+        ModalEmbed, ModalQR
     },
     props: ['id', 'hasFork', 'isDraft'],
     setup(props) {
@@ -45,7 +50,10 @@ export default {
 
         const project_id = props.id
 
-        window.addEventListener("resize", () => width.value = window.innerWidth )
+        window.addEventListener("resize", () => {
+            width.value = window.innerWidth
+            setFlagStatus('responsive', width.value < 600)
+        })
 
         return { stageLoaded, project_id, disableComponents }
     }

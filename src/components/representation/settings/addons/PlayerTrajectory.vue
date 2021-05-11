@@ -57,7 +57,7 @@ export default {
 
         const currTraj = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0].trajList[0])
 
-        console.log( trajSettings.value)
+        //console.log( trajSettings.value)
         setCurrentFrame(currTraj.value, trajSettings.value.range[0], currStr.value)
 
         onUpdated(() => {

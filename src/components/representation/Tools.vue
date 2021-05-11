@@ -6,11 +6,12 @@
         <Center :stage="stage" />
         <Background v-if="!isShared" />
         <FullScreen :stage="stage" />
-        <Picture v-if="isShared" :stage="stage" />
+        <Picture v-if="isShared && !disabled" :stage="stage" />
         <Align v-if="!isShared && isAlignable" />
         <Player v-if="isShared" :stage="stage" />
         <Embed v-if="isShared" :isDraft="isDraft" />
         <Measurements v-if="!isShared" />
+        <QR v-if="isShared" :isDraft="isDraft" />
         <Help />
         <Visit v-if="isShared" :isDraft="isDraft" />
         <ProjectSettings v-if="!isShared" />
@@ -30,6 +31,7 @@ import Background from '@/components/representation/tools/Background'
 import FullScreen from '@/components/representation/tools/FullScreen'
 import Picture from '@/components/representation/tools/Picture'
 import Help from '@/components/representation/tools/Help'
+import QR from '@/components/representation/tools/QR'
 import Player from '@/components/representation/tools/Player'
 import Embed from '@/components/representation/tools/Embed'
 import Measurements from '@/components/representation/tools/Measurements'
@@ -37,7 +39,7 @@ import Visit from '@/components/representation/tools/Visit'
 import Align from '@/components/representation/tools/Align'
 import ProjectSettings from '@/components/representation/tools/ProjectSettings'
 export default {
-    components: { Reload, Rotate, Center, Background, FullScreen, Picture, Help, Player, Embed, Measurements, Visit, Align, ProjectSettings },
+    components: { Reload, Rotate, Center, Background, FullScreen, Picture, Help, QR, Player, Embed, Measurements, Visit, Align, ProjectSettings },
     props: ['isDraft'],
     setup() {
         const { getStage } = useStage()
@@ -45,9 +47,10 @@ export default {
         const { getNumStructures } = structureSettings()
         
         const isShared = computed(() => flags.isShared)
+        const disabled = computed(() => flags.responsive)
         const isAlignable = computed(() => getNumStructures() > 1)
         const stage = getStage()
-        return { stage, isShared, isAlignable }
+        return { stage, isShared, isAlignable, disabled }
     }
 }
 </script>

@@ -47,6 +47,12 @@
                 <Textarea v-model="embedCode" rows="2"  id="embedtextarea" />
                 <Button icon="fas fa-copy" :label="labelCopy" @click="copyEmbed" />
             </div>
+
+            <h2>QR code</h2>
+            <p>Below you can find a QR code for sharing the new generated address:</p>
+            <div style="text-align:center">
+                <img v-bind:src="qrImage" /> 
+            </div>
         </div>
 
         <template #footer>
@@ -58,6 +64,7 @@
 <script>
 import { ref, computed, reactive, toRefs } from 'vue'
 import globals from '@/globals'
+import QRCode from 'qrcode'
 import useModals from '@/modules/common/useModals'
 import useAPI from '@/modules/api/useAPI'
 import useProjectSettings from '@/modules/structure/useProjectSettings'
@@ -115,6 +122,16 @@ export default {
             set: val => changeForkable(val)
         })
 
+        // QR
+        const qrImage = ref(null)
+        const generateQR = async (url) => {
+            try {
+                qrImage.value = await QRCode.toDataURL(url)
+            } catch (err) {
+                console.error(err)
+            }
+        }
+
         // sharing
         const shared = ref(false)
         const sharing = ref(false)
@@ -139,6 +156,8 @@ export default {
                     //embedCode.value = '<iframe width="500" height="500" src="' + window.location.origin + process.env.BASE_URL + 'embed/' + sharedProject.value + '" title="Title" frameborder="0" allowfullscreen></iframe>'   
                     var url = window.location.origin + process.env.BASE_URL + 'embed/' + sharedProject.value
                     embedCode.value = ecGlobal(url)
+                    // generate QR
+                    generateQR(sharedAddress.value)
                     // update project status
                     updateProjectSettings('status', 'ws', false)
                     // go to modal bottom
@@ -187,7 +206,7 @@ export default {
             ...toRefs(page), 
             dialog, closeThisModal, hideDialog,
             openDraft,
-            forkable, shared, sharing, launchShareProject, sharedAddress, copyShared, openShared, 
+            forkable, shared, sharing, launchShareProject, sharedAddress, copyShared, openShared, qrImage,
             embedCode, copyEmbed
         }
     }

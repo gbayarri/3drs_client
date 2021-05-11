@@ -164,6 +164,7 @@ export default function useTrajectories() {
 
     // set current frame 
     const setCurrentFrame = (t, f, str) => {
+        //console.log(t, f, str)
         //console.log(player)
         const p = player.filter(item => item.str === str)[0]
         if(p) p.player.frame = f
@@ -172,9 +173,11 @@ export default function useTrajectories() {
     }
 
     // get player
-    const updatePlayerSetting = (k, v) => {
+    const updatePlayerSetting = (k, v, str) => {
         //player.value.parameters[k] = v
-        player.filter(item => item.str === str)[0].parameters[k] = v
+        //console.log(player)
+        //console.log(player.filter(item => item.str === str)[0])
+        player.filter(item => item.str === str)[0].player.parameters[k] = v
     }
 
     // NGL / REST API

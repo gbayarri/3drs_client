@@ -42,24 +42,6 @@ export default {
         const { getStage } = useStage()
         const stage = getStage()
 
-        /*
-        put here 2 tabs with angles and distances
-        message if empty lists
-        get only current structure distances!!!!
-        show list as:
-        atom1 - atom2 - distance - remove - (edit?)
-
-        atom1 - atom2 - atom3 - angle - remove - (edit?)
-
-        Check if possible to edit color / labelSize
-        create removeMeasurement in useMeasurements
-        for changing labelSize, use in mouse scroll!!!:
-            for(const item of stage.getRepresentationsByName("pd2hx6-6094efa0f7aa6040b62b31c3-ang").list) {
-                item.setParameters( { labelSize: 20, labelBackgroundColor:0xff0000 } )
-            }
-        
-        */
-
         const { dialog, closeModal } = useModals()
 
         /* MODAL */

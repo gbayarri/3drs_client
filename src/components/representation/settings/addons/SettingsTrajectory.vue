@@ -79,13 +79,16 @@ export default {
 
         const { openModal } = useModals()
         const { getTrajectorySettings, currentStructure, updateTrajectorySettings } = structureSettings()
-        const { updatePlayerSetting, setTrajectorySettings, setTrajectorySettingsTimeout, currentFrame, setCurrentFrame } = useTrajectories()
+        const { updatePlayerSetting, setTrajectorySettings, setTrajectorySettingsTimeout, getCurrentFrame, setCurrentFrame } = useTrajectories()
 
         const isCollapsed = ref(true)
         const trajSettings = computed(() => getTrajectorySettings())
         const currStr = computed(() => currentStructure.value)
-        const currFr = computed(() => currentFrame.value)
+        const currFr = computed(() => getCurrentFrame(currStr.value))
+        //const currFr = computed(() => currentFrame.value)
         const currTraj = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0].trajList[0])
+
+        //console.log(currentStructure.value, currFr.value)
 
         const page = reactive({
             header: "Trajectory settings",
@@ -107,8 +110,22 @@ export default {
         const changeRange = (value) => {
             trajSettings.value.range = value
 
-            if(currFr.value < value[0]) setCurrentFrame(currTraj.value, value[0])
-            if(currFr.value > value[1]) setCurrentFrame(currTraj.value, value[1])
+            //console.log(currTraj.value, value[0], currStr.value)
+
+            if(currFr.value < value[0]) setCurrentFrame(currTraj.value, value[0], currStr.value)
+            if(currFr.value > value[1]) setCurrentFrame(currTraj.value, value[1], currStr.value)
+
+            updateTrajectorySettings(trajSettings.value)
+            updatePlayerSetting('start', value[0], currStr.value)
+            updatePlayerSetting('end', value[1], currStr.value)
+            setTrajectorySettingsTimeout({ structure: currStr.value, settings: trajSettings.value })
+                .then((r) => {
+                    if(r.code != 404) console.log(r.message)
+                    else console.error(r.message)
+                })
+
+            /*if(currFr.value < value[0]) setCurrentFrame(currTraj.value, value[0], currStr.value)
+            if(currFr.value > value[1]) setCurrentFrame(currTraj.value, value[1], currStr.value)
             //console.log(currFr.value)
 
             updateTrajectorySettings(trajSettings.value)
@@ -118,7 +135,7 @@ export default {
                 .then((r) => {
                     if(r.code != 404) console.log(r.message)
                     else console.error(r.message)
-                })
+                })*/
         }
         const range = computed({
             get: () => trajSettings.value.range,
@@ -134,7 +151,7 @@ export default {
             const l = value ? "loop": "once"
             trajSettings.value.loop = value
             updateTrajectorySettings(trajSettings.value)
-            updatePlayerSetting('mode', l)
+            updatePlayerSetting('mode', l, currStr.value)
             setTrajectorySettings({ structure: currStr.value, settings: trajSettings.value })
                 .then((r) => {
                     if(r.code != 404) console.log(r.message)
@@ -152,7 +169,7 @@ export default {
         const changeInterpolation = (value) => {
             trajSettings.value.interpolation = value.id
             updateTrajectorySettings(trajSettings.value)
-            updatePlayerSetting('interpolateType', value.id)
+            updatePlayerSetting('interpolateType', value.id, currStr.value)
             setTrajectorySettings({ structure: currStr.value, settings: trajSettings.value })
                 .then((r) => {
                     if(r.code != 404) console.log(r.message)
@@ -171,7 +188,7 @@ export default {
         const changeStep = (value) => {
             trajSettings.value.step = value
             updateTrajectorySettings(trajSettings.value)
-            updatePlayerSetting('step', value)
+            updatePlayerSetting('step', value, currStr.value)
             setTrajectorySettings({ structure: currStr.value, settings: trajSettings.value })
                 .then((r) => {
                     if(r.code != 404) console.log(r.message)

@@ -84,6 +84,8 @@ export default function UseActions() {
 
     const actionSelectSingleMolecule = (p) => {
     
+        //console.log(p)
+
         const [molecules, msg, status] = updateMolecule(p.residue, p.type, p.currRepr)
         // update representations selections
         const [selection, structures] = getSelection(molecules, status, p.currRepr, p.currStr, p.stage)

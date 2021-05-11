@@ -10,7 +10,8 @@ const dialog = reactive({
   hierarchy: false,
   embed: false,
   align: false,
-  measurements: false
+  measurements: false,
+  qrcode: false
 })
 
 const tips = ref('')

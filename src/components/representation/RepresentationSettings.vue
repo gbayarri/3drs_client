@@ -243,7 +243,7 @@ export default {
             createNewRepresentation,
             deleteRepresentation
         } = useRepresentations()
-        const { currentStructure, addNewRepresentationSettings, removeRepresentationSettings } = structureSettings()
+        const { currentStructure, addNewRepresentationSettings, removeRepresentationSettings, getFileNames } = structureSettings()
         const { updateSelection, getStructureSelection, checkSelectionType } = useSelections()
         const { openModal } = useModals()
         const { getProjectSettings } = useProjectSettings()
@@ -253,6 +253,8 @@ export default {
         const currReprVal = computed(() => currentRepresentation.value)
         const currStr = computed(() => currentStructure.value)
         const toastSettings = computed(() => getProjectSettings().toasts) 
+        const filesList = computed(() => getFileNames())
+        
         //const currReprName = computed(() => currReprSettings.value.name)
 
         const re = computed(() => new RegExp('(' + currReprVal.value + '\-[0-9a-z]*\-[a-z]*)', 'g'))
@@ -545,7 +547,7 @@ export default {
             const remRepr = representationSelected.value.id
             const reprName = representationSelected.value.name
             //delRepresentation(stage, representationSelected.value.id)
-            deleteRepresentation(remRepr)
+            deleteRepresentation(stage, remRepr)
                 .then((r) => {
                     if(r.code != 404) {
                         // remove representation from components
@@ -585,7 +587,6 @@ export default {
         const enabledRename = ref(false)
         const editRepresentation = () => {
             enabledRename.value = !enabledRename.value
-            // fer una variable que oculti / mostri una caixa de text a sota del desplegable select representation
         }
 
         let newName = currReprSettings.value.name
@@ -602,7 +603,7 @@ export default {
                 const oldName = modelRenSel.value
                 //console.log(newName, currReprVal.value)
                 updateRepresentationProperty('name', newName)
-                setNameRepresentation(newName, true)
+                setNameRepresentation(stage, newName, true)
                     .then((r) => {
                         if(r.code != 404) {
                             if(toastSettings.value) {
@@ -633,7 +634,7 @@ export default {
         const addAnnotation = () => {
             const newVal = !enabledAnnotation.value
             updateRepresentationProperty('label', newVal)
-            setLabelRepresentation(stage, newVal, currReprSettings.value, true)
+            setLabelRepresentation(stage, newVal, currReprSettings.value, filesList.value, true)
                 .then((r) => {
                     if(r.code != 404) console.log(r.message)
                     else console.error(r.message)

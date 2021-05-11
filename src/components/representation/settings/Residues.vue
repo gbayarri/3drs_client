@@ -118,7 +118,7 @@ export default {
 
         const getTotalContent = (wch) => {
             let residues = []
-            for(const c of wch) residues = [...residues, ...c.residues.filter(item => (item.name !== null))]
+            for(const c of wch) residues = [...residues, ...c.residues.filter(item => (item.name !== null && item.id !== null))]
             return residues
         }
 

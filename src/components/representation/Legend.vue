@@ -63,13 +63,14 @@ export default {
 #legend span.lowercase-legend { text-transform: lowercase!important;}
 @media (max-width: 600px) {
     #legend { 
-        right:auto; 
-        bottom:auto; 
-        top:1.5%; 
-        position: relative;
+        position: absolute;
+        bottom: 2rem;
+        left: 50%;
+        -moz-transform: translateX(-50%) translateY(-50%);
+        -webkit-transform: translateX(-50%) translateY(-50%);
+        transform: translateX(-50%) translateY(-50%);
         text-align: center;
-        display: table;
-        margin: 1.5% auto;
     }
 }
 </style>
+

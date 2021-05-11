@@ -57,8 +57,8 @@ export default function useRepresentations() {
             dataProject.value.representations.filter(item => item.id === currentRepresentation.value)[0][property] = value
     }
 
-    const setNameRepresentation = async (name, update) => {
-        //console.log(status)
+    const setNameRepresentation = async (stage, name, update) => {
+        if(getCurrentRepresentationSettings().label) updateAnnotationText(stage, name)
         if(update) {
             return await updateRepresentationData(prjID, currentRepresentation.value, { name: name })
         }
@@ -156,16 +156,41 @@ export default function useRepresentations() {
     }
 
     const updateAnnotationColor = (stage, representation) => {
+        const color = representation.color_scheme === 'uniform' ? 
+                        representation.color : 
+                        globals.colorScheme.filter(item => item.id === representation.color_scheme)[0].color
         stage.eachComponent( ( component ) => {
             component.eachAnnotation( (annotation) => {
                 if(annotation.id === currentRepresentation.value) {
-                    component.removeAnnotation(annotation)
+                    console.log(annotation)
+                    annotation.element.innerHTML = `<div style="color: rgb(255, 255, 255); 
+                    background-color: ${hex2rgba(color, .5)}; 
+                    padding: 15px; font-size: 25px; 
+                    text-shadow: rgb(0, 0, 0) -1px 1px 0px, rgb(0, 0, 0) 1px 1px 0px, rgb(0, 0, 0) 1px -1px 0px, rgb(0, 0, 0) -1px -1px 0px;">
+                        ${annotation.element.innerText}
+                    </div>`
                 }
             })
-            const re = new RegExp('(' + currentRepresentation.value + '\-' + component.parameters.name + '\-[a-z]*)', 'g')
+            /*const re = new RegExp('(' + currentRepresentation.value + '\-' + component.parameters.name + '\-[a-z]*)', 'g')
             for(const item of stage.getRepresentationsByName(re).list) {
                 if(item.parameters.sele !== 'not(*)') createAnnotation(component, item.parameters.sele, representation, component.structure.id)
-            }
+            }*/
+        })
+    }
+
+    const updateAnnotationText = (stage, text) => {
+        stage.eachComponent( ( component ) => {
+            component.eachAnnotation( (annotation) => {
+                if(annotation.id === currentRepresentation.value) {
+                    console.log(annotation)
+                    annotation.element.innerHTML = `<div style="color: rgb(255, 255, 255); 
+                    background-color: rgba(117, 117, 117, .5); 
+                    padding: 15px; font-size: 25px; 
+                    text-shadow: rgb(0, 0, 0) -1px 1px 0px, rgb(0, 0, 0) 1px 1px 0px, rgb(0, 0, 0) 1px -1px 0px, rgb(0, 0, 0) -1px -1px 0px;">
+                        ${annotation.element.innerText.split('-')[0]} - ${text}
+                    </div>`
+                }
+            })
         })
     }
 
@@ -248,12 +273,15 @@ export default function useRepresentations() {
 
     }
 
-    const setLabelRepresentation = async (stage, label, representation, update) => {
+    const setLabelRepresentation = async (stage, label, representation, fl, update) => {
         if(label) {
             stage.eachComponent( ( component ) => {
                 const re = new RegExp('(' + currentRepresentation.value + '\-' + component.parameters.name + '\-[a-z]*)', 'g')
                 for(const item of stage.getRepresentationsByName(re).list) {
-                    if(item.parameters.sele !== 'not(*)') createAnnotation(component, item.parameters.sele, representation, component.structure.id)
+                    if(item.parameters.sele !== 'not(*)') {
+                        const name = fl.filter(item => item.id === component.structure.name)[0].name
+                        createAnnotation(component, item.parameters.sele, representation, name)
+                    }
                 }
             })
         } else {
@@ -270,7 +298,20 @@ export default function useRepresentations() {
         }
     }
 
-    const deleteRepresentation = async (value) => {
+    const removeAnnotation = (stage) => {
+        stage.eachComponent( ( component ) => {
+            component.eachAnnotation( (annotation) => {
+                if(annotation.id === currentRepresentation.value) {
+                    component.removeAnnotation(annotation)
+                }
+            })
+        })
+    }
+
+    const deleteRepresentation = async (stage, value) => {
+
+        if(getCurrentRepresentationSettings().label) removeAnnotation(stage)
+
         return await eliminateRepresentation(prjID, value )
     }
 

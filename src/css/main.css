@@ -123,6 +123,8 @@ body, html { scrollbar-color: #858f98 #f1f1f1; scrollbar-width: thin; }
 /* switch */
 .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider { background: #6f96a9!important; }
 .p-inputswitch.p-focus .p-inputswitch-slider { box-shadow: none; }
+/* editor */
+.ql-tooltip { left:auto!important; }
 
 /* breadcrumbs */
 .p-breadcrumb { background:transparent; border:none; padding:0; font-size: 14px; }

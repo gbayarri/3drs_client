@@ -238,6 +238,8 @@ export default function structureSettings() {
 
     const updateMolecule = function (molecule, type, currReprVal) {
         
+        //console.log(currentStructure.value, currReprVal, molecule, type)
+
         const molecules = settings.value
                             .filter(item => item.id === currentStructure.value)[0].navigation
                             .filter(item => item.id === currReprVal)[0].models
