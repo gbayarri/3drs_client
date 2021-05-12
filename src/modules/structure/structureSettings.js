@@ -97,7 +97,8 @@ export default function structureSettings() {
             }
         }
         
-        
+        console.log(chains)
+
         /*const currStr = settings.value.filter(item => item.id === currentStructure.value)[0].original
         //const currMod = settings.value.filter(item => item.id === currentStructure.value)[0].navigation.curr_model
         const currMod =  getCurrentModel(currReprVal)
@@ -269,6 +270,8 @@ export default function structureSettings() {
             }
             status = 'remove'
         }
+
+        //console.log(settings.value)
 
         return [[molecule], msg, status]
 
@@ -485,7 +488,7 @@ export default function structureSettings() {
         if(settings.value.length === 0) return false
         const cm = getCurrentModel(currReprVal)
         if(cm === null) return []
-        
+
         return settings.value
             .filter(item => item.id === currentStructure.value)[0].navigation
             .filter(item => item.id === currReprVal)[0].models
@@ -516,11 +519,20 @@ export default function structureSettings() {
         const cm = getCurrentModel(currReprVal)
         if(cm === null) return []
 
-        return settings.value
-                .filter(item => item.id === currentStructure.value)[0].original.models
-                .filter(item => item.id === cm)[0].chains
-                .filter(item => item.id === chain)[0][type]
-                .filter(item => item.model === model && item.chain === chain && item.num === resnum)[0]
+        const m = settings.value
+            .filter(item => item.id === currentStructure.value)[0].original.models
+            .filter(item => item.id === cm)[0].chains
+            .filter(item => item.id === chain)[0][type]
+            .filter(item => item.model === model && item.chain === chain && item.num === resnum)[0]
+        
+        // add / fix id & name for heteros and ions
+        if((type === 'heteroatoms' || type === 'ions') && !m.id) {
+            m.id = `${m.num}:${m.chain}/${m.model}`
+            m.resname = m.name
+            m.name = `${m.chain}: ${m.resname} ${m.num}`
+        }
+    
+        return m
     }
 
     const checkIfTrajectory = function() {

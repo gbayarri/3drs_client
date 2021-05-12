@@ -20,7 +20,7 @@ export default function mouseObserver() {
     const { setFlagStatus } = useFlags()
     const { projectData } = structureStorage()
     const { updateProjectData } = useAPI()
-    const { /*currentStructure,*/ getFileNames, getMolecule } = structureSettings()
+    const { /*currentStructure,*/ getFileNames, getMolecule, getChains } = structureSettings()
     const { currentRepresentation, getCurrentRepresentationSettings } = useRepresentations()
     const { actionSelectSingleMolecule } = useActions()
     const { calculateDistance, calculateAngle } = useStage()
@@ -80,6 +80,13 @@ export default function mouseObserver() {
         }
     }
 
+    const chainImpostor = (ch) => {
+        if(ch === '') {
+            if(getChains(currReprVal.value).length > 1) return '@'
+            else return 'A'
+        } else return ch
+    }
+
     const checkMouseSignals = (stage) => {
 
         //const component = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0])
@@ -94,7 +101,7 @@ export default function mouseObserver() {
 
                 const name = filesList.value.filter(item => item.id === pickingProxy.atom.structure.name)[0].name
                 const model = pickingProxy.atom.modelIndex
-                const chain = pickingProxy.atom.chainname
+                const chain = chainImpostor(pickingProxy.atom.chainname)
                 const resname = pickingProxy.atom.resname
                 const resnum = pickingProxy.atom.resno
                 const atomname = pickingProxy.atom.atomname
@@ -133,7 +140,7 @@ export default function mouseObserver() {
                 }
 
                 // NGL representation
-                const sele = resnum + ':' + chain + '/' + model
+                const sele = resnum + ':' + (chain === '@' ? '' : chain) + '/' + model
                 //const new_name = currStr.value + '-' + sele + '-hover'
                 //const re = new RegExp('(' + currStr.value + '\-[0-9A-Z\:\/]*\-hover)', 'g')
                 const new_name = pickingProxy.atom.structure.name + '-' + sele + '-hover'
@@ -153,7 +160,7 @@ export default function mouseObserver() {
                 updateLegend({
                     name: name,
                     model: pickingProxy.bond.atom1.modelIndex,
-                    chainname: pickingProxy.bond.atom1.chainname,
+                    chainname: chainImpostor(pickingProxy.bond.atom1.chainname),
                     resname: pickingProxy.bond.atom1.resname,
                     resno: pickingProxy.bond.atom1.resno,
                     atomname: pickingProxy.bond.atom1.atomname + '-' + pickingProxy.bond.atom2.atomname
@@ -202,7 +209,7 @@ export default function mouseObserver() {
             if (pickingProxy && pickingProxy.atom) {
                 const name = filesList.value.filter(item => item.id === pickingProxy.atom.structure.name)[0].name
                 const model = pickingProxy.atom.modelIndex
-                const chain = pickingProxy.atom.chainname
+                const chain = chainImpostor(pickingProxy.atom.chainname)
                 const resname = pickingProxy.atom.resname
                 const resnum = pickingProxy.atom.resno
                 const atomname = pickingProxy.atom.atomname
@@ -222,7 +229,7 @@ export default function mouseObserver() {
                 updateLegend({
                     name: name,
                     model: pickingProxy.bond.atom1.modelIndex,
-                    chainname: pickingProxy.bond.atom1.chainname,
+                    chainname: chainImpostor(pickingProxy.bond.atom1.chainname),
                     resname: pickingProxy.bond.atom1.resname,
                     resno: pickingProxy.bond.atom1.resno,
                     atomname: pickingProxy.bond.atom1.atomname + '-' + pickingProxy.bond.atom2.atomname
@@ -244,10 +251,10 @@ export default function mouseObserver() {
             //const component = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0])
             const component = stage.compList.filter(item => item.parameters.name === pickingProxy.atom.structure.name)[0]
             const model = pickingProxy.atom.modelIndex
-            const chain = pickingProxy.atom.chainname
+            const chain = chainImpostor(pickingProxy.atom.chainname)
             const resnum = pickingProxy.atom.resno
 
-            const sele = resnum + ':' + chain + '/' + model
+            const sele = resnum + ':' + (chain === '@' ? '' : chain) + '/' + model
 
             component.autoView(sele, 500)
 
@@ -260,7 +267,7 @@ export default function mouseObserver() {
         if (pickingProxy && pickingProxy.atom) {
             //const name = filesList.value.filter(item => item.id === pickingProxy.atom.structure.name)[0].name
             const model = pickingProxy.atom.modelIndex
-            const chain = pickingProxy.atom.chainname
+            const chain = chainImpostor(pickingProxy.atom.chainname)
             const resname = pickingProxy.atom.resname
             const resnum = pickingProxy.atom.resno
             //const atomname = pickingProxy.atom.atomname
@@ -278,7 +285,7 @@ export default function mouseObserver() {
                 //strName: filesList.value.filter(item => item.id === currStr.value)[0].name,
                 strName: filesList.value.filter(item => item.id === pickingProxy.atom.structure.name)[0].name,
                 //re: re.value
-                re: computed(() => new RegExp('(' + currReprVal.value + '\-' + pickingProxy.atom.structure.name + '\-[a-z]*)', 'g')).value
+                re: computed(() => new RegExp('(' + currReprVal.value + '\-' + pickingProxy.atom.structure.name + '\-[a-z]*)', 'g')).value,
             }
 
             //console.log(pickingProxy.atom.isWater(), pickingProxy.atom.isHetero())
@@ -297,6 +304,8 @@ export default function mouseObserver() {
             properties.residue = getMolecule(currReprVal.value, type, model, chain, resnum)
             properties.type = type
 
+            console.log(properties)
+
             actionSelectSingleMolecule(properties)
         }
     }
@@ -305,12 +314,12 @@ export default function mouseObserver() {
         if (pickingProxy && pickingProxy.atom) {
 
             const model = pickingProxy.atom.modelIndex
-            const chain = pickingProxy.atom.chainname
+            const chain = chainImpostor(pickingProxy.atom.chainname)
             const resnum = pickingProxy.atom.resno
             const atomname = pickingProxy.atom.atomname
 
             atomPair.push({
-                sele: `${resnum}:${chain}.${atomname}/${model}`,
+                sele: `${resnum}:${(chain === '@' ? '' : chain)}.${atomname}/${model}`,
                 coords: {
                     x: pickingProxy.atom.x,
                     y: pickingProxy.atom.y,
@@ -365,12 +374,12 @@ export default function mouseObserver() {
         if (pickingProxy && pickingProxy.atom) {
 
             const model = pickingProxy.atom.modelIndex
-            const chain = pickingProxy.atom.chainname
+            const chain = chainImpostor(pickingProxy.atom.chainname)
             const resnum = pickingProxy.atom.resno
             const atomname = pickingProxy.atom.atomname
 
             atomTriple.push({
-                sele: `${resnum}:${chain}.${atomname}/${model}`,
+                sele: `${resnum}:${(chain === '@' ? '' : chain)}.${atomname}/${model}`,
                 coords: {
                     x: pickingProxy.atom.x,
                     y: pickingProxy.atom.y,

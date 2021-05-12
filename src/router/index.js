@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import About from '@/views/About.vue'
 import Launch from '@/views/Launch.vue'
 import Contact from '@/views/Contact.vue'
+import Help from '@/views/Help.vue'
+import Gallery from '@/views/Gallery.vue'
 import Representation from '@/views/Representation.vue'
 import Shared from '@/views/Shared.vue'
 import NotFound from '@/views/NotFound.vue'
@@ -16,6 +18,16 @@ const routes = [
     path: '/launch',
     name: 'Launch',
     component: Launch
+  },
+  {
+    path: '/help',
+    name: 'Help',
+    component: Help
+  },
+  {
+    path: '/gallery',
+    name: 'Gallery',
+    component: Gallery
   },
   {
     path: '/contact',

@@ -41,7 +41,10 @@ export default function useSelections() {
 
     if(!molecules.length) return  'not(*)'
 
-    return molecules.map(e => e.num + ':' + e.chain + '/' + e.model).join(', ')
+    /*if(e.chain === '@') return molecules.map(e => e.num + ':/' + e.model).join(', ')
+    else  return molecules.map(e => e.num + ':' + e.chain + '/' + e.model).join(', ')*/
+
+    return molecules.map(e => e.num + ':' + (e.chain === '@' ? '' : e.chain) + '/' + e.model).join(', ')
 
   }
 
@@ -99,7 +102,7 @@ export default function useSelections() {
       //console.log('Remove', currReprVal, currStr, molecules)
     }
 
-    //console.log(selection.value)
+    //console.log(string_sel, strs)
 
     return [string_sel, /*selection.value.filter(item => item.id === currReprVal)[0].structures*/strs]
 

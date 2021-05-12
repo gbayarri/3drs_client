@@ -28,6 +28,8 @@ export default {
     const items = [
         { label: 'About', icon: 'pi pi-fw pi-info-circle', to: '/' },
         { label: 'Launch', icon: 'fas fa-rocket', to: '/launch' },
+        { label: 'Help', icon: 'pi pi-fw pi-question-circle', to: '/help' },
+        { label: 'Gallery', icon: 'pi pi-fw pi-images', to: '/gallery' },
         { label: 'Contact', icon: 'pi pi-fw pi-envelope', class: 'tabmenu-right', to: '/contact' },
     ]
     return { menuEnabled, items }

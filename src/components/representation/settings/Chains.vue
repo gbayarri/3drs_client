@@ -149,10 +149,22 @@ export default {
             updateNav(selectedChains.value.filter(item => item.id !== e.path[1].innerText))
         }
 
+        const getOtherChains = (chains, impostor) => {
+            let sele = `not (`
+            for(const chain of chains) { 
+                if(chain.id !== impostor) sele += `:${chain.id} or `
+            }
+            sele = sele.slice(0, -4)
+            sele += `)`
+
+            return sele
+        }
+
         const onHover = (v) => {
             //console.log(currStr.value, currReprVal.value, v)
-            const sele = ':' + v + '/' + currModel.value
-            //console.log(sele)
+            let sele = null
+            if(v === '@') sele =  '/' + currModel.value + ' and ' + getOtherChains(chains.value, '@')
+            else sele = ':' + v + '/' + currModel.value
             const new_name = currStr.value + '-' + sele + '-hover'
             if(stage.getRepresentationsByName(new_name).list.length === 0) {
                 component.value.addRepresentation( "spacefill", { 
@@ -166,7 +178,9 @@ export default {
         }
 
         const onLeave = (v) => {
-            const sele = ':' + v + '/' + currModel.value
+            let sele = null
+            if(v === '@') sele =  '/' + currModel.value + ' and ' + getOtherChains(chains.value, '@')
+            else sele = ':' + v + '/' + currModel.value
             const re = currStr.value + '-' + sele + '-hover'
             for(const item of stage.getRepresentationsByName(re).list) {
                 item.dispose()

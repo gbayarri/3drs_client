@@ -38,7 +38,7 @@ export default function UseActions() {
 
     const actionLeaveSingleHetero = (stage, currStr, v) => {
         // NGL representation
-        const sele = v.num + ':' + v.chain + '/' + v.model
+        const sele = v.num + ':' + (v.chain === '@' ? '' : v.chain) + '/' + v.model
         const re = currStr + '-' + sele + '-hover'
         for(const item of stage.getRepresentationsByName(re).list) {
             item.dispose()
@@ -84,7 +84,7 @@ export default function UseActions() {
 
     const actionSelectSingleMolecule = (p) => {
     
-        //console.log(p)
+        //console.log(p.residue)
 
         const [molecules, msg, status] = updateMolecule(p.residue, p.type, p.currRepr)
         // update representations selections
