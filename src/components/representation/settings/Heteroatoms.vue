@@ -48,11 +48,9 @@
 </template>
 
 <script>
-import { ref, reactive, computed, watch, toRefs, onUpdated } from 'vue'
-//import { useToast } from 'primevue/usetoast'
+import { ref, reactive, computed, toRefs, onUpdated } from 'vue'
 import structureSettings from '@/modules/structure/structureSettings'
 import useRepresentations from '@/modules/representations/useRepresentations'
-//import useSelections from '@/modules/representations/useSelections'
 import useSettings from '@/modules/settings/useSettings'
 import useLegend from '@/modules/viewport/useLegend'
 import useFlags from '@/modules/common/useFlags'
@@ -71,14 +69,10 @@ export default {
             getCurrentChains, 
             getChainContent, 
             getFileNames, 
-            //getCurrentModel, 
             getCurrentMolecules, 
-            /*updateMolecule, 
-            updateAllMolecules */
         } = structureSettings()
         const { currentRepresentation, getCurrentRepresentationSettings, setSelectionRepresentation } = useRepresentations()
-        const { /*setMoleculesSettings,*/ setPositionSettings } = useSettings()
-        //const { getSelection } = useSelections()
+        const { setPositionSettings } = useSettings()
         const { openModal } = useModals()
         const { actionLeaveSingleHetero, actionSelectSingleMolecule, actionSelectAllHeteros } = useActions()
 
@@ -89,12 +83,9 @@ export default {
         const component = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0])
 
         const isCollapsed = ref(true)
-        //const allSelected = ref(false)
         let clicked = false
 
         const re = computed(() => new RegExp('(' + currReprVal.value + '\-' + currStr.value + '\-[a-z]*)', 'g'))
-
-        //const toast = useToast()
 
         // trick for catch which is the last selected / unselected
         let prevSelection = null
@@ -122,12 +113,43 @@ export default {
             set: val => selectHeteroatom(val)
         })
 
+        const getModelContent = (wch, label) => {
+            const chains = []
+            for(const c of wch) chains.push(c.id)
+            const allContent = getChainContent(label, currReprVal.value)
+            return allContent.filter(item => chains.includes(item.id))
+        }
+
+        const computeHeteroList = (wch, label) => {
+            const hets = []
+            const het_chains = getModelContent(wch, label)
+            for(const chain of het_chains) {
+                for(const het of chain.heteroatoms) {
+                    if(!het.id) {
+                        hets.push({
+                            name: chain.id.toUpperCase() + ': ' + het.name + ' ' + het.num,
+                            id: het.num + ':' + chain.id.toUpperCase() + '/' + het.model,
+                            model: het.model,
+                            num: het.num,
+                            chain: chain.id.toUpperCase(),
+                            resname: het.name
+                        })
+                    } else {
+                        hets.push(het)
+                    }
+                }
+            }
+            return hets
+        }
+
         const modelHeteroatoms = computed(() => computeHeteroList(getCurrentChains(currReprVal.value), 'heteroatoms'))
         const allSelected = computed(() => modelHeteroatoms.value.length === selectedHets.value.length)
 
         // ON SELECT / DESELECT
 
         const selectHeteroatom = (selHs) => {
+
+            //console.log(selHs)
 
             if(!centering) {
 
@@ -137,6 +159,8 @@ export default {
                 //let status = null
 
                 //console.log(selHs, prevSelection)
+
+                // TO CHECK!!!
 
                 if((selHs || selHs.length) && (prevSelection || prevSelection.length)) {
                     if(selHs >= prevSelection) {
@@ -162,6 +186,8 @@ export default {
                     //status = 'unselected'
                 }
 
+                //console.log(lastItem)
+
                 const properties = {
                     stage: stage,
                     residue: lastItem,
@@ -174,94 +200,12 @@ export default {
                 }
                 actionSelectSingleMolecule(properties)
 
-                //console.log(status, lastItem)
-                /*const [molecules, msg, status] = updateMolecule(lastItem, 'heteroatoms', currReprVal.value)
-                const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
-                // update representations selections
-                const [selection, structures] = getSelection(molecules, status, currReprVal.value, currStr.value)
-                // remove mouseover representation
-                actionLeave(lastItem)
-                // TODO: CLEAN residue, structure
-                setMoleculesSettings(lastItem, currStr.value, currReprVal.value)
-                    .then((r) => {
-                        if(r.code != 404) {
-                            toast.add({ 
-                                severity: msg.status, 
-                                summary: msg.tit, 
-                                detail: 'The heteroatom [ Model ' 
-                                        + (lastItem.model + 1)
-                                        + ' | Chain ' 
-                                        + lastItem.chain 
-                                        + ' | ' 
-                                        + lastItem.resname 
-                                        + ' ' 
-                                        + lastItem.num 
-                                        + ' ] of ' 
-                                        + strName 
-                                        + ' structure has been ' 
-                                        + msg.txt 
-                                        + currReprSettings.value.name 
-                                        + ' representation',
-                                life: 10000
-                            })
-                            // check if selection is empty
-                            if(selection === 'not(*)') {
-                                toast.add({ severity: 'warn', summary: 'Empty structure', detail: 'Warning! The ' + strName + ' structure of the ' + currReprSettings.value.name + ' representation is currently empty.', life: 10000 })
-                            }
-                            // save selection representation
-                            setSelectionRepresentation(stage, selection, structures, re.value, true)
-                                .then((r) => {
-                                    if(r.code != 404) console.log(r.message)
-                                    else console.error(r.message)
-                                })
-                            console.log(r.message)
-                        } else  console.error(r.message)
-                    })*/
-
                 prevSelection = selHs
 
             }
         }
 
-        // trick for creating reactivity with computed property
-        //const watchedChains = computed(() => getCurrentChains(currReprVal.value))
-
-        const getModelContent = (wch, label) => {
-            const chains = []
-            for(const c of wch) chains.push(c.id)
-            const allContent = getChainContent(label, currReprVal.value)
-            return allContent.filter(item => chains.includes(item.id))
-        }
-
-        const computeHeteroList = (wch, label) => {
-            const hets = []
-            const het_chains = getModelContent(wch, label)
-            for(const chain of het_chains) {
-                for(const het of chain.heteroatoms) {
-                    hets.push({
-                        name: chain.id.toUpperCase() + ': ' + het.name + ' ' + het.num,
-                        id: het.num + ':' + chain.id.toUpperCase() + '/' + het.model,
-                        model: het.model,
-                        num: het.num,
-                        chain: chain.id.toUpperCase(),
-                        resname: het.name
-                    })
-                }
-            }
-            return hets
-        }
-
-        /*
-        //let modelHeteroatoms = computed(() => computeHeteroList(watchedChains.value, 'heteroatoms'))
-        const modelHeteroatoms = computed(() => computeHeteroList(getCurrentChains(currReprVal.value), 'heteroatoms'))
-        //console.log(modelHeteroatoms.value)
-
-        const allSelected = computed(() => modelHeteroatoms.value.length === selectedHets.value.length)*/
-
         const selectAll = () => {
-            /*page.ttpsa = allSelected.value ? 'Select all heteroatoms' : 'Unselect all heteroatoms'
-            selectedHets.value = allSelected.value ? null : modelHeteroatoms.value
-            allSelected.value = !allSelected.value*/
 
             const properties = {
                     stage: stage,
@@ -276,73 +220,15 @@ export default {
                 }
             prevSelection = actionSelectAllHeteros(properties)
 
-            /*let status, msg
-            if(allSelected.value) {
-                status = 'remove'
-                msg = updateAllMolecules('heteroatoms', currReprVal.value, status)
-                //console.log('I want to unselect all')
-            } else {
-                status = 'add'
-                msg = updateAllMolecules('heteroatoms', currReprVal.value, status, modelHeteroatoms.value)
-                //console.log('I want to select all')
-            }
-
-            //console.log(selectedHets.value)
-
-            const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
-            // update representations selections
-            const [selection, structures] = getSelection(modelHeteroatoms.value, status, currReprVal.value, currStr.value)
-            // TODO: CLEAN residue, structure
-            setMoleculesSettings(null, null, currReprVal.value)
-                .then((r) => {
-                    if(r.code != 404) {
-                        prevSelection = getCurrentMolecules(currReprVal.value, 'heteroatoms')
-                        toast.add({ 
-                            severity: msg.status, 
-                            summary: msg.tit, 
-                            detail: 'All the heteroatoms of Model ' 
-                                    + (getCurrentModel(currReprVal.value) + 1)
-                                    + ' in ' 
-                                    + strName 
-                                    + ' structure have been ' 
-                                    + msg.txt 
-                                    + currReprSettings.value.name 
-                                    + ' representation',
-                            life: 10000
-                        })
-                        // check if selection is empty
-                        if(selection === 'not(*)') {
-                            toast.add({ severity: 'warn', summary: 'Empty structure', detail: 'Warning! The ' + strName + ' structure of the ' + currReprSettings.value.name + ' representation is currently empty.', life: 10000 })
-                        }
-                        // save selection representation
-                        setSelectionRepresentation(stage, selection, structures, re.value, true)
-                            .then((r) => {
-                                if(r.code != 404) console.log(r.message)
-                                else console.error(r.message)
-                            })
-                        console.log(r.message)
-                    } else  console.error(r.message)
-                })*/
-
         }
-
-        // TODO: REPLACE BY COMPUTED GETTER / SETTER
-        //watch([/*watchedChains,*/ modelHeteroatoms/*, selectedHets*/], (newValues, prevValues) => {
-            //const wch = newValues[0]
-            //const mdhs = newValues[0]
-            //const shts = newValues[1]
-            //modelHeteroatoms  =  computed(() => computeHeteroList(wch, 'heteroatoms'))
-            //console.log(modelHeteroatoms.value)
-            //if(mdhs.length < 1) isCollapsed.value = true
-            //if(!shts || shts.length === 0) allSelected.value = false
-            //if(shts && (shts.length === mdhs.length)) allSelected.value = true
-        //})
 
         // CENTER STRUCTURE
 
         const centerHetero = (v) => {
             centering = true
-            component.value.autoView(v.id, 500)
+            // sanitize selection in case there is @ chain
+            const s = v.id.replace(/@/g, '')
+            component.value.autoView(s, 500)
             setPositionSettings(stage)
                 .then((r) => {
                     centering = false
@@ -356,7 +242,7 @@ export default {
         const onHover = (v) => {
             if(!clicked) {
                 // NGL representation
-                const sele = v.num + ':' + v.chain + '/' + v.model
+                const sele = v.num + ':' + (v.chain === '@' ? '' : v.chain) + '/' + v.model
                 const new_name = currStr.value + '-' + sele + '-hover'
                 if(stage.getRepresentationsByName(new_name).list.length === 0) {
                     component.value.addRepresentation( "spacefill", { 
@@ -382,15 +268,6 @@ export default {
         }
 
         // MOUSE LEAVE
-
-        /*const actionLeave = (v) => {
-            // NGL representation
-            const sele = v.num + ':' + v.chain + '/' + v.model
-            const re = currStr.value + '-' + sele + '-hover'
-            for(const item of stage.getRepresentationsByName(re).list) {
-                item.dispose()
-            }
-        }*/
 
         const onLeave = (v) => {
             clicked = false

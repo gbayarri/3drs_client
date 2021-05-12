@@ -240,13 +240,13 @@ export default function processStructure() {
         let heteros = []
         structureView.eachResidue(function (rp) {
             //if(rp.resname.toUpperCase() !== 'SOL') {
-                const desc = (rp.entity !== undefined) ? rp.entity.description : null
+                //const desc = (rp.entity !== undefined) ? rp.entity.description : null
                 let res = {
                     num: rp.resno,
                     name: rp.resname.toUpperCase(),
                     chain: (chain) ? rp.chainname : '@',
                     model: rp.modelIndex,
-                    description: desc
+                    //description: desc
                 }
                 heteros.push(res)
             //} else console.log(rp.resname)

@@ -97,7 +97,7 @@ export default function structureSettings() {
             }
         }
         
-        console.log(chains)
+        //console.log(chains)
 
         /*const currStr = settings.value.filter(item => item.id === currentStructure.value)[0].original
         //const currMod = settings.value.filter(item => item.id === currentStructure.value)[0].navigation.curr_model
@@ -519,6 +519,7 @@ export default function structureSettings() {
         const cm = getCurrentModel(currReprVal)
         if(cm === null) return []
 
+        console.log(chain)
         const m = settings.value
             .filter(item => item.id === currentStructure.value)[0].original.models
             .filter(item => item.id === cm)[0].chains
@@ -527,6 +528,7 @@ export default function structureSettings() {
         
         // add / fix id & name for heteros and ions
         if((type === 'heteroatoms' || type === 'ions') && !m.id) {
+            console.log(`${m.num}:${m.chain}/${m.model}`)
             m.id = `${m.num}:${m.chain}/${m.model}`
             m.resname = m.name
             m.name = `${m.chain}: ${m.resname} ${m.num}`

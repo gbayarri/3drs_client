@@ -23,14 +23,12 @@
 import { computed } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import structureSettings from '@/modules/structure/structureSettings'
-//import structureStorage from '@/modules/structure/structureStorage'
 import useLegend from '@/modules/viewport/useLegend'
 import useFlags from '@/modules/common/useFlags'
 import useSettings from '@/modules/settings/useSettings'
 import useSelections from '@/modules/representations/useSelections'
 import useRepresentations from '@/modules/representations/useRepresentations'
 import useActions from '@/modules/representations/useActions'
-import useProjectSettings from '@/modules/structure/useProjectSettings'
 export default {
     props: ['water', 'window', 'index', 'item', 'stage'],
     setup(props) {
@@ -39,21 +37,17 @@ export default {
 
         const { updateLegend } = useLegend()
         const { setFlagStatus } = useFlags()
-        const { currentStructure, getFileNames, checkIfMoleculeExists, /*updateMolecule, updateSetOfMolecules,*/ getSetOfMolecules } = structureSettings()
-        //const { projectData } = structureStorage()
-        const { addMultipleResidues/*, getSelection*/ } = useSelections()
-        const { currentRepresentation, getCurrentRepresentationSettings/*, setSelectionRepresentation*/ } = useRepresentations()
-        const { /*setMoleculesSettings,*/ setPositionSettings } = useSettings()
+        const { currentStructure, getFileNames, checkIfMoleculeExists, getSetOfMolecules } = structureSettings()
+        const { addMultipleResidues } = useSelections()
+        const { currentRepresentation, getCurrentRepresentationSettings } = useRepresentations()
+        const { setPositionSettings } = useSettings()
         const { actionLeaveSingleMolecule, actionSelectSingleMolecule, actionSelectSetOfMolecules } = useActions()
-        const { getProjectSettings } = useProjectSettings()
 
         const filesList = computed(() => getFileNames())
-        //const dataProject = computed(() => projectData.value)
         const currStr = computed(() => currentStructure.value)
         const component = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0])
         const currReprVal = computed(() => currentRepresentation.value)
         const currReprSettings = computed(() => getCurrentRepresentationSettings())
-        const toastSettings = computed(() => getProjectSettings().toasts) 
 
         const water =  computed(() => props.water)
         const window =  computed(() => props.window)
@@ -66,7 +60,7 @@ export default {
 
         const onMouseOver = (model, chain, resnum, resname) => {
             // NGL representation
-            const sele = resnum + ':' + chain + '/' + model
+            const sele = resnum + ':' + (chain === '@' ? '' : chain) + '/' + model
             const new_name = currStr.value + '-' + sele + '-hover'
             component.value.addRepresentation( "spacefill", { 
                 name: new_name,
@@ -92,27 +86,7 @@ export default {
                 atomname: null
             })
             setFlagStatus('legendEnabled', true)
-            // old tooltip format
-            //v-tooltip.left="'Water<br>' + water.chain + ': ' + water.name + ' ' + water.num"
         }
-
-        /*const actionLeave = (model, chain, resnum, resname) => {
-            // NGL representation
-            const sele = resnum + ':' + chain + '/' + model
-            const re = currStr.value + '-' + sele + '-hover'
-            for(const item of stage.getRepresentationsByName(re).list) {
-                item.dispose()
-            }
-            // residue respresentation
-            //const waters = document.querySelectorAll('[data-model="' + model + '"][data-chain="' + chain + '"][data-resnum="' + resnum + '"][data-resname="' + resname + '"]')
-            const waters = resname ?
-                document.querySelectorAll('[data-model="' + model + '"][data-chain="' + chain + '"][data-resnum="' + resnum + '"][data-resname="' + resname + '"]') :
-                document.querySelectorAll('[data-model="' + model + '"][data-chain="' + chain + '"][data-resnum="' + resnum + '"]')
-
-            for(const wat of waters) {
-                wat.classList.remove('water-item-hover')
-            }
-        }*/
 
         const onMouseLeave = (model, chain, resnum, resname) => {
             actionLeaveSingleMolecule(stage, currStr.value, model, chain, resnum, resname, 'water')
@@ -137,55 +111,13 @@ export default {
                 re: re.value
             }
             actionSelectSingleMolecule(properties)
-            /*const [molecules, msg, status] = updateMolecule(water.value, 'waters', currReprVal.value)
-            const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
-            // update representations selections
-            //console.log(molecules, status, currReprVal.value, currStr.value)
-            const [selection, structures] = getSelection(molecules, status, currReprVal.value, currStr.value)
-            // remove mouseover representation
-            actionLeave(model, chain, resnum, resname)
-            // TODO: CLEAN residue, structure
-            setMoleculesSettings(water.value, currStr.value, currReprVal.value)
-                .then((r) => {
-                    if(r.code != 404) {
-                        toast.add({ 
-                            severity: msg.status, 
-                            summary: msg.tit, 
-                            detail: 'The water [ Model ' 
-                                    + (water.value.model + 1)
-                                    + ' | Chain ' 
-                                    + water.value.chain 
-                                    + ' | ' 
-                                    + water.value.name 
-                                    + ' ' 
-                                    + water.value.num 
-                                    + ' ] of ' 
-                                    + strName 
-                                    + ' structure has been ' 
-                                    + msg.txt 
-                                    + currReprSettings.value.name 
-                                    + ' representation',
-                            life: 10000
-                        })
-                        // check if selection is empty
-                        if(selection === 'not(*)') {
-                            toast.add({ severity: 'warn', summary: 'Empty structure', detail: 'Warning! The ' + strName + ' structure of the ' + currReprSettings.value.name + ' representation is currently empty.', life: 10000 })
-                        }
-                        // save selection representation
-                        setSelectionRepresentation(stage, selection, structures, re.value, true)
-                            .then((r) => {
-                                if(r.code != 404) console.log(r.message)
-                                else console.error(r.message)
-                            })
-                        console.log(r.message)
-                    } else  console.error(r.message)
-                })*/
+        
         }
 
         // CENTER STRUCTURE
 
         const centerWater = (model, chain, resnum, resname) => {
-            component.value.autoView(resnum + ':' + chain + '/' + model, 500)
+            component.value.autoView(resnum + ':' + (chain === '@' ? '' : chain) + '/' + model, 500)
             setPositionSettings(stage)
                 .then((r) => {
                     if(r.code != 404) console.log(r.message)
@@ -238,50 +170,11 @@ export default {
                         re: re.value
                     }
                     actionSelectSetOfMolecules(properties)
-                    /*const [status, msg] = updateSetOfMolecules('waters', currReprVal.value, setOfMolecules, water.value.chain, 'multiple')
-                    const strName = filesList.value.filter(item => item.id === currStr.value)[0].name
-                    // update representations selections
-                    const [selection, structures] = getSelection(setOfMolecules, status, currReprVal.value, currStr.value)
-                    // remove mouseover representation
-                    actionLeave(mr.lastRes.model, mr.lastRes.chain, mr.lastRes.num, null)
-                    // TODO: CLEAN residue, structure
-                    setMoleculesSettings(water.value, currStr.value, currReprVal.value)
-                        .then((r) => {
-                            if(r.code != 404) {
-                                toast.add({ 
-                                    severity: msg.status, 
-                                    summary: msg.tit, 
-                                    detail: 'The range [ Model '  
-                                            + (water.value.model + 1)
-                                            + ' | Chain ' 
-                                            + water.value.chain 
-                                            + ' | ' 
-                                            + msg.range 
-                                            + ' ] of ' 
-                                            + strName 
-                                            + ' structure has been ' 
-                                            + msg.txt 
-                                            + currReprSettings.value.name 
-                                            + ' representation',
-                                    life: 10000
-                                })
-                                // check if selection is empty
-                                if(selection === 'not(*)') {
-                                    toast.add({ severity: 'warn', summary: 'Empty structure', detail: 'Warning! The ' + strName + ' structure of the ' + currReprSettings.value.name + ' representation is currently empty.', life: 10000 })
-                                }
-                                // save selection representation
-                                setSelectionRepresentation(stage, selection, structures, re.value, true)
-                                    .then((r) => {
-                                        if(r.code != 404) console.log(r.message)
-                                        else console.error(r.message)
-                                    })
-                                console.log(r.message)
-                            } else  console.error(r.message)
-                        })*/
+                    
                 }
                 document.querySelectorAll('.water-item:not(.disabled)').forEach(el => el.style.cursor = 'pointer')
             }
-            //console.log('multiple on: ',e.target.dataset.model,e.target.dataset.chain,e.target.dataset.resnum, e.target.dataset.resname)
+            
         }
 
         return { 

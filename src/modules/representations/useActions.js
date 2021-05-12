@@ -20,7 +20,7 @@ export default function UseActions() {
 
     const actionLeaveSingleMolecule = (stage, currStr, model, chain, resnum, resname, type) => {
         // NGL representation
-        const sele = resnum + ':' + chain + '/' + model
+        const sele = resnum + ':' + (chain === '@' ? '' : chain) + '/' + model
         const re = currStr + '-' + sele + '-hover'
         for(const item of stage.getRepresentationsByName(re).list) {
             item.dispose()
@@ -50,7 +50,7 @@ export default function UseActions() {
         const resSheet = props.sheets.filter(item => item.id === chain)[0].sheets[sheet]
         const firstItem = resSheet[0]
         const lastItem = resSheet[resSheet.length-1]
-        const sele = firstItem.num + '-' + lastItem.num + ':' + chain + '/' + model
+        const sele = firstItem.num + '-' + lastItem.num + ':' + (chain === '@' ? '' : chain) + '/' + model
         const re = currStr + '-' + sele + '-hover'
         for(const item of stage.getRepresentationsByName(re).list) {
             item.dispose()
@@ -69,7 +69,7 @@ export default function UseActions() {
         const resHelix = props.helixes.filter(item => item.id === chain)[0].helixes[helix]
         const firstItem = resHelix[0]
         const lastItem = resHelix[resHelix.length-1]
-        const sele = firstItem.num + '-' + lastItem.num + ':' + chain + '/' + model
+        const sele = firstItem.num + '-' + lastItem.num + ':' + (chain === '@' ? '' : chain) + '/' + model
         const re = currStr + '-' + sele + '-hover'
         for(const item of stage.getRepresentationsByName(re).list) {
             item.dispose()

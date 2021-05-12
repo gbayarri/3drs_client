@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import { ref, reactive, computed, watch, toRefs, onUpdated } from 'vue'
+import { ref, reactive, computed, toRefs, onUpdated } from 'vue'
 import structureSettings from '@/modules/structure/structureSettings'
 import useRepresentations from '@/modules/representations/useRepresentations'
 import useSettings from '@/modules/settings/useSettings'
@@ -125,10 +125,8 @@ export default {
         const computeIonsList = (wch, label) => {
             const ions = []
             const ion_chains = getModelContent(wch, label)
-            //console.log(ion_chains)
             for(const chain of ion_chains) {
                 for(const ion of chain.ions) {
-                    //console.log(ion)
                     if(!ion.id) {
                         ions.push({
                             name: chain.id.toUpperCase() + ': ' + ion.name + ' ' + ion.num,
