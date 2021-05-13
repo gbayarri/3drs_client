@@ -163,25 +163,25 @@ export default {
                 // TO CHECK!!!
 
                 if((selHs || selHs.length) && (prevSelection || prevSelection.length)) {
-                    if(selHs >= prevSelection) {
-                        //console.log('selHs >= prevSelection')
+                    if(selHs.length >= prevSelection.length) {
+                        console.log('selHs >= prevSelection')
                         lastItem = selHs.filter(({ id: id1 }) => !prevSelection.some(({ id: id2 }) => id2 === id1))[0]
                         //status = 'selected'
                     } else {
-                        //console.log('selHs < prevSelection')
+                        console.log('selHs < prevSelection')
                         lastItem = prevSelection.filter(({ id: id1 }) => !selHs.some(({ id: id2 }) => id1 === id2))[0]
                         //status = 'unselected'
                     }
                 }
 
                 if(!prevSelection || !prevSelection.length) {
-                    //console.log('No prev (adding first)')
+                    console.log('No prev (adding first)')
                     lastItem = selHs[selHs.length - 1]
                     //status = 'selected'
                 }
 
                 if(!selHs || !selHs.length) {
-                    //console.log('No selected hets (removing last')
+                    console.log('No selected hets (removing last')
                     lastItem = prevSelection[prevSelection.length - 1]
                     //status = 'unselected'
                 }

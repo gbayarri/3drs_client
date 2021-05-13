@@ -223,11 +223,13 @@ export default function structureSettings() {
     }
 
     const checkIfMoleculeExists = function (molecule, type, currReprVal) {
+        //console.log(molecule.id)
         const molExists = settings.value
                             .filter(item => item.id === currentStructure.value)[0].navigation
                             .filter(item => item.id === currReprVal)[0].models
                             .filter(item => item.id === molecule.model)[0][type]
                             .filter(item => (item.num === molecule.num && item.chain === molecule.chain)).length > 0
+                            //.filter(item => (item.id === molecule.id)).length > 0
 
         return molExists
 
@@ -246,10 +248,13 @@ export default function structureSettings() {
                             .filter(item => item.id === currReprVal)[0].models
                             .filter(item => item.id === molecule.model)[0][type]
 
+        //console.log(molecules)
+
         let msg = null
         let status = null
         if(!checkIfMoleculeExists(molecule, type, currReprVal)) {
             // add
+            //console.log('add molecule')
             molecules.push(molecule)
             msg = {
                 status: 'info',
@@ -259,10 +264,12 @@ export default function structureSettings() {
             status = 'add'
         } else {
             //remove
+            //console.log('remove molecule')
             settings.value
                 .filter(item => item.id === currentStructure.value)[0].navigation
                 .filter(item => item.id === currReprVal)[0].models
                 .filter(item => item.id === molecule.model)[0][type] = molecules.filter(item => !(item.chain === molecule.chain && item.num === molecule.num))
+                //.filter(item => item.id === molecule.model)[0][type] = molecules.filter(item => !(item.id === molecule.id))
             msg = {
                 status: 'warn',
                 tit: 'Molecule removed',
@@ -271,7 +278,7 @@ export default function structureSettings() {
             status = 'remove'
         }
 
-        //console.log(settings.value)
+        //console.log(molecules)
 
         return [[molecule], msg, status]
 
@@ -519,7 +526,10 @@ export default function structureSettings() {
         const cm = getCurrentModel(currReprVal)
         if(cm === null) return []
 
-        console.log(chain)
+        /*console.log(settings.value
+            .filter(item => item.id === currentStructure.value)[0].original.models
+            .filter(item => item.id === cm)[0].chains
+            .filter(item => item.id === chain)[0])*/
         const m = settings.value
             .filter(item => item.id === currentStructure.value)[0].original.models
             .filter(item => item.id === cm)[0].chains
@@ -528,7 +538,7 @@ export default function structureSettings() {
         
         // add / fix id & name for heteros and ions
         if((type === 'heteroatoms' || type === 'ions') && !m.id) {
-            console.log(`${m.num}:${m.chain}/${m.model}`)
+            //console.log(`${m.num}:${m.chain}/${m.model}`)
             m.id = `${m.num}:${m.chain}/${m.model}`
             m.resname = m.name
             m.name = `${m.chain}: ${m.resname} ${m.num}`

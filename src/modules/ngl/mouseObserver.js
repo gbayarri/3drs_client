@@ -290,10 +290,8 @@ export default function mouseObserver() {
 
             //console.log(pickingProxy.atom.isWater(), pickingProxy.atom.isHetero())
             let type = ''
-            if(pickingProxy.atom.isPolymer() ||
-                pickingProxy.atom.isBackbone() || 
-                pickingProxy.atom.isHelix() || 
-                pickingProxy.atom.isSheet()) {
+            if(pickingProxy.atom.isProtein() ||
+                pickingProxy.atom.isNucleic()) {
                 type = 'residues'
                 properties.css_type = 'sequence'
             }
@@ -302,9 +300,23 @@ export default function mouseObserver() {
                 properties.css_type = 'water'
             }
             if(pickingProxy.atom.isHetero() && !pickingProxy.atom.isWater()) type = 'heteroatoms'
-            if(pickingProxy.atom.isIon()) type = 'ions'
+            if(pickingProxy.atom.isIon()||
+            pickingProxy.atom.isMetal()) type = 'ions'
 
-            //console.log(pickingProxy.atom.isPolymer(), pickingProxy.atom.isBackbone(), pickingProxy.atom.isHelix(), pickingProxy.atom.isSheet())
+            // **************************************
+            // **************************************
+            // **************************************
+            /*console.log(pickingProxy.atom)
+            console.log(pickingProxy.atom.isPolymer(), 
+            pickingProxy.atom.isBackbone(), 
+            pickingProxy.atom.isHelix(), 
+            pickingProxy.atom.isSheet(),
+            pickingProxy.atom.isAromatic(),
+            pickingProxy.atom.isProtein()
+            )*/
+            // **************************************
+            // **************************************
+            // **************************************
             properties.residue = getMolecule(currReprVal.value, type, model, chain, resnum)
             properties.type = type
 
