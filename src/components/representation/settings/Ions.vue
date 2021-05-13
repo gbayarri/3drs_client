@@ -186,6 +186,8 @@ export default {
                     //status = 'unselected'
                 }
 
+                if(lastItem === undefined) lastItem = getCurrentMolecules(currReprVal.value, 'ions')[0]
+
                 const properties = {
                     stage: stage,
                     residue: lastItem,
@@ -198,7 +200,7 @@ export default {
                 }
                 actionSelectSingleMolecule(properties)
 
-                prevSelection = selIns
+                if(selIns || selIns.length) prevSelection = selIns
             }
         }
 

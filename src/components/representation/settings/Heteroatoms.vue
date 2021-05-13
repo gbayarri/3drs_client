@@ -71,7 +71,7 @@ export default {
             getFileNames, 
             getCurrentMolecules, 
         } = structureSettings()
-        const { currentRepresentation, getCurrentRepresentationSettings, setSelectionRepresentation } = useRepresentations()
+        const { currentRepresentation, getCurrentRepresentationSettings/*, setSelectionRepresentation*/ } = useRepresentations()
         const { setPositionSettings } = useSettings()
         const { openModal } = useModals()
         const { actionLeaveSingleHetero, actionSelectSingleMolecule, actionSelectAllHeteros } = useActions()
@@ -164,28 +164,30 @@ export default {
 
                 if((selHs || selHs.length) && (prevSelection || prevSelection.length)) {
                     if(selHs.length >= prevSelection.length) {
-                        console.log('selHs >= prevSelection')
+                        //console.log('selHs >= prevSelection')
                         lastItem = selHs.filter(({ id: id1 }) => !prevSelection.some(({ id: id2 }) => id2 === id1))[0]
                         //status = 'selected'
                     } else {
-                        console.log('selHs < prevSelection')
+                        //console.log('selHs < prevSelection')
                         lastItem = prevSelection.filter(({ id: id1 }) => !selHs.some(({ id: id2 }) => id1 === id2))[0]
                         //status = 'unselected'
                     }
                 }
 
                 if(!prevSelection || !prevSelection.length) {
-                    console.log('No prev (adding first)')
+                    //console.log('No prev (adding first)')
                     lastItem = selHs[selHs.length - 1]
                     //status = 'selected'
                 }
 
                 if(!selHs || !selHs.length) {
-                    console.log('No selected hets (removing last')
+                    //console.log('No selected hets (removing last')
                     lastItem = prevSelection[prevSelection.length - 1]
                     //status = 'unselected'
                 }
 
+                //console.log(lastItem)
+                if(lastItem === undefined) lastItem = getCurrentMolecules(currReprVal.value, 'heteroatoms')[0]
                 //console.log(lastItem)
 
                 const properties = {
@@ -200,7 +202,7 @@ export default {
                 }
                 actionSelectSingleMolecule(properties)
 
-                prevSelection = selHs
+                if(selHs || selHs.length) prevSelection = selHs
 
             }
         }
