@@ -1,19 +1,25 @@
-# 3drs-front
+[![](https://readthedocs.org/projects/3dRS/badge/?version=latest)]()
 
-## Project setup
-```
-npm install
-```
+# 3-dimensional structure Representation Sharing
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+This is the front-end of the **3-dimensional structure Representation Sharing (3dRS)** web application.
 
-### Compiles and minifies for production
-```
-npm run build
-```
+<a href="https://mmb.irbbarcelona.org/3dRS"><img src="src/assets/img/logo.png" alt="3dRS" width="200"/></a>
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## Links
+
+[Visit the official website](https://mmb.irbbarcelona.org/3dRS)
+
+[Visit the official documentation]()
+
+## Credits
+
+Genís Bayarri, Adam Hospital.
+
+## Copyright & licensing
+
+This software has been developed by the [MMB group](https://mmb.irbbarcelona.org) at the [IRB Barcelona](https://irbbarcelona.org).
+
+© 2021 **Institute for Research in Biomedicine**
+
+Licensed under the **Apache License 2.0**.

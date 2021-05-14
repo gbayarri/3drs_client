@@ -20,7 +20,7 @@
 
         <p><Button :label="labelDraft" icon="fas fa-file-signature" @click="openDraft" :disabled="sharing" /></p>
 
-        <p><span class="num-list">2)</span> Be sure that you agree with the <strong>forkability permissions</strong> for this project. You can allow or not other users to <strong>fork this project</strong> once it is
+        <p><span class="num-list">2)</span> Be sure that you agree with the <strong>fork permissions</strong> for this project. You can allow or not other users to <strong>fork this project</strong> once it is
         shared:</p>
 
         <p><InputSwitch v-model="forkable" class="margin-top-5" :disabled="sharing" /> <span class="label-switch">{{ status_fork }}</span></p>
@@ -87,7 +87,7 @@ export default {
             labelCopy: 'Copy',
             labelOpen: 'Open',
             labelShare: computed(() => sharing.value ? "Sharing project, please don't close the tab" : "Share project"),
-            status_fork: computed(() => forkable.value ? "Forkability enabled" : "Forkability disabled")
+            status_fork: computed(() => forkable.value ? "Fork enabled" : "Fork disabled")
         })
         
         const closeThisModal = () => {

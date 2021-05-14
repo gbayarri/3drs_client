@@ -74,7 +74,7 @@ export default function useComponents() {
 
                 if(traj !== null) {
                     console.log('loading', traj.path, 'size', traj.size)
-                    const t = component.addTrajectory( '3dRS/trajectories/' + traj.path, {centerPdb: true, removePbc: true, superpose: true, initialFrame: 0} )
+                    const t = component.addTrajectory( process.env.VUE_APP_MDSRV_DIR + '/trajectories/' + traj.path, {centerPdb: true, removePbc: true, superpose: true, initialFrame: 0} )
                     //console.log(t)
                     // initialising players
                     setInitPlayer(id, traj)
@@ -188,7 +188,7 @@ export default function useComponents() {
         //console.log(component)
         
         console.log('loading', traj.path, 'size', traj.size)
-        const t = component.value.addTrajectory( '3dRS/trajectories/' + traj.path, {centerPdb: true, removePbc: true, superpose: true, initialFrame: 0} )
+        const t = component.value.addTrajectory( process.env.VUE_APP_MDSRV_DIR + '/trajectories/' + traj.path, {centerPdb: true, removePbc: true, superpose: true, initialFrame: 0} )
         //console.log(t)
         const cs = currStr.value
         // initialising players
