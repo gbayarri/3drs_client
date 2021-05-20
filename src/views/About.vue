@@ -6,10 +6,10 @@
           <i class="fas fa-info-circle"></i> <div class="p-panel-title">{{ welcomePanel.header }}</div>
       </template>
       <div class="p-grid">
-        <div class="p-lg-3 p-md-6 p-sm-12" id="about-logo">
+        <div class="p-lg-2 p-md-4 p-sm-12" id="about-logo">
           <p><img alt="Vue logo" class="p-mt-2" src="@/assets/img/logo.png"></p>
         </div>
-        <div class="p-lg-9 p-md-6 p-sm-12">
+        <div class="p-lg-10 p-md-8 p-sm-12">
           <div v-html="welcomePanel.description"></div>
         </div>
       </div>
@@ -52,7 +52,10 @@ export default {
 
     const welcomePanel = {
       header: "Welcome to " + globals.shortName,
-      description: `<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolores fuga veniam inventore, sapiente labore pariatur deserunt! Beatae, repellendus? Explicabo molestiae rerum minima veniam, aspernatur amet? Molestias veritatis magni, non hic illo sequi aliquam ducimus reprehenderit voluptatibus totam excepturi eum a numquam nulla asperiores officia accusantium earum. Possimus minima voluptatum sint ea quod quae amet voluptatibus, repellendus dolor. Facilis laudantium, iure consequuntur possimus quod dolorum aperiam corrupti labore inventore sunt veniam esse voluptates iusto, maxime, reiciendis porro vero nam quas nulla? Fugiat, quasi, qui eum tempora voluptatem illo aliquid adipisci natus rem autem ad quibusdam libero et assumenda deserunt amet ipsa quam molestias. Similique consectetur possimus fugit vitae perferendis quam sint reiciendis natus aperiam, magnam, veniam neque optio! Harum odio nam, ipsum iste ad consequuntur molestiae nisi eaque sit minima laudantium architecto impedit quidem, repellat ullam at ab eius est saepe nihil error modi aspernatur. Obcaecati id magni veritatis iusto consequatur!</p>`
+      description: `
+        <p>The <strong>${globals.longName} (${globals.shortName})</strong> web application has been built with the aim of <strong>sharing visualizations of 3D biological structures</strong> through the web. In these visualizations, users will be able to draw several representations with different selections of the structure(s) previously <strong>uploaded to the application</strong>.</p>
+        <p>Our <strong>philosophy for this project</strong> is to make it accessible to everybody, so there is no private area and once a project is shared <strong>everybody with the link can access it</strong> with no restrictions.</p>
+      `
     }
 
     const aboutPanel = {

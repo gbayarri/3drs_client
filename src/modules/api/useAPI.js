@@ -4,9 +4,6 @@ export default function useAPI() {
 
   const apiData = ref({})
 
-  // TRY TO MIGRATE TO AXIOS? 
-  // TRY TO INTEGRATE UPLOADS? AND MIGRATE TO FETCH??
-
   // fetch project data
   const fetchProject = async (id) => {
       
@@ -73,6 +70,21 @@ export default function useAPI() {
 
   }
 
+  const cloneRepresentation = async (id, data) => {
+
+    const response = await fetch(process.env.VUE_APP_API_LOCATION + '/clone/' + id, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+    const resp = await response.json()
+
+    return resp
+
+  }
+
   const updateRepresentationData = async (id, representation, data) => {
 
     const response = await fetch(process.env.VUE_APP_API_LOCATION + '/representation/' + id + '/' + representation, {
@@ -117,6 +129,21 @@ export default function useAPI() {
 
   }
 
+  const fetchSettings = async (data) => {
+      
+    const response = await fetch(process.env.VUE_APP_API_LOCATION + '/settings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+    const resp = await response.json()
+
+    return resp
+
+}
+
   // updateStructure (when new file added)
 
   return { 
@@ -126,9 +153,11 @@ export default function useAPI() {
     shareProject,
     forkProject,
     createRepresentation,
+    cloneRepresentation,
     updateRepresentationData,
     eliminateRepresentation,
-    updateTrajectoryData
+    updateTrajectoryData,
+    fetchSettings
   }
 
 }

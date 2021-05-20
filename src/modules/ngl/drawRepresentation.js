@@ -63,6 +63,23 @@ export default function drawRepresentation() {
                 //console.log(c1)
                 generatedRepresentations.push(c1)
               break
+            case 'hyperball':
+                c1 = component.addRepresentation( 'hyperball', { 
+                  name: name_new + '-hyperball', 
+                  ///********************************************************************* 
+                  sele: selection, 
+                  ///********************************************************************* 
+                  //sele: '*', 
+                  //colorScheme: color_scheme.value, 
+                  color: color_scheme.value,
+                  visible: representation.visible, 
+                  opacity: representation.opacity,
+                  //side: 'front'
+                  //depthWrite: false
+                } )
+                //console.log(c1)
+                generatedRepresentations.push(c1)
+              break
             case 'ball+stick':
                 c1 = component.addRepresentation( 'ball+stick', { 
                   name: name_new + '-ball+stick', 
@@ -135,8 +152,9 @@ export default function drawRepresentation() {
                   //sele: '*', 
                   //colorScheme: color_scheme.value, 
                   color: color_scheme.value,
-                  surfaceType: 'av',
+                  surfaceType: 'ms',
                   /*contour: true,*/ 
+                  side: 'front',
                   visible: representation.visible, 
                   opacity: representation.opacity
                 } )
@@ -145,6 +163,48 @@ export default function drawRepresentation() {
             case 'ribbon':
                 c1 = component.addRepresentation( 'ribbon', { 
                   name: name_new + '-ribbon', 
+                  ///********************************************************************* 
+                  sele: selection, 
+                  ///********************************************************************* 
+                  //sele: '*', 
+                  //colorScheme: color_scheme.value,
+                  color: color_scheme.value,
+                  visible: representation.visible, 
+                  opacity: representation.opacity
+                } )
+                generatedRepresentations.push(c1)
+              break
+            case 'rope':
+                c1 = component.addRepresentation( 'rope', { 
+                  name: name_new + '-rope', 
+                  ///********************************************************************* 
+                  sele: selection, 
+                  ///********************************************************************* 
+                  //sele: '*', 
+                  //colorScheme: color_scheme.value,
+                  color: color_scheme.value,
+                  visible: representation.visible, 
+                  opacity: representation.opacity
+                } )
+                generatedRepresentations.push(c1)
+              break
+            case 'trace':
+                c1 = component.addRepresentation( 'trace', { 
+                  name: name_new + '-trace', 
+                  ///********************************************************************* 
+                  sele: selection, 
+                  ///********************************************************************* 
+                  //sele: '*', 
+                  //colorScheme: color_scheme.value,
+                  color: color_scheme.value,
+                  visible: representation.visible, 
+                  opacity: representation.opacity
+                } )
+                generatedRepresentations.push(c1)
+              break
+            case 'tube':
+                c1 = component.addRepresentation( 'tube', { 
+                  name: name_new + '-tube', 
                   ///********************************************************************* 
                   sele: selection, 
                   ///********************************************************************* 

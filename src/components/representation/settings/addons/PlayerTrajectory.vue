@@ -1,12 +1,12 @@
 <template>
   
     <div class="p-grid">
-            <div class="p-col">
+            <div class="p-col margin-top-5">
                 <Slider id="player-slider" v-model="frames" :min="min" :max="max" :step="step" />
             </div>
         </div>
         <div class="p-grid double-col">
-            <div class="p-col">
+            <div class="p-col margin-top-10 margin-bottom-5">
                 <Button 
                 icon="fas fa-step-backward" 
                 class="p-button-rounded p-button-text player-button"

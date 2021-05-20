@@ -46,7 +46,8 @@ export default function useStage() {
             start: settings.range[0],
             end: settings.range[1],
             interpolateType: settings.interpolation,
-            mode: settings.loop ? "loop": "once"
+            mode: settings.loop ? "loop": "once",
+            direction: settings.bounce ? "bounce": "forward"
         } ) 
     }
 

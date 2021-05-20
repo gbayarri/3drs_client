@@ -18,99 +18,33 @@
 </template>
 
 <script>
-import { /*ref,*/ reactive, computed, toRefs/*, onUpdated*/ } from 'vue'
-//import useFlags from '@/modules/common/useFlags'
+import { reactive, computed, toRefs } from 'vue'
 import useModals from '@/modules/common/useModals'
 import structureSettings from '@/modules/structure/structureSettings'
 import PlayerTrajectory from '@/components/representation/settings/addons/PlayerTrajectory'
 import SettingsTrajectory from '@/components/representation/settings/addons/SettingsTrajectory'
-//import useTrajectories from '@/modules/ngl/useTrajectories'
 export default {
     components: { PlayerTrajectory, SettingsTrajectory },
     props: ['stage'],
     setup() {
 
-        //const stage = props.stage
-
-        /*const { checkIfTrajectory, getTrajectorySettings, currentStructure } = structureSettings()
-        const { currentFrame, getTrajectoryPlayer, setCurrentFrame } = useTrajectories()*/
         const { checkIfTrajectory } = structureSettings()
         const { dialog, openModal } = useModals()
-        //const { flags, setFlagStatus } = useFlags()
 
         // activate tools, sidebar and so on
-        //const trajectoryLoaded = computed(() => flags.trajectoryLoaded)
-        /*const currStr = computed(() => currentStructure.value)
-        const currFr = computed(() => currentFrame.value)*/
         const hasTrajectory = computed(() => checkIfTrajectory())
-        /*const trajSettings = computed(() => getTrajectorySettings())
-        const player =  computed(() => getTrajectoryPlayer())*/
         
         const page = reactive({
             btn_label: "Add Trajectory"
         })
-
-        //const currTraj = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0].trajList[0])
-        //console.log(currTraj.value)
-
-        //setCurrentFrame(currTraj.value, trajSettings.value.range[0])
-
-        /*onUpdated(() => {
-            isRunning.value = player.value.isRunning
-        })
-
-        const isRunning = ref(false)
-        const page = reactive({
-            btn_label: "Add Trajectory"
-        })
-        const settings = reactive({
-            min: computed(() => trajSettings.value.range[0]),
-            max: computed(() => trajSettings.value.range[1]),
-            step: computed(() => trajSettings.value.step)
-        })
-        
-        //console.log(stage)
-
-        const changeFrame = (frame) => {
-            setCurrentFrame(currTraj.value, frame)
-        }
-
-        const frames = computed({
-            get: () => parseInt(currFr.value) + 1,
-            set: val => changeFrame(val)
-        })*/
 
         const openModalTrajectory = () => {
             openModal('trajectory')
         }
 
-        /*const playTraj = () => {
-            isRunning.value = !isRunning.value
-
-            if(isRunning.value)  player.value.play()
-            else player.value.pause()
-
-        }
-
-        const frameStep = (dir) => {
-            const start = computed(() => trajSettings.value.range[0]).value
-            const end = computed(() => trajSettings.value.range[1]).value
-            const step = computed(() => trajSettings.value.step).value
-            let f = parseInt(currFr.value) + (dir * step)
-            if(f < start) f = end
-            if(f > end) f = start
-            //console.log(f)
-            player.value.pause()
-            setCurrentFrame(currTraj.value, f)
-
-        }*/
-
         return { 
-            //trajectoryLoaded,
             ...toRefs(page), dialog, hasTrajectory, 
-            openModalTrajectory/*,
-            frames, isRunning, playTraj, frameStep,
-            ...toRefs(settings)*/
+            openModalTrajectory
         }
     }
 }

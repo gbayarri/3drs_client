@@ -35,20 +35,22 @@ export default {
 
         const stage = props.stage
         //const { projectData } = structureStorage()
-        const { currentStructure/*, getNumStructures*/ } = structureSettings()
+        const { currentStructure, getFileNames } = structureSettings()
         const { setPositionSettings } = useSettings()
         const { flags, setFlagStatus } = useFlags()
         const { checkSelectionType, getCurrentSelection } = useSelections()
-        const { currentRepresentation } = useRepresentations()
+        const { currentRepresentation, getCurrentRepresentationSettings } = useRepresentations()
 
         const customEnabled = computed(() => flags.customEnabled)
         //const dataProject = computed(() => projectData.value)
         const currReprVal = computed(() => currentRepresentation.value)
         const currStr = computed(() => currentStructure.value)
+        const currReprName = computed(() => getCurrentRepresentationSettings().name)
+        const filesList = computed(() => getFileNames())
 
         const page = reactive({
             //ttprf: "Remove structure (double click)",
-            ttpcf: "Center structure",
+            ttpcf: computed(() => `Center to <strong>${currReprName.value}</strong> representation on <strong>${filesList.value.filter(item => item.id === currStr.value)[0].name}</strong> structure`),
             ttpcs: computed(() => flags.customEnabled ? 'Switch to manual selection' : 'Switch to custom selection' )
         })
 

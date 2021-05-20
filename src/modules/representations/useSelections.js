@@ -209,10 +209,11 @@ export default function useSelections() {
         })
       })
 
-      selection.value.push({
+      /*selection.value.push({
         id: representation,
         structures: new_str
-      })
+      })*/
+      addSelection(representation, new_str)
 
     } else {
 
@@ -221,6 +222,16 @@ export default function useSelections() {
     }
 
     //console.log(selection.value)
+
+  }
+
+  // add new cloned selection structure
+  const addSelection = function (representation, structures) {
+
+      selection.value.push({
+        id: representation,
+        structures: structures
+      })
 
   }
 
@@ -235,6 +246,7 @@ export default function useSelections() {
     checkSelectionType,
     setSelection,
     updateSelection,
+    addSelection,
     getStructureSelection
   }
 

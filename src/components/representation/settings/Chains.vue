@@ -24,7 +24,10 @@
                 @remove="removeChip" 
                 removable 
                 v-for="option of slotProps.value" 
-                :key="option.id"/>
+                :key="option.id"
+                @mouseover="onHover(option.id)"
+                @mouseleave="onLeave(option.id)"
+                />
                 <template v-if="!slotProps.value || slotProps.value.length === 0">
                     {{ page.placeholder }}
                 </template>

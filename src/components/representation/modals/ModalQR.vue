@@ -54,7 +54,13 @@ export default {
         const generateQR = async () => {
             try {
                 var url = window.location.origin + process.env.BASE_URL + 'shared/' + project_id
-                qrImage.value = await QRCode.toDataURL(url, { width: 400 })
+                qrImage.value = await QRCode.toDataURL(url, { 
+                    width: 400,
+                    color: {
+                        dark: '#6f96a9', 
+                        light: '#0000'
+                    }
+                })
             } catch (err) {
                 console.error(err)
             }

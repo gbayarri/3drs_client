@@ -8,7 +8,7 @@
             :baseZIndex="2001"
             :style="{ width: '60vw', opacity:'0.95' }">
         <template #header>
-            <i class="far fa-clone"></i> <h3>{{ header }}</h3>
+            <i class="fas fa-layer-group"></i> <h3>{{ header }}</h3>
         </template>
 
         <p class="margin-bottom-30">Please select <strong>two structures</strong> from the list below and <strong>fill the selection</strong> for each structure. If you need help with <strong>NGL viewer Selection Language</strong>, 

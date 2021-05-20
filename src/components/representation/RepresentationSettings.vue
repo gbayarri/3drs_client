@@ -15,7 +15,7 @@
             </div>
         </div>
         <div class="p-grid">
-            <div class="p-col">
+            <div class="p-col" style="width:100%">
                 <Dropdown 
                 v-model="representationSelected" 
                 :options="reprList" 
@@ -34,7 +34,7 @@
         <div class="p-grid" v-if="enabledRename">
             <div class="p-col">
                 <div class="p-inputgroup">
-                    <InputText v-model="modelRenSel" :placeholder="placeholderRenSel"/>
+                    <InputText v-model="modelRenSel" :placeholder="placeholderRenSel" />
                     <Button 
                     icon="pi pi-check" 
                     class="p-button-nr" 
@@ -44,33 +44,51 @@
             </div>
         </div>
 
-        <!--<div v-if="representationSelected.id != defaultRepresentation">-->
-
-            <!-- remove / schema -->
-            <!--<div class="p-grid ">
-                <div class="p-col">
-                    <Button 
-                    :label="label_remove"
-                    icon="far fa-trash-alt" 
-                    class="settings-button" 
-                    v-on:dblclick="removeRepresentation"
-                    v-tooltip="ttprr" />
-                </div>
-                <div class="p-col">
-                    <Button 
-                    :label="label_hierarchy"
-                    icon="fas fa-sitemap" 
-                    class="settings-button" 
-                    @click="visualizeStructure"
-                    v-tooltip="ttpvs" />
-                </div>
-            </div>-->
+        <div v-if="enabledAnnotation">
+        <!-- edit label -->
+        <div class="p-grid" >
+            <div class="p-col">
+                <label>{{ label_edit_label }} <i class="far fa-question-circle" id="custom-help" v-tooltip.top="'asdasdasd'"></i> </label>
+            </div>
+        </div>
+        <div class="p-grid">
+            <div class="p-col">
+                <InputText v-model="modelEditLabel" :placeholder="placeholderEditLabel" style="width:100%; height:2rem;margin-left:2.5%;" />
+            </div>
+            <div class="p-col-fixed" style="width:4.2rem">
+                <InputSwitch style="margin-top:2px;" />
+            </div>
+        </div>
+        <div class="p-grid">
+            <div class="p-col-6">
+                <!--<InputNumber :value="item.size" @input="changeSize(item.id, $event)" showButtons :step="1" :min="1" :max="10" inputStyle="width:100%" />-->
+                <InputNumber showButtons :step="1" :min="1" :max="10" inputStyle="width:100%;height:2rem;margin-left:2.5%;" />
+            </div>
+            <div class="p-col-4" style="text-align:center;">
+                <!--<ColorPicker v-model="item.color" class="custom-panel" @click="clickPicker(item.id)" />-->
+                <ColorPicker />
+            </div>
+            <div class="p-col-2">
+                <!--<Button 
+                    v-if="representationSelected.id != defaultRepresentation"
+                    icon="fas fa-tag" 
+                    :class="'p-button-rounded p-button-outlined repr-button' + (enabledAnnotation ? ' highlighted-btn-minisettings' : '')" 
+                    @click="addAnnotation"
+                    v-tooltip.right="ttplb" />-->
+                <Button 
+                    icon="fas fa-crosshairs" 
+                    :class="'p-button-rounded p-button-outlined repr-button'" 
+                    style="position: absolute; right: .5rem;" />
+            </div>
+        </div>
+        <hr />
+        </div>
 
             <div class="p-grid ">
                 <div class="p-col-9">
                     <Button 
                     :icon="isVisible ? 'far fa-eye' : 'far fa-eye-slash'" 
-                    class="p-button-rounded p-button-outlined repr-button" 
+                    :class="'p-button-rounded p-button-outlined repr-button' + (!isVisible ? ' highlighted-btn-minisettings' : '')" 
                     @click="setVisibility"
                     v-tooltip.right="ttphr" />
 
@@ -94,6 +112,13 @@
                     :class="'p-button-rounded p-button-outlined repr-button' + (enabledAnnotation ? ' highlighted-btn-minisettings' : '')" 
                     @click="addAnnotation"
                     v-tooltip.right="ttplb" />
+
+                    <Button 
+                    v-if="representationSelected.id != defaultRepresentation"
+                    icon="fas fa-clone" 
+                    class="p-button-rounded p-button-outlined repr-button" 
+                    @click="cloneRepresentation"
+                    v-tooltip.right="ttpcr" />
                 </div>
 
                 <div class="p-col-1">
@@ -151,7 +176,7 @@
                     </div>
                 </div>
                 <div class="p-grid">
-                    <div class="p-col">
+                    <div class="p-col" style="width:100%">
                         <Dropdown
                         v-model="mainStructureColor" 
                         :options="colorScheme" 
@@ -222,7 +247,7 @@ export default {
     setup() {
 
         const { stage } = useStage()
-        const { /*addLabelToRepresentation, removeLabelFromRepresentation,*/ addRepresentation, delRepresentation } = useComponents()
+        const { addRepresentation, delRepresentation } = useComponents()
         const { projectData, updateStructureProject, removeRepresentationFromStructure } = structureStorage()
         const { setFlagStatus } = useFlags()
         const { 
@@ -241,10 +266,11 @@ export default {
             setLabelRepresentation,
             setRadiusRepresentation,
             createNewRepresentation,
+            cloneNewRepresentation,
             deleteRepresentation
         } = useRepresentations()
         const { currentStructure, addNewRepresentationSettings, removeRepresentationSettings, getFileNames } = structureSettings()
-        const { updateSelection, getStructureSelection, checkSelectionType } = useSelections()
+        const { updateSelection, addSelection, getStructureSelection, checkSelectionType } = useSelections()
         const { openModal } = useModals()
         const { getProjectSettings } = useProjectSettings()
 
@@ -254,8 +280,6 @@ export default {
         const currStr = computed(() => currentStructure.value)
         const toastSettings = computed(() => getProjectSettings().toasts) 
         const filesList = computed(() => getFileNames())
-        
-        //const currReprName = computed(() => currReprSettings.value.name)
 
         const re = computed(() => new RegExp('(' + currReprVal.value + '\-[0-9a-z]*\-[a-z]*)', 'g'))
 
@@ -263,6 +287,7 @@ export default {
             ttpu: computed(() => isCollapsed.value ? 'Unfold representation settings' : 'Fold representation settings'),
             label_repr: "Select representation",
             label_ren_repr: "Rename representation",
+            label_edit_label: "Label settings",
             label_new_repr: "Create new representation",
             label_remove: "Remove",
             ttprr: "Remove representation (double click)",
@@ -271,7 +296,9 @@ export default {
             ttper: "Edit representation name",
             ttplb: computed(() => enabledAnnotation.value ? 'Remove label from representation' : 'Add label to representation (it can take a few seconds)'),
             ttphr: computed(() => isVisible.value ? 'Hide representation' : 'Show representation'),
+            ttpcr: "Clone current representation",
             placeholderRenSel: "Insert new name",
+            placeholderEditLabel: "Insert label name",
             placeholderNewSel: "Insert new name",
             label_mol_repr: "Select molecular representation",
             label_radius: "Select radius",
@@ -287,7 +314,6 @@ export default {
 
         // select representation
         const reprList = computed(() => getRepresentationNames())
-        //const representationSelected = ref(reprList.value.filter(item => item.id === currReprVal.value)[0])
         const representationSelected = computed({
             get: () => reprList.value.filter(item => item.id === currReprVal.value)[0],
             set: val => {
@@ -309,13 +335,6 @@ export default {
                 })
             }
         })
-        // TO REMOVE???
-        //const watchedRepresentationSelected = computed(() => reprList.value.filter(item => item.id === currReprVal.value)[0])
-
-        /*const onChangeRepresentation = (e) => {
-            //hasRadius.value = !(e.value.id == 'line' || e.value.id == 'surface')
-            //setCurrentRepresentation(e.value.id, true)
-        }*/
 
         // set visibility
         const isVisible = computed(() => currReprSettings.value.visible)
@@ -378,7 +397,6 @@ export default {
 
         // molecular representation
         const molReprType =  globals.representation
-        //const molRepresentation = ref(molReprType.filter(item => item.id === currReprSettings.value.mol_repr)[0])
 
         const changeMolRepresentation = (value) => {
             if(currReprVal.value !== defaultRepresentation) {
@@ -399,16 +417,15 @@ export default {
             set: val => changeMolRepresentation(val)
         })
 
-        // TO REMOVE???
-        //const watchedMolRepresentation = computed(() => molReprType.filter(item => item.id === currReprSettings.value.mol_repr)[0])
-
         // radius
-        // DEFINE AS A COMPUTED GLOBAL CONSTANT (line / surface / cartoon / ribbon)
-        //let hasRadius = ref(false)
-        const hasRadius = computed(() => !(currReprSettings.value.mol_repr == 'line' 
+        const hasRadius = computed(() => !(currReprSettings.value.mol_repr == 'hyperball' 
+                                            || currReprSettings.value.mol_repr == 'line' 
                                             || currReprSettings.value.mol_repr == 'surface' 
                                             || currReprSettings.value.mol_repr == 'cartoon' 
-                                            || currReprSettings.value.mol_repr == 'ribbon'))
+                                            || currReprSettings.value.mol_repr == 'ribbon'
+                                            || currReprSettings.value.mol_repr == 'rope'
+                                            || currReprSettings.value.mol_repr == 'trace'
+                                            || currReprSettings.value.mol_repr == 'tube'))
         const radius = computed({
             get: () => currReprSettings.value.radius[currReprSettings.value.mol_repr] !== undefined ? currReprSettings.value.radius[currReprSettings.value.mol_repr].value*10 : null,
             set: val => changeRadius(val)
@@ -426,10 +443,7 @@ export default {
 
         // color
         const colorScheme =  globals.colorScheme
-        //const colorUniform = ref(currReprSettings.value.color_scheme === 'uniform')
         const colorUniform = computed(() => currReprSettings.value.color_scheme === 'uniform')
-        // TO REMOVE???
-        //const watchedColorUniform = computed(() => currReprSettings.value.color_scheme === 'uniform')
 
         // change uniform color from picker
         const changeColor = (value) => {
@@ -438,7 +452,6 @@ export default {
                 if (!col.startsWith('#') && col.length < 7) col = '#' + value
                 updateRepresentationProperty('color', col)
                 //console.log(stage)
-                //setColorRepresentation(stage, col, re.value, true)
                 setColorRepresentation(stage, col, re.value, currReprSettings.value, true)
                 .then((r) => {
                     if(r.code != 404) console.log(r.message)
@@ -447,14 +460,10 @@ export default {
             }
         }
 
-        //const color = ref(currReprSettings.value.color)
         const color = computed({
             get: () => currReprSettings.value.color,
             set: val => changeColor(val)
         })
-        // TO REMOVE???
-        //const watchedColor = computed(() => currReprSettings.value.color)
-
 
         // change color schema from dropdown
         const changeColorScheme = (value) => {
@@ -469,13 +478,10 @@ export default {
             }
         }
 
-        //const mainStructureColor = ref(colorScheme.filter(item => item.id === currReprSettings.value.color_scheme)[0])
         const mainStructureColor = computed({
             get: () => colorScheme.filter(item => item.id === currReprSettings.value.color_scheme)[0],
             set: val => changeColorScheme(val)
         })
-        // TO REMOVE???
-        //const watchedMainStructureColor = computed(() => colorScheme.filter(item => item.id === currReprSettings.value.color_scheme)[0])
 
         // opacity
 
@@ -493,56 +499,15 @@ export default {
         const opacity = computed({
             get: () => Math.round(currReprSettings.value.opacity * 100),
             set: val => changeOpacity(val)
-        })
-        // TO REMOVE???
-        //const watchedOpacity = computed(() => (currReprSettings.value.opacity * 100))
-
-        //setOpacityRepresentation(stage, opacity.value, re.value, false)
-        
+        })       
 
         // watchers
         // custom color watcher
         watch(color, (col, prevColor) => {
-            //console.log(col, prevColor)
-            //if (color.value !== 'undefined' && colorUniform.value) changeColor()
             if (color.value !== undefined && colorUniform.value) color.value = col
         })
-        // generic watcher
-        // to remove
-        /*watch([watchedRepresentationSelected, 
-            watchedMolRepresentation,
-            watchedColorUniform, 
-            watchedColor, 
-            watchedMainStructureColor,
-            watchedOpacity], (newValues, prevValues) => {
-            // select representations
-            const wrs = newValues[0]
-            //representationSelected.value = wrs
-            // change molecular respresentation
-            const wmr = newValues[1]
-            //molRepresentation.value = wmr
-            // colors
-            const wclu = newValues[2]
-            //colorUniform.value = wclu
-            const wcl = newValues[3]
-            //color.value = wcl
-            const wmscl = newValues[4]
-            //mainStructureColor.value = wmscl
-            // opacity
-            const wop = newValues[5]
-            //opacity.value = Math.round(wop)
-        })*/
 
         // REMOVE REPRESENTATION / VISUALIZE REPRESENTATION STRUCTURE
-        // *****************************************************
-        // *****************************************************
-        // *****************************************************
-        /* stage.getComponentsByName('first_str').list[0].dispose() */
-        // *****************************************************
-        // *****************************************************
-        // *****************************************************
-        //const ttprr = "Remove representation (double click)"
-        //const ttpvs = "View representation structure"
         const removeRepresentation = () => {
             const remRepr = representationSelected.value.id
             const reprName = representationSelected.value.name
@@ -587,6 +552,7 @@ export default {
         const enabledRename = ref(false)
         const editRepresentation = () => {
             enabledRename.value = !enabledRename.value
+            enabledAnnotation.value = false
         }
 
         let newName = currReprSettings.value.name
@@ -595,7 +561,7 @@ export default {
             set: val => newName = val
         })
 
-        // NOT WORKING
+        // rename representation
         const rrbDisabled = computed(() => newName.length === 0)
 
         const renameRepresentation = () => {
@@ -624,14 +590,24 @@ export default {
             }
         }
 
+        // hierarchy
+
         const visualizeStructure = () => {
             openModal('hierarchy')
         }
 
+        // label
 
-        //const enabledAnnotation = ref(false)
-        const enabledAnnotation = computed(() => currReprSettings.value.label)
-        const addAnnotation = () => {
+        //const enabledAnnotation = computed(() => currReprSettings.value.label.visible)
+        const enabledAnnotation = ref(false)
+        let newLabelName = currReprSettings.value.name
+        const modelEditLabel = computed({
+            get: () => currReprSettings.value.label.name,
+            set: val => newLabelName = val
+        })
+        
+        console.log(currReprSettings.value.label)
+        /*const addAnnotation = () => {
             const newVal = !enabledAnnotation.value
             updateRepresentationProperty('label', newVal)
             setLabelRepresentation(stage, newVal, currReprSettings.value, filesList.value, true)
@@ -639,13 +615,62 @@ export default {
                     if(r.code != 404) console.log(r.message)
                     else console.error(r.message)
                 })
+        }*/
+        /*const enabledRename = ref(false)
+        const editRepresentation = () => {
+            enabledRename.value = !enabledRename.value
+        }*/
+        const addAnnotation = () => {
+            enabledAnnotation.value = !enabledAnnotation.value
+            enabledRename.value = false
+        }
+
+
+        // clone representation
+
+        const cloneRepresentation = () => {
+            //console.log("cloning " + currReprVal.value)
+            cloneNewRepresentation(currReprVal.value)
+                .then((r) => {
+                    if(r.code != 404) {
+                        // insert new representation to projectData
+                        let dp = projectData.value
+                        dp.representations.push(r.representation)
+                        // update dataProject
+                        updateStructureProject(dp)
+                        // update settings
+                        addNewRepresentationSettings(r.representation)
+                        // update selection
+                        addSelection(r.representation.id, r.representation.structures)
+                        // update current representation
+                        setCurrentRepresentation(r.representation.id, true)
+                            .then((r) => {
+                                if(r.code != 404) console.log(r.message)
+                                else console.error(r.message)
+                            })
+                        // draw new representation
+                        addRepresentation(stage, r.representation)
+                        // show toast with new representation info
+                        if(toastSettings.value) {
+                            toast.add({ 
+                                severity:'info', 
+                                summary: 'New representation', 
+                                detail:'The new representation ' 
+                                        + r.representation.name 
+                                        + ' has been successfully created.', 
+                                life: 10000
+                            });
+                        }
+                        console.log(r.message)
+                    } else {
+                        console.error(r.message)
+                    }
+                })
         }
 
         onUpdated(() => {
             // reset enabledRename
             if(enabledRename.value && newName !== currReprSettings.value.name) enabledRename.value = false
-            //console.log(currReprSettings.value)
-            //enabledAnnotation.value = currReprSettings.value.label
             newName = currReprSettings.value.name
         })
 
@@ -654,14 +679,15 @@ export default {
             ...toRefs(page), 
             defaultRepresentation,
             unfoldRepresentations,
-            reprList, representationSelected, /*onChangeRepresentation, */
+            reprList, representationSelected, 
             setVisibility,
             modelNewSel, nrbDisabled, newRepresentation,
-            molReprType, molRepresentation, /*onChangeMolRepresentation,*/
-            radius, min_radius, max_radius, hasRadius, /*onChangeRadius,*/
-            colorScheme, mainStructureColor, /*onChangeColorScheme,*/ colorUniform, color,
-            opacity, /*onChangeOpacity,*/
-            removeRepresentation, visualizeStructure, enabledRename, editRepresentation, renameRepresentation, enabledAnnotation, addAnnotation, modelRenSel, rrbDisabled
+            molReprType, molRepresentation,
+            radius, min_radius, max_radius, hasRadius, 
+            colorScheme, mainStructureColor, colorUniform, color,
+            opacity, 
+            removeRepresentation, visualizeStructure, enabledRename, editRepresentation, renameRepresentation, enabledAnnotation, addAnnotation, modelRenSel, rrbDisabled, cloneRepresentation,
+            modelEditLabel
         }
     }
 }

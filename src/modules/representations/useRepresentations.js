@@ -12,6 +12,7 @@ export default function useRepresentations() {
     const { 
         updateProjectData, 
         createRepresentation, 
+        cloneRepresentation,
         updateRepresentationData, 
         eliminateRepresentation 
     } = useAPI()
@@ -110,6 +111,10 @@ export default function useRepresentations() {
 
     const createNewRepresentation = async (value) => {
         return await createRepresentation(prjID, { name: value })
+    }
+
+    const cloneNewRepresentation = async (value) => {
+        return await cloneRepresentation(prjID, { id: value })
     }
 
     const setMolecularRepresentation = async (stage, representation, mol_repr, re, strSel, update) => {
@@ -400,6 +405,7 @@ export default function useRepresentations() {
         setOpacityRepresentation,
         setLabelRepresentation,
         createNewRepresentation,
+        cloneNewRepresentation,
         setRadiusRepresentation,
         setColorSchemeRepresentation,
         setColorRepresentation,

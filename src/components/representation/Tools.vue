@@ -9,9 +9,10 @@
         <Picture v-if="isShared && !disabled" :stage="stage" />
         <Align v-if="!isShared && isAlignable" />
         <Player v-if="isShared" :stage="stage" />
-        <Embed v-if="isShared" :isDraft="isDraft" />
+        <Embed v-if="isShared && !disabled" :isDraft="isDraft" />
         <Measurements v-if="!isShared" />
-        <QR v-if="isShared" :isDraft="isDraft" />
+        <NavigationMode v-if="!isShared" />
+        <QR v-if="isShared && !disabled" :isDraft="isDraft" />
         <Help />
         <Visit v-if="isShared" :isDraft="isDraft" />
         <ProjectSettings v-if="!isShared" />
@@ -35,11 +36,12 @@ import QR from '@/components/representation/tools/QR'
 import Player from '@/components/representation/tools/Player'
 import Embed from '@/components/representation/tools/Embed'
 import Measurements from '@/components/representation/tools/Measurements'
+import NavigationMode from '@/components/representation/tools/NavigationMode'
 import Visit from '@/components/representation/tools/Visit'
 import Align from '@/components/representation/tools/Align'
 import ProjectSettings from '@/components/representation/tools/ProjectSettings'
 export default {
-    components: { Reload, Rotate, Center, Background, FullScreen, Picture, Help, QR, Player, Embed, Measurements, Visit, Align, ProjectSettings },
+    components: { Reload, Rotate, Center, Background, FullScreen, Picture, Help, QR, Player, Embed, Measurements, NavigationMode, Visit, Align, ProjectSettings },
     props: ['isDraft'],
     setup() {
         const { getStage } = useStage()

@@ -1,3 +1,4 @@
+import globals from '@/globals'
 import { ref, computed/*, onMounted*/ } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import useLegend from '@/modules/viewport/useLegend'
@@ -105,11 +106,18 @@ export default function mouseObserver() {
                 const resname = pickingProxy.atom.resname
                 const resnum = pickingProxy.atom.resno
                 const atomname = pickingProxy.atom.atomname
+                const aminoacid = globals.aminoacids[resname.toLowerCase()]
+                let residue_name = resname
+                if(pickingProxy.atom.isProtein() ||
+                    pickingProxy.atom.isNucleic()) {
+                        const aminoacid_name = (aminoacid !== undefined) ? aminoacid.name : 'modified residue'
+                        residue_name = resname + ' (<span class="lowercase-legend">' + aminoacid_name + '</span>)'
+                }
                 updateLegend({
                     name: name,
                     model: model,
                     chainname: chain,
-                    resname: resname,
+                    resname: residue_name,
                     resno: resnum,
                     atomname: atomname
                 })
@@ -157,11 +165,19 @@ export default function mouseObserver() {
             }
             if (pickingProxy && pickingProxy.bond) {
                 const name = filesList.value.filter(item => item.id === pickingProxy.bond.structure.name)[0].name
+                const resname = pickingProxy.bond.atom1.resname
+                const aminoacid = globals.aminoacids[resname.toLowerCase()]
+                let residue_name = resname
+                if(pickingProxy.bond.atom1.isProtein() ||
+                    pickingProxy.bond.atom1.isNucleic()) {
+                        const aminoacid_name = (aminoacid !== undefined) ? aminoacid.name : 'modified residue'
+                        residue_name = resname + ' (<span class="lowercase-legend">' + aminoacid_name + '</span>)'
+                }
                 updateLegend({
                     name: name,
                     model: pickingProxy.bond.atom1.modelIndex,
                     chainname: chainImpostor(pickingProxy.bond.atom1.chainname),
-                    resname: pickingProxy.bond.atom1.resname,
+                    resname: residue_name,
                     resno: pickingProxy.bond.atom1.resno,
                     atomname: pickingProxy.bond.atom1.atomname + '-' + pickingProxy.bond.atom2.atomname
                 })
@@ -213,11 +229,18 @@ export default function mouseObserver() {
                 const resname = pickingProxy.atom.resname
                 const resnum = pickingProxy.atom.resno
                 const atomname = pickingProxy.atom.atomname
+                const aminoacid = globals.aminoacids[resname.toLowerCase()]
+                let residue_name = resname
+                if(pickingProxy.atom.isProtein() ||
+                    pickingProxy.atom.isNucleic()) {
+                        const aminoacid_name = (aminoacid !== undefined) ? aminoacid.name : 'modified residue'
+                        residue_name = resname + ' (<span class="lowercase-legend">' + aminoacid_name + '</span>)'
+                }
                 updateLegend({
                     name: name,
                     model: model,
                     chainname: chain,
-                    resname: resname,
+                    resname: residue_name,
                     resno: resnum,
                     atomname: atomname
                 })
@@ -226,11 +249,19 @@ export default function mouseObserver() {
             }
             if (pickingProxy && pickingProxy.bond) {
                 const name = filesList.value.filter(item => item.id === pickingProxy.bond.structure.name)[0].name
+                const resname = pickingProxy.bond.atom1.resname
+                const aminoacid = globals.aminoacids[resname.toLowerCase()]
+                let residue_name = resname
+                if(pickingProxy.bond.atom1.isProtein() ||
+                    pickingProxy.bond.atom1.isNucleic()) {
+                        const aminoacid_name = (aminoacid !== undefined) ? aminoacid.name : 'modified residue'
+                        residue_name = resname + ' (<span class="lowercase-legend">' + aminoacid_name + '</span>)'
+                }
                 updateLegend({
                     name: name,
                     model: pickingProxy.bond.atom1.modelIndex,
                     chainname: chainImpostor(pickingProxy.bond.atom1.chainname),
-                    resname: pickingProxy.bond.atom1.resname,
+                    resname: residue_name,
                     resno: pickingProxy.bond.atom1.resno,
                     atomname: pickingProxy.bond.atom1.atomname + '-' + pickingProxy.bond.atom2.atomname
                 })

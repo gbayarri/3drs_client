@@ -11,7 +11,8 @@ const dialog = reactive({
   embed: false,
   align: false,
   measurements: false,
-  qrcode: false
+  qrcode: false,
+  embed_gallery: false
 })
 
 const tips = ref('')

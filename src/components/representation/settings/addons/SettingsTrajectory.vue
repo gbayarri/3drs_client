@@ -62,6 +62,17 @@
             </div>
         </div>
 
+        <div class="p-grid margin-top-10">
+            <div class="p-col">
+                <label>{{ label_direction }}</label>
+            </div>
+        </div>
+        <div class="p-grid margin-top-5">
+            <div class="p-col">
+                <InputSwitch v-model="direction" class="margin-top-5" />
+            </div>
+        </div>
+
     </Panel>
 </template>
 
@@ -97,7 +108,8 @@ export default {
             label_mode: "Loop",
             label_interpolation: "Interpolation",
             label_step: "Step",
-            label_autoplay: "Autoplay"
+            label_autoplay: "Autoplay",
+            label_direction: computed(() => trajSettings.value.bounce ? "Bounce / rock enabled" : "Bounce / rock disabled")
         })
 
         const showTips = () => {
@@ -200,7 +212,7 @@ export default {
             set: val => changeStep(val)
         })
 
-        // loop
+        // autoplay
 
         // change autoplay from switch
         const changeAutoplay = (value) => {
@@ -217,13 +229,33 @@ export default {
             set: val => changeAutoplay(val)
         })
 
+        // direction
+
+        // change direction from switch
+        const changeDirection = (value) => {
+            const l = value ? "bounce": "forward"
+            trajSettings.value.bounce = value
+            updateTrajectorySettings(trajSettings.value)
+            updatePlayerSetting('direction', l, currStr.value)
+            setTrajectorySettings({ structure: currStr.value, settings: trajSettings.value })
+                .then((r) => {
+                    if(r.code != 404) console.log(r.message)
+                    else console.error(r.message)
+                })
+        }
+        const direction = computed({
+            get: () => trajSettings.value.bounce,
+            set: val => changeDirection(val)
+        })
+
         return  { 
             ...toRefs(page), isCollapsed, showTips,
             range, minRange, maxRange,
             loop,
             selectedInterpolation, interpolations,
             step,
-            autoplay
+            autoplay,
+            direction
         }
 
     }
@@ -238,5 +270,8 @@ export default {
     .range-value label { vertical-align: sub; }
 
     #sidebar-player .p-dropdown-panel .p-dropdown-items .p-dropdown-item { padding: 0.5rem 1rem!important; }
+
+    #sidebar-player .p-col { padding-bottom:0; }
+    #sidebar-player .p-inputswitch { margin-top:0!important; }
 
 </style>

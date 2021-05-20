@@ -48,6 +48,8 @@ export default {
     const prjSettings = computed(() => getProjectSettings())
     const toast = useToast()
     const isShared = computed(() => flags.isShared)
+    const navigationMode = computed(() => flags.navigationMode)
+    
     //const currReprSettings = computed(() => getCurrentRepresentationSettings())
 
     const createViewport = () => {
@@ -169,16 +171,16 @@ export default {
             })
             // select residue
             stage.mouseControls.add('clickPick+left', function( stage, pickingProxy ){
-              if(reprMode.value) selectResidue(stage, pickingProxy)
+              if(reprMode.value && !navigationMode.value) selectResidue(stage, pickingProxy)
             })
             // get distance 
             stage.mouseControls.add('clickPick+right', function( stage, pickingProxy ){
               //console.log(reprMode.value)
-              if(reprMode.value) getDistance(stage, pickingProxy)
+              if(reprMode.value && !navigationMode.value) getDistance(stage, pickingProxy)
             })
             // get angle
             stage.mouseControls.add('clickPick+right-ctrl', function( stage, pickingProxy ){
-              if(reprMode.value) getAngle(stage, pickingProxy)
+              if(reprMode.value && !navigationMode.value) getAngle(stage, pickingProxy)
             })
           //}
 

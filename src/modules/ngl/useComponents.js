@@ -7,7 +7,7 @@ import useRepresentations from '@/modules/representations/useRepresentations'
 import drawRepresentation from '@/modules/ngl/drawRepresentation'
 import useTrajectories from '@/modules/ngl/useTrajectories'
 import useStage from '@/modules/ngl/useStage'
-//import useFlags from '@/modules/common/useFlags'
+import useFlags from '@/modules/common/useFlags'
 import useModals from '@/modules/common/useModals'
 //import useAPI from '@/modules/api/useAPI'
 import useMeasurements from '@/modules/structure/useMeasurements'
@@ -24,7 +24,7 @@ export default function useComponents() {
     const { closeModal } = useModals()
     const { createDistance, createAngle } = useMeasurements()
     //const { updateTrajectoryData } = useAPI()
-    //const { setFlagStatus } = useFlags()
+    const { flags } = useFlags()
 
 
     const dataProject = computed(() => projectData.value)
@@ -100,18 +100,27 @@ export default function useComponents() {
                                         else console.error(r.message)
                                     })
                             }
+                            //console.log(settings)
                             const player = createTrajectoryPlayer(trajectory, settings)
                             setTrajectoryPlayer(player, id)
                             //console.log(player)
                             //setFlagStatus('trajectoryLoaded', true)
                             // SET SOME FLAG HERE FOR ACTIVATE Trajectory.vue
-                            trajectory.signals.frameChanged.add((a) => {
-                                updateCurrentFrame(a, id)
+                            let prev_f = null
+                            trajectory.signals.frameChanged.add((f) => {
+                                if(prev_f !== f && f < settings.range[1]) {
+                                    prev_f = f
+
+                                    updateCurrentFrame(f, id)
+                                }
+                                if(!settings.loop && f == (settings.range[1] - 1)) {
+                                    player.stop()
+                                }
                             })
                             /*trajectory.signals.parametersChanged.add((a) => {
                                 console.log(a)
                             })*/
-                            if(settings.autoplay) player.play()
+                            if(settings.autoplay && flags.isShared) player.play()
                         })
 
                 }
@@ -140,7 +149,7 @@ export default function useComponents() {
                         const generatedRepresentations = addRepresentationToComponent(representation, component, name_new, selection)
 
                         // labels
-                        if(selection !== 'not(*)' && representation.label) {
+                        if(selection !== 'not(*)' && representation.label.visible) {
                             createAnnotation(component, selection, representation, name)
                         }
 
@@ -172,7 +181,13 @@ export default function useComponents() {
             // representation name
             const name_new = representation.id + "-" + component.parameters.name
             // get selection for this structure
-            const selection = representation.structures.filter(item => item.id === component.parameters.name)[0].selection.string
+            //const selection = representation.structures.filter(item => item.id === component.parameters.name)[0].selection.string
+
+            const selection = 
+                            representation.structures.filter(item => item.id === component.parameters.name)[0].selection.custom === "" ? 
+                            representation.structures.filter(item => item.id === component.parameters.name)[0].selection.string :
+                            representation.structures.filter(item => item.id === component.parameters.name)[0].selection.custom
+
             // add representation
             const generatedRepresentations = addRepresentationToComponent(representation, component, name_new, selection)
         } )
@@ -216,8 +231,15 @@ export default function useComponents() {
                 const player = createTrajectoryPlayer(trajectory, settings)
                 setTrajectoryPlayer(player, cs)
                 //console.log(player)
-                trajectory.signals.frameChanged.add((a) => {
-                    updateCurrentFrame(a, cs)
+                let prev_f = null
+                trajectory.signals.frameChanged.add((f) => {
+                    if(prev_f !== f && f < settings.range[1]) {
+                        prev_f = f
+                        updateCurrentFrame(f, id)
+                    }
+                    if(!settings.loop && f == (settings.range[1] - 1)) {
+                        player.stop()
+                    }
                 })
             })
 

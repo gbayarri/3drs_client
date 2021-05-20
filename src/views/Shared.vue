@@ -40,6 +40,7 @@ export default {
         // activate tools, sidebar and so on
         const stageLoaded = computed(() => flags.stageLoaded)
         const width = ref(window.innerWidth)
+        //const ratio = ref(window.devicePixelRatio)
         const disableComponents = computed(() => width.value < 768 )
         
         setFlagStatus('menuEnabled', false)
@@ -49,9 +50,17 @@ export default {
         setFlagStatus('isShared', true)
 
         const project_id = props.id
+        //let maxW = ratio.value > 1 ? Math.floor(600 / ratio.value) : 600
+        setFlagStatus('responsive', width.value < 600)
+        //console.log(maxW)
 
         window.addEventListener("resize", () => {
             width.value = window.innerWidth
+            //ratio.value = window.devicePixelRatio
+            
+            /*maxW = ratio.value > 1 ? Math.floor(600 / ratio.value) : 600
+            console.log(maxW)*/
+
             setFlagStatus('responsive', width.value < 600)
         })
 

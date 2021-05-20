@@ -37,11 +37,15 @@ module.exports = {
         { name: 'Backbone', id: 'backbone' },
         { name: 'Ball and stick', id: 'ball+stick' },
         { name: 'Cartoon', id: 'cartoon' },
+        { name: 'Hyperball', id: 'hyperball' },
         { name: 'Licorice', id: 'licorice' },
         { name: 'Line', id: 'line' },
+        { name: 'Ribbon', id: 'ribbon' },
+        { name: 'Rope', id: 'rope' },
         { name: 'Spacefill', id: 'spacefill' },
         { name: 'Surface', id: 'surface' },
-        { name: 'Ribbon', id: 'ribbon' }
+        { name: 'Trace', id: 'trace' },
+        { name: 'Tube', id: 'tube' },
     ],
     colorScheme: [
         { name: 'Atom index', id: 'atomindex', color:'#0384fc' },
@@ -62,5 +66,12 @@ module.exports = {
         { name: 'Linear', id: 'linear' },
         { name: 'Spline', id: 'spline' }
     ],
-    embedCode: (url) => `<iframe width="500" height="500" src="${url}" title="3dRS" frameborder="0" allowfullscreen></iframe>`
+    embedCode: (url) => `<iframe width="500" height="500" src="${url}" title="3dRS" frameborder="0" allowfullscreen></iframe>`,
+    gallery: [
+        { id: '609f864ae5f988.76031858', img: 'gallery01.png' },
+        { id: '609f8bf52bba88.95483112', img: 'gallery02.png' },
+        { id: '60a0170e7b9041.47453401', img: 'gallery03.png' },
+        { id: '60a018efc21a50.60836011', img: 'gallery04.png' },
+        { id: '60a2eb0061f600.54953893', img: 'gallery05.png' }
+    ]
 }

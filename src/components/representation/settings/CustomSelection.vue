@@ -18,12 +18,24 @@
             </div>
         </div>
         <div class="p-grid">
-            <div class="p-col">
-                <div class="p-inputgroup">
-                    <Button icon="pi pi-check" @click="createCustom" :disabled="bDisabled" />
-                    <InputText v-model="customSelection" :placeholder="placeholder"/>
-                    <Button icon="pi pi-trash" @click="removeCustom" id="remove-custom" v-if="!bDisabled"  />
-                </div>
+            <div class="p-col">           
+                <Textarea v-model="customSelection" rows="4" :placeholder="placeholder" id="customtextarea" />
+            </div>
+        </div>
+        <div class="p-grid">
+            <div class="p-col-4">
+                <Button 
+                    icon="pi pi-trash" 
+                    class="p-button-rounded p-button-outlined cust-button danger" 
+                    @click="removeCustom"
+                     v-if="!bDisabled" />
+            </div>
+	        <div class="p-col-4 p-offset-4" style="text-align:right">
+                <Button 
+                    icon="pi pi-check" 
+                    class="p-button-rounded p-button-outlined cust-button" 
+                    @click="createCustom"
+                    :disabled="bDisabled" />
             </div>
         </div>
 
@@ -50,7 +62,7 @@ export default {
         const { getCurrentSelection, setCurrentCustomSelection } = useSelections()
         const { getProjectSettings } = useProjectSettings()
 
-        const isCollapsed = ref(true)
+        const isCollapsed = ref(false)
         const currReprVal = computed(() => currentRepresentation.value)
         const currStr = computed(() => currentStructure.value)
         const currReprSettings = computed(() => getCurrentRepresentationSettings())
@@ -165,4 +177,12 @@ export default {
     #custom-help { cursor:pointer; }
     #remove-custom { background: #c75959; border-color: #c75959; }
     #remove-custom:hover { background: #9c4a4a; border-color: #9c4a4a; }
+    #customtextarea { resize: none; width:100%;}
+    .p-button-rounded.p-button-outlined.cust-button {
+        height: 1.8rem!important;
+        width: 1.8rem;
+        font-size: 12px;
+    }
+    .cust-button:hover { background: #546974!important; color:#fff!important; }
+    .cust-button.danger:hover { border-color:#c75959!important;background: #c75959!important; color:#fff!important;}
 </style>

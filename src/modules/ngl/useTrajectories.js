@@ -62,7 +62,8 @@ export default function useTrajectories() {
             str: str,
             player: null,
             frame: 0,
-            autoplay: traj.settings.autoplay
+            autoplay: traj.settings.autoplay,
+            bounce: traj.settings.bounce
         })
 
         /*currentFrame.push({
@@ -151,6 +152,7 @@ export default function useTrajectories() {
 
     // update current frame
     const updateCurrentFrame = (f, str) => {
+        //console.log(f)
         player.filter(item => item.str === str)[0].frame = f
         //currentFrame.value = parseInt(f)    
         //currentFrame.filter(item => item.str === str)[0].frame = parseInt(f)    
@@ -177,7 +179,12 @@ export default function useTrajectories() {
         //player.value.parameters[k] = v
         //console.log(player)
         //console.log(player.filter(item => item.str === str)[0])
-        player.filter(item => item.str === str)[0].player.parameters[k] = v
+        const p = player.filter(item => item.str === str)[0].player
+        const params = p.parameters
+        params[k] = v
+        p.setParameters(params)
+        //player.filter(item => item.str === str)[0].player.parameters[k] = v
+        //console.log(player.filter(item => item.str === str)[0].player.parameters)
     }
 
     // NGL / REST API

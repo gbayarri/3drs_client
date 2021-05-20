@@ -54,14 +54,14 @@ export default {
   color: #fff;
   padding: 10px 15px;
   max-width: 30%;
-  max-height: 10rem;
 }
 @media (max-width: 768px) {
-    #caption { left: 3.5rem; bottom: auto; top:1.5%; max-width: calc(3.5rem + 60%);  }
+    #caption { left: 3.5rem; bottom: auto; top:1.5%; max-width: calc(3.5rem + 60%); /*max-height: 200px;*/  }
     #caption div { text-align: center; }
+    #capt-description { max-height: 6rem; overflow-y: auto; overflow-x: hidden; }
 }
 @media (max-width: 600px) {
-    #caption { left: 1.5%; max-width: 100%;  }
+    #caption { left: 1.5%; max-width: 97%;  }
 }
 #capt-title { font-weight: 900; text-align: left!important; }
 #capt-title span#tit { position: relative; top: -2px; font-size: 18px; margin-right: .5rem; }
@@ -79,9 +79,7 @@ export default {
   background-color: rgb(153 171 191 / 0.5);
   margin-top: 0.5rem;
   padding: 0.5rem 0.5rem;
-  max-height: 6rem;
-  overflow-y: auto;
-  overflow-x: hidden;
+  /*max-height: 6rem;*/
   text-align: left!important;
 }
 #capt-description p { margin: 0.5rem 0; }
