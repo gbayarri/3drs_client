@@ -78,7 +78,11 @@ export default function useStage() {
 
         return parseFloat(d.toFixed(1))
     }
+
+    const arrayToVector3 = function (array) {
+        return new NGL.Vector3(array[0], array[1], array[2])
+    }
   
-    return { stage, selection, createStage, getStage, createSelection, createTrajectoryPlayer, createSuperposition, calculateDistance, calculateAngle }
+    return { stage, selection, createStage, getStage, createSelection, createTrajectoryPlayer, createSuperposition, calculateDistance, calculateAngle, arrayToVector3 }
   
   }

@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
-import globals from '@/globals'
+//import globals from '@/globals'
+import useStage from '@/modules/ngl/useStage'
 import structureStorage from '@/modules/structure/structureStorage'
 import useAPI from '@/modules/api/useAPI'
 import drawRepresentation from '@/modules/ngl/drawRepresentation'
@@ -8,6 +9,7 @@ let currentRepresentation = ref(null)
 
 export default function useRepresentations() {
 
+    const { arrayToVector3 } = useStage()
     const { projectData/*, updateStructureProject*/ } = structureStorage()
     const { 
         updateProjectData, 
@@ -59,7 +61,7 @@ export default function useRepresentations() {
     }
 
     const setNameRepresentation = async (stage, name, update) => {
-        if(getCurrentRepresentationSettings().label) updateAnnotationText(stage, name)
+        //if(getCurrentRepresentationSettings().label) updateAnnotationText(stage, name)
         if(update) {
             return await updateRepresentationData(prjID, currentRepresentation.value, { name: name })
         }
@@ -160,19 +162,20 @@ export default function useRepresentations() {
         }
     }
 
-    const updateAnnotationColor = (stage, representation) => {
-        const color = representation.color_scheme === 'uniform' ? 
+    const updateAnnotationProperty = (stage, representation) => {
+        
+        /*const color = representation.color_scheme === 'uniform' ? 
                         representation.color : 
-                        globals.colorScheme.filter(item => item.id === representation.color_scheme)[0].color
+                        globals.colorScheme.filter(item => item.id === representation.color_scheme)[0].color*/
         stage.eachComponent( ( component ) => {
             component.eachAnnotation( (annotation) => {
                 if(annotation.id === currentRepresentation.value) {
-                    console.log(annotation)
+                    annotation.position = arrayToVector3(representation.label.position)
                     annotation.element.innerHTML = `<div style="color: rgb(255, 255, 255); 
-                    background-color: ${hex2rgba(color, .5)}; 
-                    padding: 15px; font-size: 25px; 
+                    background-color: ${hex2rgba(representation.label.color, .5)}; 
+                    padding: 15px; font-size: ${representation.label.size}px; 
                     text-shadow: rgb(0, 0, 0) -1px 1px 0px, rgb(0, 0, 0) 1px 1px 0px, rgb(0, 0, 0) 1px -1px 0px, rgb(0, 0, 0) -1px -1px 0px;">
-                        ${annotation.element.innerText}
+                        ${representation.label.name}
                     </div>`
                 }
             })
@@ -183,7 +186,7 @@ export default function useRepresentations() {
         })
     }
 
-    const updateAnnotationText = (stage, text) => {
+    /*const updateAnnotationText = (stage, text) => {
         stage.eachComponent( ( component ) => {
             component.eachAnnotation( (annotation) => {
                 if(annotation.id === currentRepresentation.value) {
@@ -197,7 +200,7 @@ export default function useRepresentations() {
                 }
             })
         })
-    }
+    }*/
 
     const setColorSchemeRepresentation = async (stage, color_scheme, color, re, representation, update) => {
         for(const item of stage.getRepresentationsByName(re).list) {
@@ -205,7 +208,7 @@ export default function useRepresentations() {
             if(color_scheme === 'uniform') item.setColor( color )
             else item.setColor( color_scheme )
         }
-        if(representation.label) updateAnnotationColor(stage, representation)
+        //if(representation.label) updateAnnotationColor(stage, representation)
         if(update) {
             return await updateRepresentationData(prjID, currentRepresentation.value, { color_scheme: color_scheme })
         }
@@ -220,7 +223,7 @@ export default function useRepresentations() {
             return await new Promise((resolve) => {
                 clearTimeout(myTimeOutColor)
                 myTimeOutColor = setTimeout(() => {
-                    if(representation.label) updateAnnotationColor(stage, representation)
+                    //if(representation.label) updateAnnotationColor(stage, representation)
                     const response = updateRepresentationData(prjID, currentRepresentation.value, { color: color })
                     resolve(response)
                 }, shortTimeOut)
@@ -257,35 +260,75 @@ export default function useRepresentations() {
         return `rgba(${output.r}, ${output.g}, ${output.b}, ${output.a})`;
     }
 
-    const createAnnotation = (component, selection, representation, name) => {
+    const createAnnotation = (component, selection, representation) => {
 
-        const ap = component.getCenterUntransformed(selection)
-
-        const color = representation.color_scheme === 'uniform' ? 
-                        representation.color : 
-                        globals.colorScheme.filter(item => item.id === representation.color_scheme)[0].color
+        const ap = representation.label.position === null ? component.getCenterUntransformed(selection) : arrayToVector3(representation.label.position)
 
         const elm = document.createElement("div")
-            elm.innerText = name + ' - ' + representation.name
+            elm.innerText = representation.label.name
             elm.style.color = "#fff"
-            elm.style.backgroundColor = hex2rgba(color, .5)
+            elm.style.backgroundColor = hex2rgba(representation.label.color, .5)
             elm.style.padding = "15px"
-            elm.style.fontSize = "25px"
+            elm.style.fontSize = representation.label.size + "px"
             elm.style.textShadow =  '-1px 1px 0 #000, 1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000'
 
         const ann = component.addAnnotation(ap, elm)
         ann.id = representation.id
 
+        return ap.toArray()
+
     }
 
-    const setLabelRepresentation = async (stage, label, representation, fl, update) => {
-        if(label) {
+    let myTimeOutLabel = null
+    const setLabelProperty = async (stage, representation, update) => {
+        updateAnnotationProperty(stage, representation)
+        if(update) {
+            return await new Promise((resolve) => {
+                clearTimeout(myTimeOutLabel)
+                myTimeOutLabel = setTimeout(() => {
+                    const response = updateRepresentationData(prjID, currentRepresentation.value, { label: representation.label })
+                    resolve(response)
+                }, shortTimeOut)
+            })
+            
+        }
+    }
+
+    const setLabelPosition = async (stage, representation, update) => {
+        stage.eachComponent( ( component ) => {
+
+            component.eachAnnotation( (annotation) => {
+                if(annotation.id === currentRepresentation.value) {
+                    component.removeAnnotation(annotation)
+                }
+            })
+
+            const re = new RegExp('(' + currentRepresentation.value + '\-' + component.parameters.name + '\-[a-z]*)', 'g')
+            let c = 0
+            for(const item of stage.getRepresentationsByName(re).list) {
+                if(item.parameters.sele !== 'not(*)' && c === 0) {
+                    representation.label.position = createAnnotation(component, item.parameters.sele, representation)
+                    c ++
+                }
+            }
+
+        })
+        if(update) {
+            if(prjID === undefined) prjID = dataProject.value._id
+            return await updateRepresentationData(prjID, currentRepresentation.value, { label: representation.label })
+        }
+    }
+
+    const setLabelRepresentation = async (stage, representation, update) => {
+
+        if(representation.label.visible) {
             stage.eachComponent( ( component ) => {
                 const re = new RegExp('(' + currentRepresentation.value + '\-' + component.parameters.name + '\-[a-z]*)', 'g')
+                let c = 0
                 for(const item of stage.getRepresentationsByName(re).list) {
-                    if(item.parameters.sele !== 'not(*)') {
-                        const name = fl.filter(item => item.id === component.structure.name)[0].name
-                        createAnnotation(component, item.parameters.sele, representation, name)
+                    if(item.parameters.sele !== 'not(*)' && c === 0) {
+                        representation.label.position = createAnnotation(component, item.parameters.sele, representation)
+                        c ++
                     }
                 }
             })
@@ -299,8 +342,9 @@ export default function useRepresentations() {
             })
         }
         if(update) {
-            return await updateRepresentationData(prjID, currentRepresentation.value, { label: label })
+            return await updateRepresentationData(prjID, currentRepresentation.value, { label: representation.label })
         }
+
     }
 
     const removeAnnotation = (stage) => {
@@ -403,6 +447,8 @@ export default function useRepresentations() {
         setVisibilityRepresentation,
         setMolecularRepresentation,
         setOpacityRepresentation,
+        setLabelProperty,
+        setLabelPosition,
         setLabelRepresentation,
         createNewRepresentation,
         cloneNewRepresentation,

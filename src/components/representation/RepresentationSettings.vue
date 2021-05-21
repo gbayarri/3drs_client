@@ -48,37 +48,32 @@
         <!-- edit label -->
         <div class="p-grid" >
             <div class="p-col">
-                <label>{{ label_edit_label }} <i class="far fa-question-circle" id="custom-help" v-tooltip.top="'asdasdasd'"></i> </label>
+                <label>{{ label_edit_label }} <i class="far fa-question-circle" id="custom-help" v-tooltip.top="ttplbh"></i> </label>
             </div>
         </div>
         <div class="p-grid">
             <div class="p-col">
-                <InputText v-model="modelEditLabel" :placeholder="placeholderEditLabel" style="width:100%; height:2rem;margin-left:2.5%;" />
+                <InputText v-model="modelEditLabel" :placeholder="placeholderEditLabel" style="width:100%; height:2rem;margin-left:2.5%;" :disabled="!labelState" />
             </div>
             <div class="p-col-fixed" style="width:4.2rem">
-                <InputSwitch style="margin-top:2px;" />
+                <InputSwitch v-model="labelState" v-tooltip.top="ttplbe" />
             </div>
         </div>
         <div class="p-grid">
             <div class="p-col-6">
-                <!--<InputNumber :value="item.size" @input="changeSize(item.id, $event)" showButtons :step="1" :min="1" :max="10" inputStyle="width:100%" />-->
-                <InputNumber showButtons :step="1" :min="1" :max="10" inputStyle="width:100%;height:2rem;margin-left:2.5%;" />
+                <InputNumber v-model="labelSize" showButtons :step="1" :min="15" :max="45" inputStyle="width:100%;height:2rem;margin-left:2.5%;" :disabled="!labelState" />
             </div>
             <div class="p-col-4" style="text-align:center;">
-                <!--<ColorPicker v-model="item.color" class="custom-panel" @click="clickPicker(item.id)" />-->
-                <ColorPicker />
+                <ColorPicker :disabled="!labelState" v-model="labelColor" />
             </div>
             <div class="p-col-2">
-                <!--<Button 
-                    v-if="representationSelected.id != defaultRepresentation"
-                    icon="fas fa-tag" 
-                    :class="'p-button-rounded p-button-outlined repr-button' + (enabledAnnotation ? ' highlighted-btn-minisettings' : '')" 
-                    @click="addAnnotation"
-                    v-tooltip.right="ttplb" />-->
                 <Button 
-                    icon="fas fa-crosshairs" 
-                    :class="'p-button-rounded p-button-outlined repr-button'" 
-                    style="position: absolute; right: .5rem;" />
+                    :icon="labelPosition ? 'fas fa-crosshairs fa-spin' : 'fas fa-crosshairs'" 
+                    :class="'p-button-rounded p-button-outlined repr-button' + (labelPosition ? ' highlighted-btn-minisettings' : '')" 
+                    style="position: absolute; right: .5rem;" 
+                    v-tooltip.top="ttplbp"
+                    @click="handleLabelPosition"
+                    :disabled="!labelState" />
             </div>
         </div>
         <hr />
@@ -249,7 +244,7 @@ export default {
         const { stage } = useStage()
         const { addRepresentation, delRepresentation } = useComponents()
         const { projectData, updateStructureProject, removeRepresentationFromStructure } = structureStorage()
-        const { setFlagStatus } = useFlags()
+        const { flags, setFlagStatus } = useFlags()
         const { 
             defaultRepresentation, 
             currentRepresentation, 
@@ -263,6 +258,7 @@ export default {
             setColorSchemeRepresentation,
             setColorRepresentation,
             setOpacityRepresentation,
+            setLabelProperty,
             setLabelRepresentation,
             setRadiusRepresentation,
             createNewRepresentation,
@@ -294,9 +290,12 @@ export default {
             label_hierarchy: "Hierarchy",
             ttpvs: "View hierarchy map",
             ttper: "Edit representation name",
-            ttplb: computed(() => enabledAnnotation.value ? 'Remove label from representation' : 'Add label to representation (it can take a few seconds)'),
+            ttplb: computed(() => enabledAnnotation.value ? 'Close label settings' : 'Open label settings'),
             ttphr: computed(() => isVisible.value ? 'Hide representation' : 'Show representation'),
             ttpcr: "Clone current representation",
+            ttplbh: "Modify label settings: name, size, background color and position clicking on the <i class='fas fa-crosshairs'></i> button and then on an atom of the representation. To enable it, please click the button <i class='fas fa-toggle-off'></i> right to the label name.",
+            ttplbe: computed(() => !labelState.value ? 'Click to enable label' : 'Click to disable label'),
+            ttplbp: 'Click to place label and then pick an atom from the representation',
             placeholderRenSel: "Insert new name",
             placeholderEditLabel: "Insert label name",
             placeholderNewSel: "Insert new name",
@@ -317,6 +316,14 @@ export default {
         const representationSelected = computed({
             get: () => reprList.value.filter(item => item.id === currReprVal.value)[0],
             set: val => {
+
+                //******************************** */
+                //******************************** */
+                labelPosition.value = false
+                setFlagStatus('labelPositionMode', false)
+                //******************************** */
+                //******************************** */
+
                 // if Default, close settings menu
                 if(val.id === defaultRepresentation) {
                     setFlagStatus('sidebarEnabled', false)
@@ -598,34 +605,78 @@ export default {
 
         // label
 
-        //const enabledAnnotation = computed(() => currReprSettings.value.label.visible)
+        // open / close label editor
         const enabledAnnotation = ref(false)
-        let newLabelName = currReprSettings.value.name
-        const modelEditLabel = computed({
-            get: () => currReprSettings.value.label.name,
-            set: val => newLabelName = val
-        })
-        
-        console.log(currReprSettings.value.label)
-        /*const addAnnotation = () => {
-            const newVal = !enabledAnnotation.value
-            updateRepresentationProperty('label', newVal)
-            setLabelRepresentation(stage, newVal, currReprSettings.value, filesList.value, true)
-                .then((r) => {
-                    if(r.code != 404) console.log(r.message)
-                    else console.error(r.message)
-                })
-        }*/
-        /*const enabledRename = ref(false)
-        const editRepresentation = () => {
-            enabledRename.value = !enabledRename.value
-        }*/
         const addAnnotation = () => {
             enabledAnnotation.value = !enabledAnnotation.value
             enabledRename.value = false
         }
 
+        // modify label properties
 
+        const changeLabelProperty = (key, value, tm) => {
+            const lbl = currReprSettings.value.label
+            lbl[key] = value
+            updateRepresentationProperty('label', lbl)
+            setLabelProperty(stage, currReprSettings.value, true)
+                .then((r) => {
+                    if(r.code != 404) console.log(r.message)
+                    else console.error(r.message)
+                })
+        }
+
+        // enable / disable label from switch
+
+        const changeLabelStatus = (value) => {
+            currReprSettings.value.label.visible = value
+            updateRepresentationProperty('label', currReprSettings.value.label)
+            setLabelRepresentation(stage, currReprSettings.value, true)
+                .then((r) => {
+                    if(r.code != 404) console.log(r.message)
+                    else console.error(r.message)
+                })
+        }
+        //status
+        const labelState = computed({
+            get: () => currReprSettings.value.label.visible,
+            set: val => changeLabelStatus(val)
+        })
+
+        // name
+        const modelEditLabel = computed({
+            get: () => currReprSettings.value.label.name,
+            set: val => changeLabelProperty('name', val, 1000)
+        })
+        
+        // size
+        const labelSize = computed({
+            get: () => currReprSettings.value.label.size,
+            set: val =>  changeLabelProperty('size', val, 2000)
+        })
+
+        //color
+        const labelColor = computed({
+            get: () => currReprSettings.value.label.color,
+            set: val => {
+                let col = val
+                if (!col.startsWith('#') && col.length < 7) col = '#' + val
+                changeLabelProperty('color', col, 2000)
+            }
+        })
+
+        const labelPosition = ref(false)
+        /*const labelPosition = computed({
+            get: () => flags.labelPositionMode,
+            set: val => {
+                return val
+            }
+        })*/
+        const handleLabelPosition = () => {
+            labelPosition.value = !labelPosition.value
+            setFlagStatus('labelPositionMode', labelPosition.value)
+        }
+        
+        
         // clone representation
 
         const cloneRepresentation = () => {
@@ -687,7 +738,7 @@ export default {
             colorScheme, mainStructureColor, colorUniform, color,
             opacity, 
             removeRepresentation, visualizeStructure, enabledRename, editRepresentation, renameRepresentation, enabledAnnotation, addAnnotation, modelRenSel, rrbDisabled, cloneRepresentation,
-            modelEditLabel
+            labelState, modelEditLabel, labelSize, labelColor, handleLabelPosition, labelPosition
         }
     }
 }
@@ -732,6 +783,14 @@ export default {
     #minisettings .slider-value { text-align:right; font-weight: 700;}
     /* input group */
     #minisettings .p-inputgroup { width:95%; margin:0 2.5%; }
+    /* switch */
+    #minisettings .p-inputswitch.p-component { margin-top:2px; }
+    #minisettings .p-inputswitch .p-inputswitch-slider:before { background:#ced4da; border: 3px solid #fff;width:1rem; height:1rem; margin-top:-.7rem; }
+    #minisettings .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider { background:#ffffff!important;}
+    #minisettings .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider:before { background:#6f96a9; border-color:#6f96a9; }
+    /* input number */
+    #minisettings .p-inputnumber-buttons-stacked .p-inputnumber-button-group .p-button.p-inputnumber-button { color:#6f96a9; background:#fff; }
+    #minisettings .p-inputnumber-buttons-stacked .p-inputnumber-button-group .p-button.p-inputnumber-button .pi { font-size:.9rem; }
 
     #minisettings #unfold-button {
         z-index:2;

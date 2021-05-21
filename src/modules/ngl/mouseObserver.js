@@ -22,7 +22,7 @@ export default function mouseObserver() {
     const { projectData } = structureStorage()
     const { updateProjectData } = useAPI()
     const { /*currentStructure,*/ getFileNames, getMolecule, getChains } = structureSettings()
-    const { currentRepresentation, getCurrentRepresentationSettings } = useRepresentations()
+    const { currentRepresentation, getCurrentRepresentationSettings, updateRepresentationProperty, setLabelPosition } = useRepresentations()
     const { actionSelectSingleMolecule } = useActions()
     const { calculateDistance, calculateAngle } = useStage()
     const { getMeasurements, updateMeasurements, createDistance, createAngle } = useMeasurements()
@@ -294,6 +294,21 @@ export default function mouseObserver() {
         }
     }
 
+    const pickAtomPosition = (stage, pickingProxy) => {
+        if (pickingProxy && pickingProxy.atom) {
+            const pos = [pickingProxy.atom.x, pickingProxy.atom.y, pickingProxy.atom.z]
+            currReprSettings.value.label.position = pos
+            updateRepresentationProperty('label', currReprSettings.value.label)
+            setLabelPosition(stage, currReprSettings.value, true)
+                .then((r) => {
+                    if(r.code != 404) {
+                        //setFlagStatus('labelPositionMode', false)
+                        console.log(r.message)
+                    }else console.error(r.message)
+                })
+        }
+    }
+
     const selectResidue = (stage, pickingProxy) => {
         if (pickingProxy && pickingProxy.atom) {
             //const name = filesList.value.filter(item => item.id === pickingProxy.atom.structure.name)[0].name
@@ -484,6 +499,7 @@ export default function mouseObserver() {
       checkMouseSignals, 
       checkMouseSignalsShared, 
       zoomToResidue,
+      pickAtomPosition,
       selectResidue,
       getDistance,
       getAngle

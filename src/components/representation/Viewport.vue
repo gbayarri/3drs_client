@@ -34,7 +34,7 @@ export default {
     const { dialog, openModal, closeModal, setBlockUI } = useModals()
     const { apiData, fetchProject, updateProjectData } = useAPI()
     const { loadFileToStage } = useComponents()
-    const { setInitOrientation, checkMouseSignals, checkMouseSignalsShared, zoomToResidue, selectResidue, getDistance, getAngle } = mouseObserver()
+    const { setInitOrientation, checkMouseSignals, checkMouseSignalsShared, zoomToResidue, selectResidue, getDistance, getAngle, pickAtomPosition } = mouseObserver()
     const { /*processedStructure,*/ projectData, updateStructureProject, resetStructure, getFirstProjectData } = structureStorage()
     const { /*settings,*/ setCurrentStructure } = structureSettings()
     const { /*defaultRepresentation,*/ currentRepresentation, setCurrentRepresentation/*, getCurrentRepresentationSettings*/ } = useRepresentations()
@@ -49,6 +49,7 @@ export default {
     const toast = useToast()
     const isShared = computed(() => flags.isShared)
     const navigationMode = computed(() => flags.navigationMode)
+    const labelPositionMode = computed(() => flags.labelPositionMode)
     
     //const currReprSettings = computed(() => getCurrentRepresentationSettings())
 
@@ -171,16 +172,17 @@ export default {
             })
             // select residue
             stage.mouseControls.add('clickPick+left', function( stage, pickingProxy ){
-              if(reprMode.value && !navigationMode.value) selectResidue(stage, pickingProxy)
+              if(reprMode.value && !navigationMode.value && !labelPositionMode.value) selectResidue(stage, pickingProxy)
+              if(labelPositionMode.value) pickAtomPosition(stage, pickingProxy)
             })
             // get distance 
             stage.mouseControls.add('clickPick+right', function( stage, pickingProxy ){
               //console.log(reprMode.value)
-              if(reprMode.value && !navigationMode.value) getDistance(stage, pickingProxy)
+              if(reprMode.value && !navigationMode.value && !labelPositionMode.value) getDistance(stage, pickingProxy)
             })
             // get angle
             stage.mouseControls.add('clickPick+right-ctrl', function( stage, pickingProxy ){
-              if(reprMode.value && !navigationMode.value) getAngle(stage, pickingProxy)
+              if(reprMode.value && !navigationMode.value && !labelPositionMode.value) getAngle(stage, pickingProxy)
             })
           //}
 

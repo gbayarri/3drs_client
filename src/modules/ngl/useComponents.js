@@ -150,7 +150,7 @@ export default function useComponents() {
 
                         // labels
                         if(selection !== 'not(*)' && representation.label.visible) {
-                            createAnnotation(component, selection, representation, name)
+                            createAnnotation(component, selection, representation)
                         }
 
                         // distances
@@ -190,6 +190,11 @@ export default function useComponents() {
 
             // add representation
             const generatedRepresentations = addRepresentationToComponent(representation, component, name_new, selection)
+
+            // labels
+            if(selection !== 'not(*)' && representation.label.visible) {
+                createAnnotation(component, selection, representation)
+            }
         } )
 
         //console.log(stage)

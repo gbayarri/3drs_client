@@ -9,7 +9,8 @@ const flags = reactive({
     customEnabled: false,
     isShared: false,
     responsive: false,
-    navigationMode: false
+    navigationMode: false,
+    labelPositionMode: false
 })
 
 export default function useFlags() {
