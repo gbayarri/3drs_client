@@ -321,6 +321,7 @@ export default {
                 //******************************** */
                 labelPosition.value = false
                 setFlagStatus('labelPositionMode', false)
+                enabledAnnotation.value = false
                 //******************************** */
                 //******************************** */
 
@@ -522,6 +523,13 @@ export default {
             deleteRepresentation(stage, remRepr)
                 .then((r) => {
                     if(r.code != 404) {
+                        //******************************** */
+                        //******************************** */
+                        labelPosition.value = false
+                        setFlagStatus('labelPositionMode', false)
+                        enabledAnnotation.value = false
+                        //******************************** */
+                        //******************************** */
                         // remove representation from components
                         delRepresentation(stage, remRepr)
                         // update dataProject
@@ -638,25 +646,40 @@ export default {
         }
         //status
         const labelState = computed({
-            get: () => currReprSettings.value.label.visible,
+            get: () => {
+                if(currReprVal.value !== defaultRepresentation) return currReprSettings.value.label.visible
+                else return false
+            },
             set: val => changeLabelStatus(val)
         })
 
         // name
         const modelEditLabel = computed({
-            get: () => currReprSettings.value.label.name,
+            get: () => {
+                //currReprSettings.value.label.name,
+                if(currReprVal.value !== defaultRepresentation) return currReprSettings.value.label.name
+                else return null
+            },
             set: val => changeLabelProperty('name', val, 1000)
         })
         
         // size
         const labelSize = computed({
-            get: () => currReprSettings.value.label.size,
+            get: () => {
+                //currReprSettings.value.label.size,
+                if(currReprVal.value !== defaultRepresentation) return currReprSettings.value.label.size
+                else return null
+            },
             set: val =>  changeLabelProperty('size', val, 2000)
         })
 
         //color
         const labelColor = computed({
-            get: () => currReprSettings.value.label.color,
+            get: () => {
+                //currReprSettings.value.label.color,
+                if(currReprVal.value !== defaultRepresentation) return currReprSettings.value.label.color
+                else return null
+            },
             set: val => {
                 let col = val
                 if (!col.startsWith('#') && col.length < 7) col = '#' + val
@@ -664,16 +687,19 @@ export default {
             }
         })
 
-        const labelPosition = ref(false)
-        /*const labelPosition = computed({
-            get: () => flags.labelPositionMode,
+        //const labelPosition = ref(false)
+        const labelPosition = computed({
+            get: () => {
+                document.querySelector("#stage").style.cursor = flags.labelPositionMode ? 'crosshair' : 'default'
+                return flags.labelPositionMode
+            },
             set: val => {
-                return val
+                document.querySelector("#stage").style.cursor = val ? 'crosshair' : 'default'
+                return setFlagStatus('labelPositionMode', val)
             }
-        })*/
+        })
         const handleLabelPosition = () => {
             labelPosition.value = !labelPosition.value
-            setFlagStatus('labelPositionMode', labelPosition.value)
         }
         
         

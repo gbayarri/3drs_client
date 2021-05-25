@@ -302,7 +302,7 @@ export default function mouseObserver() {
             setLabelPosition(stage, currReprSettings.value, true)
                 .then((r) => {
                     if(r.code != 404) {
-                        //setFlagStatus('labelPositionMode', false)
+                        setFlagStatus('labelPositionMode', false)
                         console.log(r.message)
                     }else console.error(r.message)
                 })

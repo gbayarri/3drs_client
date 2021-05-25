@@ -13,10 +13,19 @@
 
         <Message :severity="message.severity" :key="message.content" v-if="message.show">{{message.content}}</Message>
 
-        <FileUpload 
+        <!--<FileUpload 
         @uploader="uploader"
         @select="selector"
         accept=".xtc, .dcd" 
+        :customUpload="true"
+        :multiple="false" 
+        :fileLimit="1"
+        :maxFileSize="524288000"
+        :disabled="disableFileUpload"
+        chooseLabel="Select">-->
+        <FileUpload 
+        @uploader="uploader"
+        @select="selector"
         :customUpload="true"
         :multiple="false" 
         :fileLimit="1"

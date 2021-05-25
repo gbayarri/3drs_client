@@ -1,7 +1,7 @@
 <template>
   <Button
     :icon="activated ? 'fas fa-compass fa-spin' : 'fas fa-compass'"
-    class="p-shadow-2"
+    :class="'p-shadow-2 ' + (activated ? 'nav-mode' : '')"
     v-tooltip.right="ttp"
     @click="handleClick"
   />
@@ -32,7 +32,7 @@ export default {
               To disable it, please click again the Navigation Mode button.`, 
               life: 15000
           })
-          document.querySelector("#stage").style.cursor = 'crosshair'
+          document.querySelector("#stage").style.cursor = 'move'
           setFlagStatus('navigationMode', true)
         } else {
           document.querySelector("#stage").style.cursor = 'default'
@@ -46,4 +46,5 @@ export default {
 </script>
 
 <style>
+  #tools .p-button.p-button-icon-only.nav-mode { color:#6f96a9; background:#fff; }
 </style>
