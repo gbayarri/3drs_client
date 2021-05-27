@@ -1,15 +1,17 @@
 <template>
   <div>
-    TODO: residues
+    <p>List of <strong>features available</strong> in Sequence:</p>
     <ul>
-      <li>Put mouse over a residue to highlight it</li>
-      <li>Click on residue for single selection / unselection</li>
-      <li>Click on window > helix for selection / unselection</li>
-      <li>Click on window > sheet for selection / unselection</li>
-      <li>To select / unselect a set of residues, shift+click on first residue and shift+click on last residue</li>
-      <li>To select / unselect all residues, click on select all residues button</li>
-      <li>To zoom on a residue, alt+click on residue</li>
+      <li>Put the mouse over a residue to <strong>highlight</strong> it on the stage.</li>
+      <li>Click on a residue for <strong>single selection / unselection</strong>.</li>
+      <li>To zoom on a residue, press <strong>Alt key and click left mouse</strong> on residue.</li>
+      <li>To select / unselect a set of residues, press <strong>Shift key and click left mouse</strong> on the first residue and then press <strong>Shift key and click left mouse</strong> on last residue.</li>
+      <li>To select / unselect <strong>all residues</strong>, click on <strong>select all residues</strong> button</li>
+      <li>For highlighting <strong>α-helix / β-sheet</strong>, open the <strong>zoom window</strong> and put the mouse over an α-helix or a β-sheet.</li>
+      <li>To select / unselect <strong>α-helix / β-sheet</strong>, open the <strong>zoom window</strong> and click on an α-helix or a β-sheet.</li>
+      <li>To zoom on an <strong>α-helix / β-sheet</strong>, open the <strong>zoom window</strong> and put the mouse over an α-helix or a β-sheet with the mouse <strong>left button while pressing the Alt key</strong>.</li>   
     </ul>
+    <p>More information in the <a href="https://3drs-documentation.readthedocs.io/en/latest/edit.html#sequence" target="_blank">official documentation</a>.</p>
   </div>
 </template>
 

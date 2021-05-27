@@ -1,12 +1,13 @@
 <template>
   <div>
-    TODO: heteroos
+    <p>List of <strong>features available</strong> in Heteroatoms:</p>
     <ul>
-      <li>Put mouse over a heteroatom to highlight it</li>
-      <li>Click on heteroatom for single selection / unselection</li>
-      <li>To select / unselect all heteroatoms, click on select all heteroatoms button</li>
-      <li>To zoom on a heteroatom, click on the right bullseye button</li>
+      <li>Put the mouse over an heteroatom to <strong>highlight</strong> it on the stage.</li>
+      <li>Click on an heteroatom for <strong>single selection / unselection</strong>.</li>
+      <li>To select / unselect all heteroatoms, click on <strong>select all heteroatoms button</strong>.</li>
+      <li>To zoom on an heteroatom, click on the <strong>right bullseye button</strong>.</li>
     </ul>  
+    <p>More information in the <a href="https://3drs-documentation.readthedocs.io/en/latest/edit.html#heteroatoms" target="_blank">official documentation</a>.</p>
   </div>
 </template>
 

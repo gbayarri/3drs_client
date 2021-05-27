@@ -12,6 +12,7 @@
         <Embed v-if="isShared && !disabled" :isDraft="isDraft" />
         <Measurements v-if="!isShared" />
         <NavigationMode v-if="!isShared" />
+        <Camera v-if="!isShared" :stage="stage" />
         <QR v-if="isShared && !disabled" :isDraft="isDraft" />
         <Help />
         <Visit v-if="isShared" :isDraft="isDraft" />
@@ -37,11 +38,12 @@ import Player from '@/components/representation/tools/Player'
 import Embed from '@/components/representation/tools/Embed'
 import Measurements from '@/components/representation/tools/Measurements'
 import NavigationMode from '@/components/representation/tools/NavigationMode'
+import Camera from '@/components/representation/tools/Camera'
 import Visit from '@/components/representation/tools/Visit'
 import Align from '@/components/representation/tools/Align'
 import ProjectSettings from '@/components/representation/tools/ProjectSettings'
 export default {
-    components: { Reload, Rotate, Center, Background, FullScreen, Picture, Help, QR, Player, Embed, Measurements, NavigationMode, Visit, Align, ProjectSettings },
+    components: { Reload, Rotate, Center, Background, FullScreen, Picture, Help, QR, Player, Embed, Measurements, NavigationMode, Camera, Visit, Align, ProjectSettings },
     props: ['isDraft'],
     setup() {
         const { getStage } = useStage()

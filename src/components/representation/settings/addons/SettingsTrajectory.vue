@@ -162,6 +162,7 @@ export default {
         const changeLoop = (value) => {
             const l = value ? "loop": "once"
             trajSettings.value.loop = value
+            if(!value) trajSettings.value.bounce = false
             updateTrajectorySettings(trajSettings.value)
             updatePlayerSetting('mode', l, currStr.value)
             setTrajectorySettings({ structure: currStr.value, settings: trajSettings.value })
@@ -235,6 +236,7 @@ export default {
         const changeDirection = (value) => {
             const l = value ? "bounce": "forward"
             trajSettings.value.bounce = value
+            if(value) trajSettings.value.loop = true
             updateTrajectorySettings(trajSettings.value)
             updatePlayerSetting('direction', l, currStr.value)
             setTrajectorySettings({ structure: currStr.value, settings: trajSettings.value })

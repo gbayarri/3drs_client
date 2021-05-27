@@ -13,27 +13,19 @@
 
         <Message :severity="message.severity" :key="message.content" v-if="message.show">{{message.content}}</Message>
 
-        <!--<FileUpload 
-        @uploader="uploader"
-        @select="selector"
-        accept=".xtc, .dcd" 
-        :customUpload="true"
-        :multiple="false" 
-        :fileLimit="1"
-        :maxFileSize="524288000"
-        :disabled="disableFileUpload"
-        chooseLabel="Select">-->
+        <p v-html="desc"></p>
         <FileUpload 
         @uploader="uploader"
         @select="selector"
+        accept=".xtc, .dcd, .trr, .binpos, .netcdf, .nc" 
         :customUpload="true"
         :multiple="false" 
         :fileLimit="1"
         :maxFileSize="524288000"
         :disabled="disableFileUpload"
-        chooseLabel="Select">
+        chooseLabel="Select" >
             <template #empty>
-                <p v-html="descr"></p>
+                <p v-html="int_desc"></p>
             </template>
         </FileUpload>
 
@@ -44,7 +36,7 @@
 </template>
 
 <script>
-import { ref, inject, computed } from 'vue'
+import { ref, inject, computed, reactive, toRefs } from 'vue'
 import useModals from '@/modules/common/useModals'
 import useMessages from '@/modules/common/useMessages'
 import structureSettings from '@/modules/structure/structureSettings'
@@ -55,7 +47,12 @@ export default {
     setup(props) {
 
         /* MODAL */
-        const header = "Upload Trajectory"
+        //const header = "Upload Trajectory"
+        const page = reactive({
+            header: "Upload Trajectory",
+            desc: "Please click or drag and drop files, only <strong>XTC</strong>, <strong>DCD</strong>, <strong>TRR</strong>, <strong>BINPOS</strong> and <strong>NETCDF</strong> files accepted:",
+            int_desc: "Click <strong>Select button</strong> above or drag and drop files to here to upload."
+        })
         //const modals = inject('modals')
         const { dialog, openModal, closeModal, setBlockUI } = useModals()
         const { currentStructure } = structureSettings()
@@ -81,10 +78,15 @@ export default {
         const descr = "Click <strong>Select button</strong> above or drag and drop files to here to upload."
         
         const selector = (e) => {
+            // TO FIX!!!!
             setTimeout(function(){
                 let ext = ''
                 if(e.originalEvent.path[3].innerText.indexOf('.xtc') != -1) ext = 'xtc'
                 if(e.originalEvent.path[3].innerText.indexOf('.dcd') != -1) ext = 'dcd'
+                if(e.originalEvent.path[3].innerText.indexOf('.trr') != -1) ext = 'trr'
+                if(e.originalEvent.path[3].innerText.indexOf('.binpos') != -1) ext = 'binpos'
+                if(e.originalEvent.path[3].innerText.indexOf('.netcdf') != -1) ext = 'netcdf'
+                if(e.originalEvent.path[3].innerText.indexOf('.nc') != -1) ext = 'netcdf'
 
                 if(ext != '') {
                     const rows = document.getElementsByClassName("p-fileupload-row")
@@ -94,6 +96,10 @@ export default {
                         //let ext = ''
                         if(item.getElementsByTagName("div")[1].innerText.indexOf('.xtc') != -1) ext = 'xtc'
                         if(item.getElementsByTagName("div")[1].innerText.indexOf('.dcd') != -1) ext = 'dcd'
+                        if(item.getElementsByTagName("div")[1].innerText.indexOf('.trr') != -1) ext = 'trr'
+                        if(item.getElementsByTagName("div")[1].innerText.indexOf('.binpos') != -1) ext = 'binpos'
+                        if(item.getElementsByTagName("div")[1].innerText.indexOf('.netcdf') != -1) ext = 'netcdf'
+                        if(item.getElementsByTagName("div")[1].innerText.indexOf('.nc') != -1) ext = 'netcdf'
                         item.querySelector("div").innerHTML = '<span class="fu-ext-traj">' + ext + '</span><br><span class="fu-traj">trajectory</span>'
                         item.querySelector("div").style.lineHeight = '15px'
                     }
@@ -168,7 +174,7 @@ export default {
                 })
         }
 
-        return { header, dialog, closeThisModal, message,
+        return { ...toRefs(page), dialog, closeThisModal, message,
                  descr, selector, uploader, disableFileUpload, hideDialog }
     }
 }

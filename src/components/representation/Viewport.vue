@@ -115,6 +115,10 @@ export default {
             setInitOrientation(orientation)
           }
 
+          // ********************************************
+          //stage.setParameters({cameraType: dataProject.value.camera})
+          // ***********************************************
+
           // superpositions
           if(dataProject.value.superpositions) {
             for(const s of dataProject.value.superpositions) {

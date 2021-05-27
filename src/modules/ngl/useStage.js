@@ -22,7 +22,7 @@ export default function useStage() {
         /*NGL.setListingDatasource(mdsrvDatasource)
         NGL.setTrajectoryDatasource(mdsrvDatasource)*/
 
-        stage = new NGL.Stage(layer, { tooltip:false })
+        stage = new NGL.Stage(layer, { tooltip:false/*, cameraType: 'perspective'*/ })
         //console.log('stage created')
         return stage 
     }
@@ -41,7 +41,8 @@ export default function useStage() {
     const createTrajectoryPlayer = function (traj, settings) {
         return new NGL.TrajectoryPlayer( traj, {
             step: settings.step,
-            timeout: 100,
+            // from 100 to 10000
+            timeout:100,
             // interpolateStep: 5, ??
             start: settings.range[0],
             end: settings.range[1],

@@ -1,13 +1,14 @@
 <template>
   <div>
-    TODO: waters
+    <p>List of <strong>features available</strong> in Waters:</p>
     <ul>
-      <li>Put mouse over a water to highlight it</li>
-      <li>Click on water for single selection / unselection</li>
-      <li>To select a set of waters, shift+click on first water and shift+click on last water</li>
-      <li>To select / unselect all waters, click on select all waters button</li>
-      <li>To zoom on a water, alt+click on water</li>
-    </ul>  
+      <li>Put the mouse over a water to <strong>highlight</strong> it on the stage.</li>
+      <li>Click on a water for <strong>single selection / unselection</strong>.</li>
+      <li>To zoom on a water, press <strong>Alt key and click left mouse</strong> on water.</li>
+      <li>To select / unselect a set of waters, press <strong>Shift key and click left mouse</strong> on the first water and then press <strong>Shift key and click left mouse</strong> on last water.</li>
+      <li>To select / unselect <strong>all waters</strong>, click on <strong>select all waters</strong> button</li>
+    </ul>
+    <p>More information in the <a href="https://3drs-documentation.readthedocs.io/en/latest/edit.html#waters" target="_blank">official documentation</a>.</p>
   </div>
 </template>
 

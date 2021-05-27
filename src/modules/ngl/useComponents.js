@@ -240,7 +240,7 @@ export default function useComponents() {
                 trajectory.signals.frameChanged.add((f) => {
                     if(prev_f !== f && f < settings.range[1]) {
                         prev_f = f
-                        updateCurrentFrame(f, id)
+                        updateCurrentFrame(f, currStr.value)
                     }
                     if(!settings.loop && f == (settings.range[1] - 1)) {
                         player.stop()
