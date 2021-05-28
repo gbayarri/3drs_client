@@ -4,11 +4,13 @@
 
 <script>
 export default {
-  setup() {
+  props: ['isShared'],
+  setup(props) {
     const ttp = "Open help documentation"
 
     const handleClick = () => {
-      window.open(process.env.VUE_APP_HELP_URL, '_blank')
+      const url = process.env.VUE_APP_HELP_URL + (props.isShared ? 'share.html' : 'edit.html')
+      window.open(url, '_blank')
     }
 
     return { ttp, handleClick }

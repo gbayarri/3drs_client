@@ -14,7 +14,7 @@
         <NavigationMode v-if="!isShared" />
         <Camera v-if="!isShared" :stage="stage" />
         <QR v-if="isShared && !disabled" :isDraft="isDraft" />
-        <Help />
+        <Help :isShared="isShared" />
         <Visit v-if="isShared" :isDraft="isDraft" />
         <ProjectSettings v-if="!isShared" />
         </div>

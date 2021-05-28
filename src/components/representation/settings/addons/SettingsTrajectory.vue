@@ -124,7 +124,7 @@ export default {
             label_mode: "Loop",
             label_interpolation: "Interpolation",
             label_timeout: "Timeout",
-            ttp_to: "Timeout between playing frames. This slider is in a logartihmic scale.",
+            ttp_to: "Timeout between playing frames. This slider is in a logarithmic scale.",
             label_step: "Step",
             label_autoplay: "Autoplay",
             label_direction: computed(() => trajSettings.value.bounce ? "Bounce / rock enabled" : "Bounce / rock disabled")
