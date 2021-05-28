@@ -70,6 +70,11 @@ export default {
         const toastSettings = computed(() => getProjectSettings().toasts) 
 
         const re = computed(() => new RegExp('(' + currReprVal.value + '\-' + currStr.value + '\-[a-z]*)', 'g'))
+        // ***********************************
+        // FIX THIS REGEX
+        const re_others = computed(() => new RegExp('([0-9a-z\.]*\-^(' + currStr.value + ')\-[a-z]*)', 'g'))
+        // ***********************************
+        // ***********************************
         
         let newSelection = getCurrentSelection(currReprVal.value, currStr.value, 'custom')
         let bDisabled = ref(newSelection.length === 0)
@@ -101,7 +106,7 @@ export default {
                 //console.log(newSelection, 'redraw!!!')
                 const [old_sele, structures] = setCurrentCustomSelection(currReprVal.value, currStr.value, newSelection)
                 // save selection representation
-                setSelectionRepresentation(stage, newSelection, structures, re.value, true)
+                setSelectionRepresentation(stage, newSelection, structures, re.value, true, re_others.value)
                     .then((r) => {
                         if(r.code != 404) {
                             //console.log(stage)

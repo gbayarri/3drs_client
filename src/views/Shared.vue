@@ -44,6 +44,7 @@ export default {
         const { apiData, fetchProject } = useAPI()
         const { setMessage } = useMessages()
         const { closeModal } = useModals()
+        
 
         // activate tools, sidebar and so on
         const stageLoaded = computed(() => flags.stageLoaded)
@@ -59,6 +60,7 @@ export default {
         setFlagStatus('isShared', true)
 
         const project_id = props.id
+        const isDraft = props.isDraft
 
         fetchProject(project_id)
         .then(() => {
@@ -76,7 +78,7 @@ export default {
             return false
           }
           // project exists, but is read only (not representation)
-         if(apiData.value.projectSettings.status !== 'rs') {
+         if(apiData.value.projectSettings.status !== 'rs' && !isDraft) {
               const msg = {
                 severity: 'warn',
                 content: 'You tried to access to an unexisting project, please check your project id or create a new one',
