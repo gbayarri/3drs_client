@@ -41,9 +41,7 @@ export default function useStage() {
     const createTrajectoryPlayer = function (traj, settings) {
         return new NGL.TrajectoryPlayer( traj, {
             step: settings.step,
-            // from 100 to 10000
-            timeout:100,
-            // interpolateStep: 5, ??
+            timeout:settings.timeout,
             start: settings.range[0],
             end: settings.range[1],
             interpolateType: settings.interpolation,

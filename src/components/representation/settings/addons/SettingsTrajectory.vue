@@ -47,6 +47,22 @@
 
         <div class="p-grid margin-top-10">
             <div class="p-col">
+                <label>{{ label_timeout }} <i class="far fa-question-circle" id="custom-help" v-tooltip.top="ttp_to"></i></label>
+            </div>
+            <div class="p-col range-value">
+                <label>{{ timeout }}</label>
+            </div>
+        </div>
+        <div class="p-grid margin-top-5">
+            <div class="p-col">
+                <div class="p-inputgroup">
+                    <Slider v-model="timeout" :min="0" :max="100" />
+                </div>
+            </div>
+        </div>
+
+        <div class="p-grid margin-top-10">
+            <div class="p-col">
                 <label>{{ label_mode }}</label>
             </div>
             <div class="p-col">
@@ -107,6 +123,8 @@ export default {
             label_range: "Range",
             label_mode: "Loop",
             label_interpolation: "Interpolation",
+            label_timeout: "Timeout",
+            ttp_to: "Timeout between playing frames. This slider is in a logartihmic scale.",
             label_step: "Step",
             label_autoplay: "Autoplay",
             label_direction: computed(() => trajSettings.value.bounce ? "Bounce / rock enabled" : "Bounce / rock disabled")
@@ -135,19 +153,6 @@ export default {
                     if(r.code != 404) console.log(r.message)
                     else console.error(r.message)
                 })
-
-            /*if(currFr.value < value[0]) setCurrentFrame(currTraj.value, value[0], currStr.value)
-            if(currFr.value > value[1]) setCurrentFrame(currTraj.value, value[1], currStr.value)
-            //console.log(currFr.value)
-
-            updateTrajectorySettings(trajSettings.value)
-            updatePlayerSetting('start', value[0])
-            updatePlayerSetting('end', value[1])
-            setTrajectorySettingsTimeout({ structure: currStr.value, settings: trajSettings.value })
-                .then((r) => {
-                    if(r.code != 404) console.log(r.message)
-                    else console.error(r.message)
-                })*/
         }
         const range = computed({
             get: () => trajSettings.value.range,
@@ -155,6 +160,38 @@ export default {
         })
         const minRange = computed(() => trajSettings.value.init)
         const maxRange = computed(() => trajSettings.value.end)
+
+        // timeout
+
+        const logarithmicTimeout = (value, flag) => {
+            // position will be between 0 and 100
+            var minp = 0
+            var maxp = 100
+            // The result should be between 50 an 10000
+            var minv = Math.log(50)
+            var maxv = Math.log(10000)
+            // calculate adjustment factor
+            var scale = (maxv - minv) / (maxp  -minp)
+            // return exponential or logarithm depending on the flag
+            return ( flag ? Math.exp(minv + scale*(value-minp)) : ((Math.log(value)-minv) / scale + minp) )
+        }
+
+        // change loop from switch
+        const changeTimeout = (value) => {
+            trajSettings.value.timeout = Math.round(value)
+            updateTrajectorySettings(trajSettings.value)
+            updatePlayerSetting('timeout', value, currStr.value)
+            setTrajectorySettingsTimeout({ structure: currStr.value, settings: trajSettings.value })
+                .then((r) => {
+                    if(r.code != 404) console.log(r.message)
+                    else console.error(r.message)
+                })
+
+        }
+        const timeout = computed({
+            get: () => Math.round(logarithmicTimeout(trajSettings.value.timeout, false)),
+            set: val => changeTimeout(logarithmicTimeout(val, true))
+        })
 
         // loop
 
@@ -254,6 +291,7 @@ export default {
             ...toRefs(page), isCollapsed, showTips,
             range, minRange, maxRange,
             loop,
+            timeout,
             selectedInterpolation, interpolations,
             step,
             autoplay,
@@ -266,10 +304,11 @@ export default {
 </script>
 
 <style>
+    #custom-help { cursor:pointer; }
     #step-traj.p-inputtext.p-component.p-inputnumber-input { width:100%; }
 
     .range-value { text-align:right; font-weight: 700; }
-    .range-value label { vertical-align: sub; }
+    /*.range-value label { vertical-align: sub; }*/
 
     #sidebar-player .p-dropdown-panel .p-dropdown-items .p-dropdown-item { padding: 0.5rem 1rem!important; }
 
