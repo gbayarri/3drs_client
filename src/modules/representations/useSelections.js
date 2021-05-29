@@ -154,7 +154,7 @@ export default function useSelections() {
                   .filter(item => item.id === currStr)[0].selection[type]
   }
 
-  const setCurrentCustomSelection = function (currReprVal, currStr, str) {
+  const setCurrentCustomSelection = function (stage, currReprVal, currStr, str) {
     selection.value
                   .filter(item => item.id === currReprVal)[0].structures
                   .filter(item => item.id === currStr)[0].selection.custom = str
@@ -163,7 +163,32 @@ export default function useSelections() {
                   .filter(item => item.id === currReprVal)[0].structures
                   .filter(item => item.id === currStr)[0].selection.string
 
-    //console.log(selection)
+    
+    /*const other_str = selection.value
+                      .filter(item => item.id === currReprVal)[0].structures
+                      .filter(item => item.id !== currStr)
+
+    for(const s of other_str) {
+      if(s.selection.custom === '*' && s.selection.string === '') s.selection.custom = 'not(*)'
+    }*/
+
+    const strs = selection.value.filter(item => item.id === currReprVal)[0].structures
+
+    for(const s of strs) {
+      if(s.selection.string === '*' /*&& s.selection.custom === ''*/) {
+        s.selection.string = 'not(*)'
+        if(s.id !== currStr) {
+          const re = new RegExp('(' + currReprVal + '\-' + s.id + '\-[a-z]*)', 'g')
+          setSelectionRepresentation(stage, 'not(*)', strs, re, false)
+        }
+      }
+    }
+
+    //selection.value.filter(item => item.id === currReprVal)[0].structures = strs
+
+    //console.log(other_str)
+
+    console.log(selection.value)
     return [string, selection.value.filter(item => item.id === currReprVal)[0].structures ]
   }
 

@@ -73,16 +73,16 @@ export default function useRepresentations() {
     const shortTimeOut = 500
 
     // NOT UPDATING PROPERLY??????
-    const setSelectionRepresentation = async (stage, sele, structures, re, update, re_others = null) => {
+    const setSelectionRepresentation = async (stage, sele, structures, re, update/*, re_others = null*/) => {
 
         // FIX re_others and control defaultrepresentation?????
-        console.log(re_others)
+        /*console.log(re_others)
 
         if(re_others) {
             stage.getRepresentationsByName(re_others).list.forEach(function( item ){
                 console.log(item)
             })
-        }
+        }*/
 
         //console.log(stage.getRepresentationsByName(re))
         /*for(const item of stage.getRepresentationsByName(re).list){
