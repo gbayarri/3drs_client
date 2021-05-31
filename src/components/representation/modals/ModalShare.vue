@@ -24,8 +24,12 @@
         shared:</p>
 
         <p><InputSwitch v-model="forkable" class="margin-top-5" :disabled="sharing" /> <span class="label-switch">{{ status_fork }}</span></p>
+
+        <p><span class="num-list">3)</span> Allow or not to <strong>make this project public</strong> and <strong>available to other users</strong> throughout the home page:</p>
+
+        <p><InputSwitch v-model="isPublic" class="margin-top-5" :disabled="sharing" /> <span class="label-switch">{{ status_public }}</span></p>
         
-        <p><span class="num-list">3)</span> Finally, clicking the button below <strong>the shared project will be generated</strong>. 
+        <p><span class="num-list">4)</span> Finally, clicking the button below <strong>the shared project will be generated</strong>. 
         Remember that <strong>you can share the same project as many times as you want</strong>, but once a project is shared, the subsequent updates in the current representation <strong> won't
         be reflected </strong> in the previous shared projects. </p>
 
@@ -87,7 +91,8 @@ export default {
             labelCopy: 'Copy',
             labelOpen: 'Open',
             labelShare: computed(() => sharing.value ? "Sharing project, please don't close the tab" : "Share project"),
-            status_fork: computed(() => forkable.value ? "Fork enabled" : "Fork disabled")
+            status_fork: computed(() => forkable.value ? "Fork enabled" : "Fork disabled"),
+            status_public: computed(() => isPublic.value ? "Project is public" : "Project is private")
         })
         
         const closeThisModal = () => {
@@ -119,6 +124,19 @@ export default {
         const forkable = computed({
             get: () => settings.value.forkable,
             set: val => changeForkable(val)
+        })
+        // public
+        // change public from switch
+        const changeisPublic = (value) => {
+            updateProjectSettings('public', value)
+                .then((r) => {
+                    if(r.code != 404) console.log(r.message)
+                    else console.error(r.message)
+                })
+        }
+        const isPublic = computed({
+            get: () => settings.value.public,
+            set: val => changeisPublic(val)
         })
 
         // QR
@@ -156,6 +174,9 @@ export default {
                     var url = window.location.origin + process.env.BASE_URL + 'embed/' + sharedProject.value
                     embedCode.value = ecGlobal(url)
                     // update project status
+                    var children = settings.value.children
+                    children.push(r.project)
+                    updateProjectSettings('children', children, false)
                     updateProjectSettings('status', 'ws', false)
                     // generate QR
                     generateQR(sharedAddress.value)
@@ -163,7 +184,7 @@ export default {
                             // go to modal bottom
                             var element = document.querySelector('.p-dialog-content')
                             element.scrollTop = element.scrollHeight - element.clientHeight
-                            console.log(element.scrollHeight, element.clientHeight)
+                            //console.log(element.scrollHeight, element.clientHeight)
                         })                    
                 }
                 else console.error(r.message)
@@ -207,7 +228,7 @@ export default {
             ...toRefs(page), 
             dialog, closeThisModal, hideDialog,
             openDraft,
-            forkable, shared, sharing, launchShareProject, sharedAddress, copyShared, openShared, qrImage,
+            forkable, isPublic, shared, sharing, launchShareProject, sharedAddress, copyShared, openShared, qrImage,
             embedCode, copyEmbed
         }
     }

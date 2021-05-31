@@ -56,7 +56,7 @@ export default {
               if(r.code != 404) {
                 const g = r.gallery.map(v => ({...v, img: globals.gallery.filter(item => item.id == v._id)[0].img}))
                 galleryList.value = g
-                console.log(galleryList.value)
+                //console.log(galleryList.value)
               } else console.error(r.message)
         })
     })

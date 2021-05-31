@@ -8,7 +8,7 @@ const projectSettings = ref([])
 export default function useProjectSettings() {
 
     const { projectData } = structureStorage()
-    const { updateProjectData, fetchSettings } = useAPI()
+    const { updateProjectData, fetchSettings, fetchLastProjects } = useAPI()
 
     const dataProject = computed(() => projectData.value)
     let prjID = projectData.value._id
@@ -24,6 +24,10 @@ export default function useProjectSettings() {
 
     const getMultipleSettings = async (data) => {
         return await fetchSettings(data)
+    }
+
+    const getLastProjects = async () => {
+        return await fetchLastProjects()
     }
 
     const updateProjectSettings = async (k, v, update = true) => {
@@ -54,7 +58,8 @@ export default function useProjectSettings() {
         getProjectSettings,
         updateProjectSettings,
         updateProjectSettingsTimeout,
-        getMultipleSettings
+        getMultipleSettings,
+        getLastProjects
     }
 
 }

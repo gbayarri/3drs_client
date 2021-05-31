@@ -17,6 +17,31 @@
 
     <Panel class="p-shadow-2 p-mb-3" id="header-about">
       <template #header>
+          <i class="fas fa-tasks"></i> <div class="p-panel-title">{{ projectsPanel.header }}</div>
+      </template>
+      <div v-html="projectsPanel.description"></div>
+        <DataTable 
+          :value="projectsList" 
+          responsiveLayout="scroll"
+          :scrollable="true" 
+          scrollHeight="250px"
+          class="p-datatable-sm p-datatable-striped">
+          <Column field="name" header="Name" ></Column>
+          <Column field="time" header="Date">
+            <template #body="{ data }">
+              {{ data.date }} <span class="projects-time">{{ data.time }}</span>
+            </template>
+          </Column>
+          <Column header="Link">
+            <template #body="slotProps">
+                <Button :label="projectsPanel.label_btn" icon="fas fa-external-link-alt" class="p-button-sm" @click="openLink(slotProps.data.link)"/>
+            </template>
+          </Column>
+      </DataTable>
+    </Panel>
+
+    <Panel class="p-shadow-2 p-mb-3" id="header-about">
+      <template #header>
           <i class="fas fa-user-friends"></i> <div class="p-panel-title">{{ aboutPanel.header }}</div>
       </template>
       <div v-html="aboutPanel.description"></div>
@@ -43,10 +68,14 @@
 </template>
 
 <script>
+import { ref, onMounted } from 'vue'
 import globals from '@/globals'
+import useProjectSettings from '@/modules/structure/useProjectSettings'
 export default {
   components: {  },
   setup() {
+
+    const { getLastProjects } = useProjectSettings()
 
     const header = globals.longName
 
@@ -58,13 +87,53 @@ export default {
       `
     }
 
+    const projectsPanel = {
+      header: " Last projects",
+      description: `<p>List with the last projects developed by our users:</p>`,
+      label_btn: 'Open'
+    }
+
+    const truncate = (input) => input.length > 25 ? `${input.substring(0, 25)}...` : input;
+
+    let projectsList = ref([])
+
+    const generateProjectsList = (projects) => {
+
+      const pl = []
+
+      for(const p of projects) {
+        pl.push({
+          name: truncate(p.projectSettings.title),
+          date: new Date(p.projectSettings.uploadDate.date).toLocaleDateString("en-GB"),
+          time: new Date(p.projectSettings.uploadDate.date).toLocaleTimeString("en-GB"),
+          link: p._id
+        })
+      }
+
+      return pl
+
+    }
+
+    onMounted(() => {
+      getLastProjects()
+        .then((r) => {
+              if(r.code != 404) {
+                projectsList.value = generateProjectsList(r.projects)
+              } else console.error(r.message)
+        })
+    })
+
+    const openLink = (id) => {
+      window.open(window.location.origin + process.env.BASE_URL + 'shared/' + id, '_blank')
+    }
+
     const aboutPanel = {
       header: " About us",
       description: `<p>` + globals.longName + ` has been developed by the <a href="https://mmb.irbbarcelona.org" target="_blank">Molecular Modeling and Bioinformatics</a> laboratory at the <a href="https://irbbarcelona.org" target="_blank">IRB Barcelona</a>.</p>
                     <p>Genís Bayarri <a href="https://www.irbbarcelona.org/en/profile/genis-bayarri" target="_blank"><i class="fas fa-envelope"></i></a> , Adam Hospital and Modesto Orozco.</p>`
     }
 
-    return { header, welcomePanel, aboutPanel }
+    return { header, welcomePanel, projectsPanel, projectsList, openLink, aboutPanel }
   }
 }
 </script>
@@ -73,5 +142,6 @@ export default {
 
   #about-logo p { text-align: center;}
   #about-logo p img { width: 80%; }
+  .projects-time { color:#717171; font-size: 13px;}
 
 </style>

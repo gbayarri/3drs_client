@@ -212,8 +212,8 @@ export default {
             // close BlockUI
             closeModal('block')
 
-            // only show this toast if project status is 'w' (still not shared)
-            if(prjSettings.value.status === 'w')
+            // only show this toast if project status is 'w' (still not shared) o r ''wf' (forked and still not shared)
+            if(prjSettings.value.status === 'w' || prjSettings.value.status === 'wf')
               toast.add({ 
                     severity:'warn', 
                     summary: 'Expiration date', 

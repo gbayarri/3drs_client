@@ -31,6 +31,8 @@ import InputSwitch from 'primevue/inputswitch'
 import Textarea from 'primevue/textarea'
 import Checkbox from 'primevue/checkbox'
 import Editor from 'primevue/editor'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
 
 // generic components
 import Header from '@/components/global/Header'
@@ -90,6 +92,8 @@ app.component('InputSwitch', InputSwitch)
 app.component('Textarea', Textarea)
 app.component('Checkbox', Checkbox)
 app.component('Editor', Editor)
+app.component('DataTable', DataTable)
+app.component('Column', Column)
 
 // create directives
 app.directive('tooltip', Tooltip)

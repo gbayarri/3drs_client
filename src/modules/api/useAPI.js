@@ -142,9 +142,22 @@ export default function useAPI() {
 
     return resp
 
-}
+  }
 
-  // updateStructure (when new file added)
+  const fetchLastProjects = async (data) => {
+      
+    const response = await fetch(process.env.VUE_APP_API_LOCATION + '/public', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+    const resp = await response.json()
+
+    return resp
+
+  }
 
   return { 
     apiData, 
@@ -157,7 +170,8 @@ export default function useAPI() {
     updateRepresentationData,
     eliminateRepresentation,
     updateTrajectoryData,
-    fetchSettings
+    fetchSettings,
+    fetchLastProjects
   }
 
 }

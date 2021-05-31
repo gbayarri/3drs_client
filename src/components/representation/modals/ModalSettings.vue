@@ -3,9 +3,9 @@
             @show="onOpenDialog"
             :closable="true"
             :closeOnEscape="true" 
-            :dismissableMask="true" 
+            :dismissableMask="false" 
             :modal="true" 
-            :baseZIndex="2001"
+            :baseZIndex="10"
             :style="{ width: '60vw' }">
         <template #header>
             <i class="fas fa-cog"></i> <h3>{{ header }}</h3>
@@ -29,7 +29,7 @@
 
         <div class="p-grid">
             <div class="p-col">
-                <label>{{ label_caption }}</label>
+                <label v-html="label_caption"></label>
             </div>
         </div>
         <div class="p-fluid p-grid">
@@ -43,41 +43,58 @@
                             <button class="ql-underline"></button>
                             <button class="ql-link"></button>
                         </span>
+                        <span class="ql-formats">
+                            <button class="ql-clean"></button>
+                        </span>
                     </template>
                 </Editor>
             </div>
         </div>
 
         <div class="p-grid">
-            <div class="p-col">
+            <div class="p-md-4 p-col-12">
                 <label>{{ label_fork }}</label>
             </div>
-            <div class="p-col">
+            <div class="p-md-4 p-col-12">
+                <label>{{ label_public }}</label>
+            </div>
+            <div class="p-md-4 p-col-12">
                 <label>{{ label_toasts }}</label>
             </div>
         </div>
         <div class="p-fluid p-grid">
-            <div class="p-field p-col-12 p-md-6">
-                <InputSwitch v-model="forkable" class="margin-top-5" /> <!--<span class="label-switch">{{ status_fork }}</span>-->
+            <div class="p-field p-col-12 p-md-4">
+                <InputSwitch v-model="forkable" class="margin-top-5" /> 
             </div>
-            <div class="p-field p-col-12 p-md-6">
-                <InputSwitch v-model="toasts" class="margin-top-5" /> <!--<span class="label-switch">{{ status_toasts }}</span>-->
+            <div class="p-field p-col-12 p-md-4">
+                <InputSwitch v-model="isPublic" class="margin-top-5" /> 
+            </div>
+            <div class="p-field p-col-12 p-md-4">
+                <InputSwitch v-model="toasts" class="margin-top-5" /> 
             </div>
         </div>
 
         <div class="p-grid">
-            <div class="p-col">
+            <div class="p-md-4 p-col-12">
                 <label>{{ label_creation }}</label>
             </div>
-            <div v-if="expires" class="p-col">
+            <!--<div class="p-md-4 p-col-12">
+                <label>{{ label_update }}</label>
+            </div>-->
+            <div v-if="expires" class="p-md-4 p-col-12">
                 <label>{{ label_expiration }}</label>
             </div>
         </div>
         <div class="p-fluid p-grid">
-            <div class="p-field p-col-12 p-md-6 settings-dates">
+            <div class="p-field p-col-12 p-md-4 settings-dates">
                 {{ creationDate }}
+                <span>{{ creationTime }}</span>
             </div>
-            <div v-if="expires" class="p-field p-col-12 p-md-6 settings-dates expiring-date">
+            <!--<div class="p-field p-col-12 p-md-4 settings-dates">
+                {{ lastUpdate }}
+                <span>{{ lastUpdateTime }}</span>
+            </div>-->
+            <div v-if="expires" class="p-field p-col-12 p-md-4 settings-dates expiring-date">
                 {{ expirationDate }}
             </div>
         </div>
@@ -100,8 +117,11 @@ export default {
         const { getProjectSettings, updateProjectSettings, updateProjectSettingsTimeout } = useProjectSettings()
 
         const settings = computed(() => getProjectSettings())
-        const expires = computed(() => getProjectSettings().status === 'w')
+        const expires = computed(() => getProjectSettings().status === 'w' || getProjectSettings().status === 'wf')
         const creationDate = new Date(settings.value.uploadDate.date).toLocaleDateString("en-GB")
+        const creationTime = new Date(settings.value.uploadDate.date).toLocaleTimeString("en-GB")
+        //const lastUpdate = computed(() => new Date(settings.value.lastUpdate.date).toLocaleDateString("en-GB"))
+        //const lastUpdateTime = computed(() => new Date(settings.value.lastUpdate.date).toLocaleTimeString("en-GB"))
         const expirationDate = new Date(settings.value.expiration.date).toLocaleDateString("en-GB")
         const daysToExpire = Math.floor((new Date(settings.value.expiration.date).getTime() - new Date().getTime()) / (1000 * 3600 * 24))
 
@@ -132,13 +152,15 @@ export default {
             header: "Project settings",
             label_title: "Project title",
             warning_title: "Warning! If title is empty, nothing will be shown as project description",
-            label_caption: "Representation caption",
-            caption_placeholder: "Plase add here description, author(s), links and so on.\nUse the buttons above for adding bold, italic, underline and links.",
+            label_caption: "Representation caption (use <strong>Ctrl+Shift+V</strong> to copy without format)",
+            caption_placeholder: "Plase add here description, author(s), links and so on.\nUse the buttons above for adding bold (B), italic (I), underline (U) and links.\nUse clean button (Tx) for cleaning format or paste with Ctrl+Shift+V.",
             label_fork:  "Fork project when shared",
+            label_public: "Make project public",
             label_toasts: "Overlay messages",
             /*status_fork:  computed(() => forkable.value ? "Enabled" : "Disabled"),
             status_toasts: computed(() => toasts.value ?  "Enabled" : "Disabled"),*/
             label_creation: "Creation date",
+            label_update: "Last update",
             label_expiration: "Expiration date",
         })
 
@@ -208,6 +230,21 @@ export default {
             set: val => changeForkable(val)
         })
 
+        // public
+
+        // change public from switch
+        const changeisPublic = (value) => {
+            updateProjectSettings('public', value)
+                .then((r) => {
+                    if(r.code != 404) console.log(r.message)
+                    else console.error(r.message)
+                })
+        }
+        const isPublic = computed({
+            get: () => settings.value.public,
+            set: val => changeisPublic(val)
+        })
+
         // toasts
 
         // change toasts from switch
@@ -226,9 +263,9 @@ export default {
         return { 
             updating,
             onOpenDialog,
-            expires, creationDate, expirationDate,
+            expires, creationDate, creationTime, /*lastUpdate, lastUpdateTime,*/ expirationDate,
             ...toRefs(page), dialog, closeThisModal,
-            title, titleEmpty, caption, forkable, toasts
+            title, titleEmpty, caption, forkable, isPublic, toasts
         }
     }
 }
@@ -236,6 +273,7 @@ export default {
 
 <style>
     .settings-dates { font-weight: 700; color:#6f96a9; font-size: 20px;}
+    .settings-dates span { display:block; font-weight: 400; font-size: 16px; line-height:10px; }
     .spinner-settings { color:#6f96a9!important; }
     .spinner-caption { color:#6f96a9!important; position: absolute; right: 1rem; bottom: 1rem; z-index: 1; }
     .label-switch { margin-left: 10px; vertical-align:super; font-size:14px; }
