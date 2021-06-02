@@ -3,22 +3,34 @@
 </template>
 
 <script>
-import { computed, ref } from '@vue/runtime-core'
+import { computed, ref, onUpdated } from '@vue/runtime-core'
+import structureSettings from '@/modules/structure/structureSettings'
 import useFlags from '@/modules/common/useFlags'
 import useTrajectories from '@/modules/ngl/useTrajectories'
 export default {
   setup() {
 
-    const { getNumberOfPlayers, togglePlayAll, checkAutoplay } = useTrajectories()
+    const { currentStructure } = structureSettings()
+    const { getNumberOfPlayers, togglePlayAll, checkAutoplay, getTrajectoryPlayer } = useTrajectories()
     const { flags } = useFlags()
+
+    const currStr = computed(() => currentStructure.value)
+    const player = computed(() => getTrajectoryPlayer(currStr.value))
 
     const isVisible = computed(() => {
       if(getNumberOfPlayers() > 1) return true
-      else if(getNumberOfPlayers() === 1 && flags.responsive) return true
+      else if(getNumberOfPlayers() === 1 && flags.responsive768) return true
       else return false
+      return true
     })
+
+    onUpdated(() => {
+        // update isRunningValue once the player has been created
+        playing.value = computed(() => player.value.isRunning).value
+    })
+
     
-    const playing = ref(false)
+    const playing = ref(player.value.isRunning)
     const ttp = computed(() => playing.value ? "Pause trajectories" : "Play trajectories")
     const autoplay = computed(() => checkAutoplay())
     if(autoplay.value) {

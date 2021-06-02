@@ -11,7 +11,7 @@
       <li>To select / unselect <strong>α-helix / β-sheet</strong>, open the <strong>zoom window</strong> and click on an α-helix or a β-sheet.</li>
       <li>To zoom on an <strong>α-helix / β-sheet</strong>, open the <strong>zoom window</strong> and put the mouse over an α-helix or a β-sheet with the mouse <strong>left button while pressing the Alt key</strong>.</li>   
     </ul>
-    <p>More information in the <a href="https://3drs-documentation.readthedocs.io/en/latest/edit.html#sequence" target="_blank">official documentation</a>.</p>
+    <p>More information in the <a v-bind:href="`${docsURL}edit.html#sequence`" target="_blank">official documentation</a>.</p>
   </div>
 </template>
 
@@ -24,6 +24,11 @@ export default {
     }
 
     changeModalTitle()
+
+    const docsURL = process.env.VUE_APP_HELP_URL
+
+    return { docsURL }
+
   }
 }
 </script>

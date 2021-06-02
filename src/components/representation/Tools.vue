@@ -51,7 +51,7 @@ export default {
         const { getNumStructures } = structureSettings()
         
         const isShared = computed(() => flags.isShared)
-        const disabled = computed(() => flags.responsive)
+        const disabled = computed(() => flags.responsive600)
         const isAlignable = computed(() => getNumStructures() > 1)
         const stage = getStage()
         return { stage, isShared, isAlignable, disabled }
@@ -60,7 +60,7 @@ export default {
 </script>
 
 <style>
-    #tools { position: absolute; z-index: 2; left: 1%; top: 1%;  width:40px; }
+    #tools { position: absolute; z-index: 3; left: 1%; top: 1%;  width:40px; }
     #tools .p-button.p-button-icon-only { width:auto; width:2.2rem; height:2rem; margin-top:.2rem; }
     @media (max-width: 600px) {
         #tools { left: 0; bottom: 2%; top:auto; width:100%; }

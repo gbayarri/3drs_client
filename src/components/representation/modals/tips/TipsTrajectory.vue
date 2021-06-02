@@ -10,7 +10,7 @@
       <li><strong>Autoplay:</strong> if enabled plays the trajectory automatically.</li>
       <li><strong>Bounce:</strong> if enabled plays in rock / bounce mode (back and forth).</li>
     </ul>  
-    <p>More information in the <a href="https://3drs-documentation.readthedocs.io/en/latest/edit.html#trajectories" target="_blank">official documentation</a>.</p>
+    <p>More information in the <a v-bind:href="`${docsURL}edit.html#trajectories`" target="_blank">official documentation</a>.</p>
   </div>
 </template>
 
@@ -23,6 +23,11 @@ export default {
     }
 
     changeModalTitle()
+
+    const docsURL = process.env.VUE_APP_HELP_URL
+
+    return { docsURL }
+
   }
 }
 </script>

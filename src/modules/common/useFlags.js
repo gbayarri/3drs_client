@@ -8,7 +8,8 @@ const flags = reactive({
     zoomWindowEnabled: false, 
     customEnabled: false,
     isShared: false,
-    responsive: false,
+    responsive600: false,
+    responsive768: false,
     navigationMode: false,
     labelPositionMode: false
 })

@@ -1,28 +1,36 @@
 <template>
   <div id="player-shared" v-if="isVisible">
     <div> 
-        <div class="p-grid double-col dc-top">
-            <div class="p-col margin-top-5">
-                <Slider id="player-slider" v-model="frames" :min="min" :max="max" :step="step" />
+        <Button 
+        :icon="!isCollapsed ? 'pi pi-angle-double-up' : 'pi pi-angle-double-down'" 
+        @click="unfoldPlayer" 
+        id="unfold-button"
+        :class="!isCollapsed ? ' ' : 'folded'"
+        v-tooltip.bottom="ttpu" />
+        <div v-if="!isCollapsed">
+            <div class="p-grid double-col dc-top">
+                <div class="p-col margin-top-5">
+                    <Slider id="player-slider" v-model="frames" :min="min" :max="max" :step="step" />
+                </div>
             </div>
-        </div>
-        <div class="p-grid double-col dc-bottom">
-            <div class="p-col-9 margin-bottom-5" style="text-align:left">
-                <Button 
-                icon="fas fa-step-backward" 
-                class="p-button-rounded p-button-text player-button"
-                @click="frameStep(-1)" />
-                <Button 
-                :icon="isRunning ? 'fas fa-pause' : 'fas fa-play'" 
-                class="p-button-rounded p-button-text player-button"
-                @click="playTraj" />
-                <Button 
-                icon="fas fa-step-forward" 
-                class="p-button-rounded p-button-text player-button"
-                @click="frameStep(1)" />
-            </div>
-            <div class="p-col-3 slider-value" style="text-align:right">
-                <label>{{ frames }}</label>
+            <div class="p-grid double-col dc-bottom">
+                <div class="p-col-9 margin-bottom-5" style="text-align:left">
+                    <Button 
+                    icon="fas fa-step-backward" 
+                    class="p-button-rounded p-button-text player-button"
+                    @click="frameStep(-1)" />
+                    <Button 
+                    :icon="isRunning ? 'fas fa-pause' : 'fas fa-play'" 
+                    class="p-button-rounded p-button-text player-button"
+                    @click="playTraj" />
+                    <Button 
+                    icon="fas fa-step-forward" 
+                    class="p-button-rounded p-button-text player-button"
+                    @click="frameStep(1)" />
+                </div>
+                <div class="p-col-3 slider-value" style="text-align:right">
+                    <label>{{ frames }}</label>
+                </div>
             </div>
         </div>
     </div>
@@ -51,15 +59,24 @@ export default {
         const trajSettings = computed(() => getTrajectorySettings())
         const player = computed(() => getTrajectoryPlayer(currStr.value))
         const currTraj = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0].trajList[0])
+        let isCollapsed = ref(false)
 
-        onUpdated(() => {
+        /*onUpdated(() => {
             // update isRunningValue once the player has been created
             isRunning.value = computed(() => player.value.isRunning).value
-            // if no loop and player at end, set isRunning to false
-            //if(!trajSettings.value.loop && player.value.traj.currentFrame === trajSettings.value.range[1]) isRunning.value = false
+        })*/
+
+        const isRunning = computed(() => player.value.isRunning)
+
+        const page = reactive({
+            ttpu: computed(() => isCollapsed.value ? 'Unfold player' : 'Fold player')
         })
 
-        const isRunning = ref(player.value.isRunning)
+        const unfoldPlayer = (e) => {
+            isCollapsed.value = !isCollapsed.value
+        }
+
+        //const isRunning = ref(player.value.isRunning)
 
         const settings = reactive({
             min: computed(() => trajSettings.value.range[0]),
@@ -68,7 +85,7 @@ export default {
         })
 
         const isVisible = computed(() => {
-            if(getNumberOfPlayers() === 1 && !flags.responsive) return true
+            if(getNumberOfPlayers() === 1 && !flags.responsive768) return true
             else return false
         })
 
@@ -83,9 +100,11 @@ export default {
 
         const playTraj = () => {
 
-            isRunning.value = !isRunning.value
+            //isRunning.value = !isRunning.value
 
-            if(isRunning.value)  player.value.play()
+            //player.value.isRunning = !isRunning.value
+
+            if(!isRunning.value) player.value.play()
             else player.value.pause()
 
         }
@@ -103,7 +122,7 @@ export default {
 
         }
 
-        return { ...toRefs(settings), isVisible, frames, isRunning, playTraj, frameStep }
+        return { ...toRefs(page), ...toRefs(settings), isVisible, isCollapsed, unfoldPlayer, frames, isRunning, playTraj, frameStep }
     }
 }
 </script>
@@ -113,20 +132,46 @@ export default {
 #player-shared { 
     position: absolute; 
     z-index: 2; 
-    left:calc(2% + 38px); 
+    /*left:calc(2% + 38px); */
+    left:0;
     top:0;
-    width:calc(98% - 39px); 
+    width:100%; 
 }
 #player-shared div { text-align: center; }
 
-#player-shared .double-col { width:25%; margin: 0 auto; background-color: rgb(123 141 160 / 0.8); padding:0 .5rem; }
-#player-shared .double-col.dc-bottom { border-bottom-left-radius: 3px; border-bottom-right-radius: 3px; }
+#player-shared #unfold-button {
+    z-index:2;
+    position: absolute;
+    left: 50%;
+    top: 4.5rem;
+    transform: translateX(-50%);
+    cursor: pointer;
+    background: rgb(123 141 160 / 0.75); 
+    color: #fff;
+    padding: 0 1rem 0 1rem;
+    width: 3rem;
+    font-size: 20px;
+    border-radius: 0 0 5px 5px ;
+    border-bottom:1px solid rgb(255 255 255 / 0.75);
+    border-left:1px solid rgb(255 255 255 / 0.75);
+    border-right:1px solid rgb(255 255 255 / 0.75);
+    border-top:1px solid rgb(123 141 160 / 0.65);
+}
+#player-shared #unfold-button.folded { top: 0!important; }
+
+#player-shared .double-col { width:25%; margin: 0 auto; background-color: rgb(123 141 160 / 0.75); padding:0 .5rem; }
+#player-shared .double-col.dc-bottom { border-bottom-left-radius: 3px; border-bottom-right-radius: 3px; border-bottom:1px solid rgb(255 255 255 / 0.75); border-left:1px solid rgb(255 255 255 / 0.75);  border-right:1px solid rgb(255 255 255 / 0.75); }
+#player-shared .double-col.dc-top { border-left:1px solid rgb(255 255 255 / 0.75);  border-right:1px solid rgb(255 255 255 / 0.75); }
 #player-shared #player-slider.p-slider.p-slider-horizontal { background: #ccc; width:100%; }
 #player-shared #player-slider.p-slider .p-slider-range { background: #fff; }
 #player-shared #player-slider.p-slider .p-slider-handle { border-color: #b4cce6; }
 #player-shared #player-slider.p-slider:not(.p-disabled) .p-slider-handle:hover { background: #6f96a9;  border-color: #fff; }
 #player-shared .slider-value { text-align:right; font-weight: 700; }
 #player-shared .slider-value label { color:#fff; }
+
+@media (max-width: 1200px) {
+    #player-shared .double-col { width:35%;}
+}
 
 @media (max-width: 768px) {
     #player-shared { left:2%; top:auto; bottom:0; }
@@ -148,4 +193,5 @@ export default {
 }
 #player-shared .p-button-rounded.p-button-text.player-button:hover { background: #546974!important; color:#fff!important; border-color: #fff!important; }
 #player-shared .p-button-rounded.p-button-text.player-button span.p-button-icon { margin-top:-2px;}
+
 </style>

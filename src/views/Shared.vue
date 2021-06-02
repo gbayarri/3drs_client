@@ -99,7 +99,8 @@ export default {
 
 
         //let maxW = ratio.value > 1 ? Math.floor(600 / ratio.value) : 600
-        setFlagStatus('responsive', width.value < 600)
+        setFlagStatus('responsive600', width.value < 600)
+        setFlagStatus('responsive768', width.value < 768)
         //console.log(maxW)
 
         window.addEventListener("resize", () => {
@@ -109,7 +110,8 @@ export default {
             /*maxW = ratio.value > 1 ? Math.floor(600 / ratio.value) : 600
             console.log(maxW)*/
 
-            setFlagStatus('responsive', width.value < 600)
+            setFlagStatus('responsive600', width.value < 600)
+            setFlagStatus('responsive768', width.value < 768)
         })
 
         return { stageLoaded, project_id, disableComponents, loadViewport }

@@ -7,7 +7,7 @@
       <li>To select / unselect all ions, click on <strong>select all ions button</strong>.</li>
       <li>To zoom on an ion, click on the <strong>right bullseye button</strong>.</li>
     </ul>  
-    <p>More information in the <a href="https://3drs-documentation.readthedocs.io/en/latest/edit.html#ions" target="_blank">official documentation</a>.</p>
+    <p>More information in the <a v-bind:href="`${docsURL}edit.html#ions`" target="_blank">official documentation</a>.</p>
   </div>
 </template>
 
@@ -20,6 +20,11 @@ export default {
     }
 
     changeModalTitle()
+
+    const docsURL = process.env.VUE_APP_HELP_URL
+
+    return { docsURL }
+    
   }
 }
 </script>
