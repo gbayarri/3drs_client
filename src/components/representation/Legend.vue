@@ -61,6 +61,17 @@ export default {
 }
 #legend span { text-transform: uppercase; font-weight: 600;}
 #legend span.lowercase-legend { text-transform: lowercase!important;}
+@media (max-width: 768px) {
+    #legend { 
+        position: absolute;
+        bottom: 4rem;
+        left: 50%;
+        -moz-transform: translateX(-50%) translateY(-50%);
+        -webkit-transform: translateX(-50%) translateY(-50%);
+        transform: translateX(-50%) translateY(-50%);
+        text-align: center;
+    }
+}
 @media (max-width: 600px) {
     #legend { 
         position: absolute;

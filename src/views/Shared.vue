@@ -2,6 +2,8 @@
 
     <Tools v-if="stageLoaded" :isDraft="isDraft" />
 
+    <PlayerShared v-if="stageLoaded" :isDraft="isDraft" />
+
     <Fork v-if="stageLoaded && hasFork && !disableComponents" :isDraft="isDraft" :project_id="project_id" />
 
     <Legend v-if="stageLoaded" />
@@ -25,13 +27,14 @@ import Tools from '@/components/representation/Tools'
 import Fork from '@/components/representation/Fork'
 import Legend from '@/components/representation/Legend'
 import Caption from '@/components/representation/Caption'
+import PlayerShared from '@/components/representation/PlayerShared'
 import Viewport from '@/components/representation/Viewport'
 import ModalEmbed from '@/components/representation/modals/ModalEmbed'
 import ModalQR from '@/components/representation/modals/ModalQR'
 export default {
     components: { 
         Tools,
-        Fork, Legend, Caption,
+        Fork, Legend, Caption, PlayerShared,
         Viewport,
         ModalEmbed, ModalQR
     },

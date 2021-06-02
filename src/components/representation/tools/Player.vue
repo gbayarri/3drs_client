@@ -1,16 +1,22 @@
 <template>
-  <Button  v-if="isVisible" :icon="playing ? 'fas fa-pause-circle': 'fas fa-play-circle'" class="p-shadow-2" v-tooltip.right="ttp"  @click="handleClick" />
+  <Button v-if="isVisible" :icon="playing ? 'fas fa-pause-circle': 'fas fa-play-circle'" class="p-shadow-2" v-tooltip.right="ttp"  @click="handleClick" />
 </template>
 
 <script>
 import { computed, ref } from '@vue/runtime-core'
+import useFlags from '@/modules/common/useFlags'
 import useTrajectories from '@/modules/ngl/useTrajectories'
 export default {
   setup() {
 
     const { getNumberOfPlayers, togglePlayAll, checkAutoplay } = useTrajectories()
+    const { flags } = useFlags()
 
-    const isVisible = computed(() => getNumberOfPlayers() > 0)
+    const isVisible = computed(() => {
+      if(getNumberOfPlayers() > 1) return true
+      else if(getNumberOfPlayers() === 1 && flags.responsive) return true
+      else return false
+    })
     
     const playing = ref(false)
     const ttp = computed(() => playing.value ? "Pause trajectories" : "Play trajectories")
