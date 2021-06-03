@@ -67,11 +67,24 @@ module.exports = {
         { name: 'Spline', id: 'spline' }
     ],
     embedCode: (url) => `<iframe width="500" height="500" src="${url}" title="3dRS" frameborder="0" allowfullscreen></iframe>`,
-    gallery: [
-        { id: '609f864ae5f988.76031858', img: 'gallery01.png' },
-        { id: '609f8bf52bba88.95483112', img: 'gallery02.png' },
-        { id: '60a0170e7b9041.47453401', img: 'gallery03.png' },
-        { id: '60a018efc21a50.60836011', img: 'gallery04.png' },
-        { id: '60a2eb0061f600.54953893', img: 'gallery05.png' }
-    ]
+    gallery: {
+        development: [
+            { id: '609f864ae5f988.76031858', img: 'gallery01.png' },
+            { id: '609f8bf52bba88.95483112', img: 'gallery02.png' }
+        ],
+        staging: [
+            { id: '609f864ae5f988.76031858', img: 'gallery01.png' },
+            { id: '609f8bf52bba88.95483112', img: 'gallery02.png' },
+            { id: '60a0170e7b9041.47453401', img: 'gallery03.png' },
+            { id: '60a018efc21a50.60836011', img: 'gallery04.png' },
+            { id: '60a2eb0061f600.54953893', img: 'gallery05.png' }
+        ],
+        production: [
+            { id: '609f864ae5f988.76031858', img: 'gallery01.png' },
+            { id: '609f8bf52bba88.95483112', img: 'gallery02.png' },
+            { id: '60a0170e7b9041.47453401', img: 'gallery03.png' },
+            { id: '60a018efc21a50.60836011', img: 'gallery04.png' },
+            { id: '60a2eb0061f600.54953893', img: 'gallery05.png' }
+        ]
+    }
 }

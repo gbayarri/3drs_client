@@ -43,7 +43,7 @@ export default {
   components: { ModalEmbedGallery },
   setup() {
 
-    const galleryIds = globals.gallery.map(a => a.id)
+    const galleryIds = globals.gallery[process.env.NODE_ENV].map(a => a.id)
     const { getMultipleSettings } = useProjectSettings()
     const { openModal } = useModals()
 
@@ -54,7 +54,7 @@ export default {
       getMultipleSettings(galleryIds)
         .then((r) => {
               if(r.code != 404) {
-                const g = r.gallery.map(v => ({...v, img: globals.gallery.filter(item => item.id == v._id)[0].img}))
+                const g = r.gallery.map(v => ({...v, img: globals.gallery[process.env.NODE_ENV].filter(item => item.id == v._id)[0].img}))
                 galleryList.value = g
                 //console.log(galleryList.value)
               } else console.error(r.message)
