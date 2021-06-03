@@ -6,6 +6,7 @@ import Help from '@/views/Help.vue'
 import Gallery from '@/views/Gallery.vue'
 import Representation from '@/views/Representation.vue'
 import Shared from '@/views/Shared.vue'
+import ShortURL from '@/views/ShortURL.vue'
 import NotFound from '@/views/NotFound.vue'
 
 const routes = [
@@ -65,6 +66,17 @@ const routes = [
     }
   },
   {
+    path: '/s/:id',
+    name: 'ShortShared',
+    component: ShortURL,
+    props(route) { 
+      return {
+        id: route.params.id,
+        isShared: true
+      }
+    }
+  },
+  {
     path: '/embed/:id',
     name: 'Embed',
     component: Shared,
@@ -72,6 +84,17 @@ const routes = [
       return {
         id: route.params.id,
         hasFork: false
+      }
+    }
+  },
+  {
+    path: '/e/:id',
+    name: 'ShortEmbed',
+    component: ShortURL,
+    props(route) { 
+      return {
+        id: route.params.id,
+        isShared: false
       }
     }
   },

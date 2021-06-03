@@ -51,6 +51,12 @@
         <template #content>
             <div class="p-grid">
                 <div class="p-lg-3 p-md-6 p-sm-12">
+                    <div class="box"><a href="https://bioexcel.eu" target="_blank"><img alt="Bioexcel logo" class="bioexcel-logo" src="../assets/img/bioexcel.png"></a></div>
+                </div>
+                <div class="p-lg-3 p-md-6 p-sm-12">
+                    <div class="box"><a href="https://inb-elixir.es/" target="_blank"><img alt="Elixir logo" class="elixir-logo" src="../assets/img/elixir.png"></a></div>
+                </div>
+                <div class="p-lg-3 p-md-6 p-sm-12">
                     <div class="box"><a href="https://mmb.irbbarcelona.org" target="_blank"><img alt="MMB logo" class="mmb-logo" src="../assets/img/mmb.png"></a></div>
                 </div>
                 <div class="p-lg-3 p-md-6 p-sm-12">

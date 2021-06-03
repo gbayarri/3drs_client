@@ -43,7 +43,7 @@ export default {
       labelIssues: "Check " + globals.shortName + " GitHub issues",
       labelNewIssue: "Open new issue in " + globals.shortName + " GitHub",
       newIssue: process.env.VUE_APP_GITHUB_NEW_ISSUE_URL,
-      gitHubRepo: process.env.VUE_APP_OFFICIAL_URL,
+      gitHubRepo: process.env.VUE_APP_GITHUB_REPO,
       issuesList: process.env.VUE_APP_GITHUB_ISSUES_URL
     }
 

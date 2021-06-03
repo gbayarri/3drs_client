@@ -8,7 +8,7 @@
         <FullScreen :stage="stage" />
         <Picture v-if="isShared && !disabled" :stage="stage" />
         <Align v-if="!isShared && isAlignable" />
-        <Player v-if="isShared" :stage="stage" />
+        <Player v-if="isShared && showPlayer" :stage="stage" />
         <Embed v-if="isShared && !disabled" :isDraft="isDraft" />
         <Measurements v-if="!isShared" />
         <NavigationMode v-if="!isShared" />
@@ -44,7 +44,7 @@ import Align from '@/components/representation/tools/Align'
 import ProjectSettings from '@/components/representation/tools/ProjectSettings'
 export default {
     components: { Reload, Rotate, Center, Background, FullScreen, Picture, Help, QR, Player, Embed, Measurements, NavigationMode, Camera, Visit, Align, ProjectSettings },
-    props: ['isDraft'],
+    props: ['isDraft', 'showPlayer'],
     setup() {
         const { getStage } = useStage()
         const { flags } = useFlags()

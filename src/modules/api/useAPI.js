@@ -159,6 +159,20 @@ export default function useAPI() {
 
   }
 
+  const fetchShortURL = async (id) => {
+      
+    const response = await fetch(process.env.VUE_APP_API_LOCATION + '/short/' + id, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    const resp = await response.json()
+
+    return resp
+
+  }
+
   return { 
     apiData, 
     fetchProject, 
@@ -171,7 +185,8 @@ export default function useAPI() {
     eliminateRepresentation,
     updateTrajectoryData,
     fetchSettings,
-    fetchLastProjects
+    fetchLastProjects,
+    fetchShortURL
   }
 
 }

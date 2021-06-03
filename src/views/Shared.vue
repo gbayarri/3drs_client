@@ -1,8 +1,8 @@
 <template>
 
-    <Tools v-if="stageLoaded" :isDraft="isDraft" />
+    <Tools v-if="stageLoaded" :isDraft="isDraft" :showPlayer="showPlayer" />
 
-    <PlayerShared v-if="stageLoaded" :isDraft="isDraft" />
+    <PlayerShared v-if="stageLoaded && showPlayer" :isDraft="isDraft" />
 
     <Fork v-if="stageLoaded && hasFork && !disableComponents" :isDraft="isDraft" :project_id="project_id" />
 
@@ -23,6 +23,7 @@ import useFlags from '@/modules/common/useFlags'
 import useAPI from '@/modules/api/useAPI'
 import useMessages from '@/modules/common/useMessages'
 import useModals from '@/modules/common/useModals'
+import useTrajectories from '@/modules/ngl/useTrajectories'
 import Tools from '@/components/representation/Tools'
 import Fork from '@/components/representation/Fork'
 import Legend from '@/components/representation/Legend'
@@ -47,6 +48,7 @@ export default {
         const { apiData, fetchProject } = useAPI()
         const { setMessage } = useMessages()
         const { closeModal } = useModals()
+        const { getNumberOfTrajectories } = useTrajectories()
         
 
         // activate tools, sidebar and so on
@@ -64,6 +66,8 @@ export default {
 
         const project_id = props.id
         const isDraft = props.isDraft
+
+        let showPlayer = ref(false)
 
         fetchProject(project_id)
         .then(() => {
@@ -93,7 +97,7 @@ export default {
             return false
           }
 
-          //console.log(apiData.value)
+          showPlayer.value = getNumberOfTrajectories(apiData.value.files) > 0
           loadViewport.value = true
         })
 
@@ -114,7 +118,7 @@ export default {
             setFlagStatus('responsive768', width.value < 768)
         })
 
-        return { stageLoaded, project_id, disableComponents, loadViewport }
+        return { stageLoaded, project_id, disableComponents, loadViewport, showPlayer }
     }
 }
 </script>

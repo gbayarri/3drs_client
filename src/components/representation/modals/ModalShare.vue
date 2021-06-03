@@ -143,7 +143,13 @@ export default {
         const qrImage = ref(null)
         const generateQR = async (url) => {
             try {
-                qrImage.value = await QRCode.toDataURL(url, { width: 400 })
+                qrImage.value = await QRCode.toDataURL(url, { 
+                    width: 400,
+                    color: {
+                        dark: '#6f96a9', 
+                        light: '#0000'
+                    }
+                })
             } catch (err) {
                 console.error(err)
             }
@@ -168,10 +174,19 @@ export default {
                     sharing.value = false
                     shared.value = true
                     // update models
-                    sharedProject.value = r.project
-                    sharedAddress.value =  window.location.origin + process.env.BASE_URL + 'shared/' + sharedProject.value
+                    // **************
+                    //sharedProject.value = r.project
+                    // **************
+                    sharedProject.value = r.shortid
+                    // **************
+                    //sharedAddress.value =  window.location.origin + process.env.BASE_URL + 'shared/' + sharedProject.value
+                    // **************
+                    sharedAddress.value =  window.location.origin + process.env.BASE_URL + 's/' + sharedProject.value
                     //embedCode.value = '<iframe width="500" height="500" src="' + window.location.origin + process.env.BASE_URL + 'embed/' + sharedProject.value + '" title="Title" frameborder="0" allowfullscreen></iframe>'   
-                    var url = window.location.origin + process.env.BASE_URL + 'embed/' + sharedProject.value
+                    // **************
+                    // var url = window.location.origin + process.env.BASE_URL + 'embed/' + sharedProject.value
+                    // **************
+                    var url = window.location.origin + process.env.BASE_URL + 'e/' + sharedProject.value
                     embedCode.value = ecGlobal(url)
                     // update project status
                     var children = settings.value.children
@@ -204,7 +219,10 @@ export default {
         }
 
         const openShared = () => {
-            window.open(process.env.BASE_URL + 'shared/' + sharedProject.value, '_blank')
+            // **************
+            // window.open(process.env.BASE_URL + 'shared/' + sharedProject.value, '_blank')
+            // **************
+            window.open(process.env.BASE_URL + 's/' + sharedProject.value, '_blank')
         }
 
         // embedding

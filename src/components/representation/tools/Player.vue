@@ -21,7 +21,7 @@ export default {
       if(getNumberOfPlayers() > 1) return true
       else if(getNumberOfPlayers() === 1 && flags.responsive768) return true
       else return false
-      return true
+      //return true
     })
 
     onUpdated(() => {

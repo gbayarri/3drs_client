@@ -187,6 +187,15 @@ export default function useTrajectories() {
         //console.log(player.filter(item => item.str === str)[0].player.parameters)
     }
 
+    // get initial number of trajectories for shared
+    const getNumberOfTrajectories = (files) => {
+        let n = 0
+        for(const f of files) {
+            if(f.trajectory) n ++
+        }
+        return n
+    }
+
     // NGL / REST API
 
     const setTrajectorySettings = async (value) => {
@@ -210,6 +219,7 @@ export default function useTrajectories() {
         player, //currentFrame, 
         checkTrajectory, 
         setInitPlayer, setTrajectoryPlayer, getTrajectoryPlayer, checkPlayersLoaded, togglePlayAll, checkAutoplay, getNumberOfPlayers, updateCurrentFrame, getCurrentFrame, setCurrentFrame, updatePlayerSetting,
-        setTrajectorySettings, setTrajectorySettingsTimeout
+        setTrajectorySettings, setTrajectorySettingsTimeout,
+        getNumberOfTrajectories
     }
 }
