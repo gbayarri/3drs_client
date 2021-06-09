@@ -6,6 +6,21 @@ This is the front-end of the **3-dimensional structure Representation Sharing (3
 
 <a href="https://mmb.irbbarcelona.org/3dRS"><img src="src/assets/img/logo.png" alt="3dRS" width="200"/></a>
 
+## Config
+
+As this Vue project has been configured to use **history mode**, an additional **.htaccess file** must be added to the root folder (e.g. replacing `RewriteBase /` with `RewriteBase /name-of-your-subfolder/`, where _/name-of-your-subfolder/_ is the folder in the server)
+
+```apacheconf
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
+```
+
 ## Links
 
 [Visit the official website](https://mmb.irbbarcelona.org/3dRS)
