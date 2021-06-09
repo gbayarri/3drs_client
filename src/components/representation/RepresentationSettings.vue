@@ -773,7 +773,7 @@ export default {
 <style>
     #minisettings { 
         position: absolute; 
-        z-index: 2; 
+        z-index: 3; 
         left: 1%;
         bottom: 0;
         width: 20%;
