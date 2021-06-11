@@ -32,7 +32,7 @@ export default {
               To disable it, please click again the Navigation Mode button.`, 
               life: 15000
           })
-          document.querySelector("#stage").style.cursor = 'move'
+          document.querySelector("#stage").style.cursor = 'grabbing'
           setFlagStatus('navigationMode', true)
         } else {
           document.querySelector("#stage").style.cursor = 'default'
