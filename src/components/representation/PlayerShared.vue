@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import { computed, ref, reactive, toRefs, onUpdated } from "vue"
+import { computed, ref, reactive, toRefs, onUpdated, watch } from "vue"
 import useStage from "@/modules/ngl/useStage"
 import structureSettings from '@/modules/structure/structureSettings'
 import useFlags from '@/modules/common/useFlags'
@@ -66,7 +66,7 @@ export default {
             isRunning.value = computed(() => player.value.isRunning).value
         })*/
 
-        const isRunning = computed(() => player.value.isRunning)
+        const isRunning = computed(() => player.value.isRunning )
 
         const page = reactive({
             ttpu: computed(() => isCollapsed.value ? 'Unfold player' : 'Fold player')
@@ -94,9 +94,23 @@ export default {
         }
 
         const frames = computed({
-            get: () => parseInt(currFr.value) + 1,
+            get: () => {
+                //console.log(player.value.isRunning, isRunning.value)
+                //if(!player.value.isRunning) isRunning.value = false
+                return parseInt(currFr.value) + 1
+            },
             set: val => changeFrame(val)
         })
+
+        /*watch(frames, (c, p) => {
+            //if (!r) console.log ("stopped")
+            //console.log(c, p)
+            setTimeout(() => {
+                // tricky :/
+                //console.log(player.value.isRunning, isRunning.value)
+                if(!player.value.isRunning && isRunning.value) player.value.pause()
+            }, 200)
+        })*/
 
         const playTraj = () => {
 
@@ -104,8 +118,15 @@ export default {
 
             //player.value.isRunning = !isRunning.value
 
+            //console.log(isRunning.value, player.value.isRunning)
+
             if(!isRunning.value) player.value.play()
             else player.value.pause()
+
+            if(isRunning.value && !player.value.isRunning) {
+                // tricky :/
+                player.value.play()
+            }
 
         }
 

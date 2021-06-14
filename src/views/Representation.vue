@@ -134,4 +134,5 @@ export default {
     .p-toast .p-toast-message.p-toast-message-info .p-toast-icon-close { color: #48596d!important; }
     .p-toast .p-toast-message .p-toast-icon-close:focus { box-shadow: none!important;}
     .p-toast .p-toast-message .p-toast-icon-close:hover { background:transparent!important; color:#000!important }
+    .p-toast .p-toast-message .p-toast-message-content .p-toast-detail { word-break: break-word; }
 </style>
