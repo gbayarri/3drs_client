@@ -69,23 +69,28 @@ module.exports = {
     embedCode: (url) => `<iframe width="500" height="500" src="${url}" title="3dRS" frameborder="0" allowfullscreen></iframe>`,
     gallery: {
         development: [
-            { id: '609f864ae5f988.76031858', img: 'gallery01.png' },
-            { id: '609f8bf52bba88.95483112', img: 'gallery02.png' }
+            { id: '609f864ae5f988.76031858', img: '60c1ff158a6696.79962296.png' },
+            { id: '609f8bf52bba88.95483112', img: '60c20aa8325d47.86149716.png' }
         ],
         staging: [
-            { id: '609f864ae5f988.76031858', img: 'gallery01.png' },
-            { id: '609f8bf52bba88.95483112', img: 'gallery02.png' },
-            { id: '60a0170e7b9041.47453401', img: 'gallery03.png' },
-            { id: '60a018efc21a50.60836011', img: 'gallery04.png' },
-            { id: '60a2eb0061f600.54953893', img: 'gallery05.png' }
+            { id: '609f864ae5f988.76031858', img: '60c1ff158a6696.79962296.png' },
+            { id: '609f8bf52bba88.95483112', img: '60c20aa8325d47.86149716.png' },
+            { id: '60a0170e7b9041.47453401', img: '60c20aa8325d47.86149716.png' },
+            { id: '60a018efc21a50.60836011', img: '60c20aa8325d47.86149716.png' },
+            { id: '60a2eb0061f600.54953893', img: '60c20aa8325d47.86149716.png' }
         ],
-        // TODO!!!!
         production: [
-            { id: '609f864ae5f988.76031858', img: 'gallery01.png' },
-            { id: '609f8bf52bba88.95483112', img: 'gallery02.png' },
-            { id: '60a0170e7b9041.47453401', img: 'gallery03.png' },
-            { id: '60a018efc21a50.60836011', img: 'gallery04.png' },
-            { id: '60a2eb0061f600.54953893', img: 'gallery05.png' }
+            { id: '60c1ff158a6696.79962296', img: '60c1ff158a6696.79962296.png' },
+            { id: '60c20aa8325d47.86149716', img: '60c20aa8325d47.86149716.png' },
+            { id: '60c22f3395c088.30671802', img: '60c22f3395c088.30671802.png' },
+            { id: '60c25dcd85ace9.59066405', img: '60c25dcd85ace9.59066405.png' },
+            { id: '60c46e5fba5825.76009464', img: '60c46e5fba5825.76009464.png' },
+            { id: '60c47a53c44f29.38290043', img: '60c47a53c44f29.38290043.png' },
+            { id: '60c48b6fafa071.73308409', img: '60c48b6fafa071.73308409.png' },
+            { id: '60c466b3e46963.78931227', img: '60c466b3e46963.78931227.png' },
+            { id: '60c475caa99bd2.17608420', img: '60c475caa99bd2.17608420.png' },
+            { id: '60c481dbc19af6.80182065', img: '60c481dbc19af6.80182065.png' },
+            { id: '60c2586512b0a4.33959631', img: '60c2586512b0a4.33959631.png' }
         ]
     }
 }

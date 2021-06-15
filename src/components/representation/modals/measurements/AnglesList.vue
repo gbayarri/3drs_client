@@ -1,5 +1,7 @@
 <template>
-    <p v-if="anglesList.length > 0" class="margin-bottom-30">The list below shows all the angles found in the current structure. You can remove them and modify size and color.To create a new one, <strong>
+    <p v-if="anglesList.length > 0" class="margin-bottom-30">The list below shows all the angles found in the current structure. You can remove them and modify size and color.
+        If <strong>only the lines</strong> are needed (<strong>without label</strong>), please input <strong>0 as a Label size</strong>.
+        To create a new one, <strong>
         you must press ctrl key and click on three atoms with the mouse right button</strong>.
     </p>
     <p v-else class="margin-bottom-30">There are no angles in the current structure. To create a new one, <strong>
@@ -22,7 +24,7 @@
                 {{ item.angle }}°
             </div>
             <div class="p-col-2">
-                <InputNumber :value="item.size" @input="changeSize(item.id, $event)" showButtons :step="1" :min="1" :max="10" inputStyle="width:100%" />
+                <InputNumber :value="item.size" @input="changeSize(item.id, $event)" showButtons :step="1" :min="0" :max="10" inputStyle="width:100%" />
             </div>
             <div class="p-col-1" style="padding-top:.8rem">
                 <ColorPicker v-model="item.color" class="custom-panel" @click="clickPicker(item.id)" />

@@ -153,7 +153,7 @@ export default {
             label_title: "Project title",
             warning_title: "Warning! If title is empty, nothing will be shown as project description",
             label_caption: "Representation caption (use <strong>Ctrl+Shift+V</strong> to copy without format)",
-            caption_placeholder: "Plase add here description, author(s), links and so on.\nUse the buttons above for adding bold (B), italic (I), underline (U) and links.\nUse clean button (Tx) for cleaning format or paste with Ctrl+Shift+V.",
+            caption_placeholder: "Please add here description, author(s), links and so on.\nUse the buttons above for adding bold (B), italic (I), underline (U) and links.\nUse clean button (Tx) for cleaning format or paste with Ctrl+Shift+V.",
             label_fork:  "Fork project when shared",
             label_public: "Make project public",
             label_toasts: "Overlay messages",

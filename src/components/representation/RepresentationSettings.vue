@@ -638,6 +638,7 @@ export default {
         const changeLabelStatus = (value) => {
             currReprSettings.value.label.visible = value
             updateRepresentationProperty('label', currReprSettings.value.label)
+            if(!value) setFlagStatus('labelPositionMode', false)
             setLabelRepresentation(stage, currReprSettings.value, true)
                 .then((r) => {
                     if(r.code != 404) console.log(r.message)
