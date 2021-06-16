@@ -149,6 +149,7 @@ export default function useSelections() {
   }
 
   const getCurrentSelection = function (currReprVal, currStr, type) {
+    console.log(currReprVal, currStr, type)
     return selection.value
                   .filter(item => item.id === currReprVal)[0].structures
                   .filter(item => item.id === currStr)[0].selection[type]

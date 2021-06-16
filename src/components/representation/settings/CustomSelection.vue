@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { ref, computed, reactive, toRefs, watch } from 'vue'
+import { ref, computed, reactive, toRefs, watch/*, onRenderTriggered */} from 'vue'
 import { useToast } from 'primevue/usetoast'
 import useModals from '@/modules/common/useModals'
 import useRepresentations from '@/modules/representations/useRepresentations'
@@ -81,6 +81,10 @@ export default {
 
         const toast = useToast()
 
+        /*onRenderTriggered(() => {
+            console.log('hook!', newSelection)
+        })*/
+
         const customSelection = computed({
             get: () => getCurrentSelection(currReprVal.value, currStr.value, 'custom'),
             set: val => {
@@ -103,7 +107,7 @@ export default {
 
         const createCustom = () => {
             if(newSelection) {
-                //console.log(newSelection, 'redraw!!!')
+                console.log(newSelection, 'redraw!!!')
                 const [old_sele, structures] = setCurrentCustomSelection(stage, currReprVal.value, currStr.value, newSelection)
                 // save selection representation
                 setSelectionRepresentation(stage, newSelection, structures, re.value, true/*, re_others.value*/)
@@ -163,7 +167,7 @@ export default {
             openModal('tips', 'custom')
         }
 
-        watch([currStr], (newValues, prevValues) => {
+        watch([currStr, currReprVal], (newValues, prevValues) => {
             newSelection = getCurrentSelection(currReprVal.value, currStr.value, 'custom')
             //console.log(newSelection.length)
             bDisabled.value = (newSelection.length === 0)
