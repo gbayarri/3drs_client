@@ -59,7 +59,7 @@ export default {
     -o-transition-timing-function: ease-in;
     transition-timing-function: ease-in;
 }
-#legend span { text-transform: uppercase; font-weight: 600;}
+#legend span { text-transform: uppercase; font-weight: 600; word-break: break-all;}
 #legend span.lowercase-legend { text-transform: lowercase!important;}
 @media (max-width: 768px) {
     #legend { 

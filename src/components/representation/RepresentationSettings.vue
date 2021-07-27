@@ -294,7 +294,7 @@ export default {
             ttphr: computed(() => isVisible.value ? 'Hide representation' : 'Show representation'),
             ttpcr: "Clone current representation",
             ttplbh: "Modify label settings: name, size, background color and position clicking on the <i class='fas fa-crosshairs'></i> button and then on an atom of the representation. To enable it, please click the button <i class='fas fa-toggle-off'></i> right to the label name.",
-            ttplbe: computed(() => !labelState.value ? 'Click to enable label' : 'Click to disable label'),
+            ttplbe: computed(() => !labelState.value ? 'Click to enable label and put the mouse on the stage for viewing it' : 'Click to disable label'),
             ttplbp: 'Click to place label and then pick an atom from the representation',
             placeholderRenSel: "Insert new name",
             placeholderEditLabel: "Insert label name",

@@ -30,6 +30,16 @@
           <p>Please visit <strong>our gallery</strong> to get an idea of what is possible to be built with <strong>{{ helpPanel.shortName }}</strong> web application:</p>
 
           <p><Button type="button" :label="helpPanel.labelBtnGal" icon="pi pi-fw pi-images" @click="openGallery" /></p>
+
+          <h2>Integration</h2>
+
+          <p>To integrate <strong>{{ helpPanel.shortName }}</strong> in your project is straightforward. An embed mode is provided and it can be added to both a HTML page and a Jupyter Notebook:</p>
+
+          <p>
+            <Button type="button" :label="helpPanel.labelBtnHtml" icon="fas fa-code" @click="openHTML" />&nbsp;
+            <Button type="button" :label="helpPanel.labelBtnJN" icon="fas fa-book" @click="openJN" />&nbsp;
+            <Button type="button" :label="helpPanel.labelBtnGC" icon="fab fa-google" @click="openGC" />
+          </p>
         </div>
       </div>
     </Panel>
@@ -58,7 +68,10 @@ export default {
       longName: globals.longName,
       shortName: globals.shortName,
       labelBtnDocs: 'Open documentation',
-      labelBtnGal: 'Open gallery'
+      labelBtnGal: 'Open gallery',
+      labelBtnHtml: 'Open Embed in HTML',
+      labelBtnJN: 'Open Embed in Jupyter Notebook',
+      labelBtnGC: 'Open Embed in Google Colab'
     }
 
     const openDocs = () => {
@@ -69,7 +82,19 @@ export default {
      $router.push({ name: 'Gallery' })
     }
 
-    return { header, helpPanel, home, breadcrumbs, openDocs, openGallery }
+    const openHTML = () => {
+     $router.push({ name: 'Integration' })
+    }
+
+    const openJN = () => {
+      window.open(process.env.VUE_APP_JUPYTER, '_blank')
+    }
+
+    const openGC = () => {
+      window.open(process.env.VUE_APP_COLAB, '_blank')
+    }
+
+    return { header, helpPanel, home, breadcrumbs, openDocs, openGallery, openHTML, openJN, openGC }
   }
 }
 </script>

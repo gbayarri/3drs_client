@@ -1,6 +1,6 @@
 <template>
     <p v-if="distancesList.length > 0" class="margin-bottom-30">The list below shows all the distances found in the current structure. You can remove them and modify size and color. 
-        If <strong>only</strong> a <strong>distance</strong> is needed (<strong>without label</strong>), please input <strong>0 as a Label size</strong>. To create a new one, <strong>
+        If <strong>only</strong> a <strong>distance</strong> is needed (<strong>without label</strong>), please set <strong>0 as Label size</strong>. To create a new one, <strong>
         you must click on two atoms with the mouse right button</strong>.
     </p>
     <p v-else class="margin-bottom-30">There are no distances in the current structure. To create a new one, <strong>

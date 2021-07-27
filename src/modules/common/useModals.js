@@ -47,6 +47,11 @@ const blockProperties = [
     status: 'fork',
     header: 'Forking project',
     message: 'The new project is being created, please don\'t close the tab.'
+  },
+  {
+    status: 'picture',
+    header: 'Taking picture',
+    message: 'Taking a picture from stage, this process can take a few seconds.'
   }
 ]
 

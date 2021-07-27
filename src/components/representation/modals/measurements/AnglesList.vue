@@ -1,6 +1,6 @@
 <template>
     <p v-if="anglesList.length > 0" class="margin-bottom-30">The list below shows all the angles found in the current structure. You can remove them and modify size and color.
-        If <strong>only the lines</strong> are needed (<strong>without label</strong>), please input <strong>0 as a Label size</strong>.
+        If <strong>only the lines</strong> are needed (<strong>without label</strong>), please set <strong>0 as Label size</strong>.
         To create a new one, <strong>
         you must press ctrl key and click on three atoms with the mouse right button</strong>.
     </p>
