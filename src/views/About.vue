@@ -65,7 +65,7 @@
             </div>
         </template>
     </Card>
-
+    <ScrollTop :threshold="200" />
   </div>
 
   <Footer />

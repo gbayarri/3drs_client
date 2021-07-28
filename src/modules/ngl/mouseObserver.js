@@ -417,7 +417,7 @@ export default function mouseObserver() {
                                 toast.add({ 
                                     severity:'info', 
                                     summary: 'New distance', 
-                                    detail:`A new distance of ${dist} Å has been added.`, 
+                                    detail:`A new distance of <strong>${dist} Å</strong> has been added.`, 
                                     life: 5000
                                 })
                             }
@@ -479,7 +479,7 @@ export default function mouseObserver() {
                                 toast.add({ 
                                     severity:'info', 
                                     summary: 'New angle', 
-                                    detail:`A new angle of ${angle}° has been added.`, 
+                                    detail:`A new angle of <strong>${angle}°</strong> has been added.`, 
                                     life: 5000
                                 })
                             }

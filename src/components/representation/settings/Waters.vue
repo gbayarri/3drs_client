@@ -158,20 +158,20 @@ export default {
                             toast.add({ 
                                 severity: msg.status, 
                                 summary: msg.tit, 
-                                detail: 'All the waters of Model ' 
+                                detail: 'All the waters of Model <strong>' 
                                         + (getCurrentModel(currReprVal.value) + 1)
-                                        + ' in ' 
+                                        + '</strong> in <strong>' 
                                         + strName 
-                                        + ' structure have been ' 
-                                        + msg.txt 
-                                        + currReprSettings.value.name 
-                                        + ' representation',
+                                        + '</strong> structure have been ' 
+                                        + msg.txt
+                                        + '<strong>' + currReprSettings.value.name  
+                                        + '</strong> representation',
                                 life: 10000
                             })
                         }
                         // check if selection is empty
                         if(selection === 'not(*)' && toastSettings.value) {
-                            toast.add({ severity: 'warn', summary: 'Empty structure', detail: 'Warning! The ' + strName + ' structure of the ' + currReprSettings.value.name + ' representation is currently empty.', life: 10000 })
+                            toast.add({ severity: 'warn', summary: 'Empty structure', detail: 'Warning! The <strong>' + strName + '</strong> structure of the <strong>' + currReprSettings.value.name + '</strong> representation is currently empty.', life: 10000 })
                         }
                         // save selection representation
                         setSelectionRepresentation(stage, selection, structures, re.value, true)

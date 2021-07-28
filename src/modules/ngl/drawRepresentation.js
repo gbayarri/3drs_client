@@ -14,6 +14,8 @@ export default function drawRepresentation() {
         // https://github.com/nglviewer/ngl/issues/552
         // TRY TO ADD A DEPTHWRITE SELECTOR????
 
+        //if(representation.radius.cartoon !== undefined) console.log(representation.radius.cartoon.value)
+
         switch (representation.mol_repr) {
             // in case of cartoon, add base (just in case is nucleic)
             case 'cartoon':
@@ -25,7 +27,7 @@ export default function drawRepresentation() {
                   //sele: '*', 
                   //colorScheme: color_scheme.value,
                   color: color_scheme.value,
-                  //color: color.value,
+                  radius: representation.radius.cartoon !== undefined ? representation.radius.cartoon.value : 0.3,
                   visible: representation.visible, 
                   opacity: representation.opacity,
                   side: 'front'

@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all');
 
 /* GENERIC STYLES */
-body, html { margin:0; height:100%; overflow-x: hidden; }
+body, html { margin:0; height:100%; overflow-x: hidden; scroll-behavior: smooth; }
 a { color:#6f96a9; font-weight: 600; }
 a.white-link { color:#fff; font-weight: 600; }
 body, .p-component { font-family: Open Sans; }

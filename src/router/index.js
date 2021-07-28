@@ -3,6 +3,7 @@ import About from '@/views/About.vue'
 import Launch from '@/views/Launch.vue'
 import Contact from '@/views/Contact.vue'
 import Help from '@/views/Help.vue'
+import Integration from '@/views/Integration.vue'
 import Gallery from '@/views/Gallery.vue'
 import Representation from '@/views/Representation.vue'
 import Shared from '@/views/Shared.vue'
@@ -24,6 +25,11 @@ const routes = [
     path: '/help',
     name: 'Help',
     component: Help
+  },
+  {
+    path: '/help/integration',
+    name: 'Integration',
+    component: Integration
   },
   {
     path: '/gallery',

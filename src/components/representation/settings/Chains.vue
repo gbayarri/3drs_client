@@ -117,17 +117,17 @@ export default {
                                     severity: msg.status, 
                                     summary: msg.tit, 
                                     detail: msg.txt1
-                                            + ' [ '
+                                            + ' <strong>[ '
                                             + msg.chains
-                                            + ' ] ' 
+                                            + ' ]</strong> ' 
                                             + msg.txt2 
-                                            + ' Model ' 
+                                            + ' Model <strong>' 
                                             + (getCurrentModel(currReprVal.value) + 1)
-                                            + ' in ' 
+                                            + '</strong> in <strong>' 
                                             + strName 
-                                            + ' structure of ' 
+                                            + '</strong> structure of <strong>' 
                                             + currReprSettings.value.name 
-                                            + ' representation',
+                                            + '</strong> representation',
                                     life: 10000
                                 })
                             }

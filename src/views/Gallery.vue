@@ -27,6 +27,7 @@
         </div>
       </div>
     </Panel>
+    <ScrollTop :threshold="200" />
   </div>
   <Footer />
 

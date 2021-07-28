@@ -81,7 +81,37 @@ export default function useStage() {
     const arrayToVector3 = function (array) {
         return new NGL.Vector3(array[0], array[1], array[2])
     }
+
+    const distanceBasedSelection = function (o, sele) {
+        var selection = new NGL.Selection( sele )
+        console.log(selection)
+        var radius = 7
+        //console.log(o)
+        var atomSetOrig = o.structure.getAtomSet( selection )
+        var atomSet = o.structure.getAtomSetWithinSelection( selection, radius )
+
+        //console.log(atomSetOrig, atomSet)
+
+        var newAS = atomSet.difference(atomSetOrig)
+
+        // expand selection to complete groups
+        var atomSet2 = o.structure.getAtomSetWithinGroup( newAS )
+
+        o.addRepresentation( "surface", { sele: atomSet.toSeleString() } )
+    }
   
-    return { stage, selection, createStage, getStage, createSelection, createTrajectoryPlayer, createSuperposition, calculateDistance, calculateAngle, arrayToVector3 }
+    return { 
+        stage, 
+        selection, 
+        createStage, 
+        getStage, 
+        createSelection, 
+        createTrajectoryPlayer, 
+        createSuperposition, 
+        calculateDistance, 
+        calculateAngle, 
+        arrayToVector3,
+        distanceBasedSelection
+    }
   
   }

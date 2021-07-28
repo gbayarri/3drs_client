@@ -350,6 +350,8 @@ export default {
         const setVisibility = () => {
             //console.log(stage)
             const newVal = !isVisible.value
+            //currReprSettings.value.label.visible = false
+            if(currReprSettings.value.label !== undefined) changeLabelStatus(false)
             updateRepresentationProperty('visible', newVal)
             setVisibilityRepresentation(stage, newVal, re.value, true)
                 .then((r) => {
@@ -387,9 +389,9 @@ export default {
                             toast.add({ 
                                 severity:'info', 
                                 summary: 'New representation', 
-                                detail:'The new representation ' 
+                                detail:'The new representation <strong>' 
                                         + r.representation.name 
-                                        + ' has been successfully created. Now you have to integrate components to it from the right Settings menu.', 
+                                        + '</strong> has been successfully created. Now you have to integrate components to it from the right <strong>Settings menu</strong>.', 
                                 life: 10000
                             });
                         }
@@ -429,11 +431,11 @@ export default {
         const hasRadius = computed(() => !(currReprSettings.value.mol_repr == 'hyperball' 
                                             || currReprSettings.value.mol_repr == 'line' 
                                             || currReprSettings.value.mol_repr == 'surface' 
-                                            || currReprSettings.value.mol_repr == 'cartoon' 
+                                            || (currReprSettings.value.mol_repr == 'cartoon' && currReprSettings.value.radius.cartoon === undefined)
                                             || currReprSettings.value.mol_repr == 'ribbon'
                                             || currReprSettings.value.mol_repr == 'rope'
                                             || currReprSettings.value.mol_repr == 'trace'
-                                            || currReprSettings.value.mol_repr == 'tube'))
+                                            || currReprSettings.value.mol_repr == 'tube'))        
         const radius = computed({
             get: () => currReprSettings.value.radius[currReprSettings.value.mol_repr] !== undefined ? currReprSettings.value.radius[currReprSettings.value.mol_repr].value*10 : null,
             set: val => changeRadius(val)
@@ -520,6 +522,10 @@ export default {
             const remRepr = representationSelected.value.id
             const reprName = representationSelected.value.name
             //delRepresentation(stage, representationSelected.value.id)
+            // remove label
+            const lbl = currReprSettings.value.label.visible
+            if(lbl) changeLabelStatus(false)
+            
             deleteRepresentation(stage, remRepr)
                 .then((r) => {
                     if(r.code != 404) {
@@ -548,9 +554,9 @@ export default {
                             toast.add({ 
                                 severity: 'warn', 
                                 summary: 'Representation removed', 
-                                detail:'The representation ' 
+                                detail:'The representation <strong>' 
                                         + reprName 
-                                        + ' has been removed from your workspace.', 
+                                        + '</strong> has been removed from your workspace.', 
                                 life: 5000
                             });
                         }
@@ -591,10 +597,10 @@ export default {
                                 toast.add({ 
                                     severity: 'info', 
                                     summary: 'Representation renamed', 
-                                    detail:'The representation ' 
+                                    detail:'The representation <strong>' 
                                             + oldName 
-                                            + ' has been renamed to '
-                                            + newName + '.', 
+                                            + '</strong> has been renamed to <strong>'
+                                            + newName + '</strong>.', 
                                     life: 5000
                                 })
                             }
@@ -733,9 +739,9 @@ export default {
                             toast.add({ 
                                 severity:'info', 
                                 summary: 'New representation', 
-                                detail:'The new representation ' 
+                                detail:'The new representation <strong>' 
                                         + r.representation.name 
-                                        + ' has been successfully created.', 
+                                        + '</strong> has been successfully created.', 
                                 life: 10000
                             });
                         }

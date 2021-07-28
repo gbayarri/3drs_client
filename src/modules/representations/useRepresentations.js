@@ -9,7 +9,7 @@ let currentRepresentation = ref(null)
 
 export default function useRepresentations() {
 
-    const { arrayToVector3 } = useStage()
+    const { arrayToVector3, distanceBasedSelection } = useStage()
     const { projectData/*, updateStructureProject*/ } = structureStorage()
     const { 
         updateProjectData, 
@@ -73,7 +73,7 @@ export default function useRepresentations() {
     const shortTimeOut = 500
 
     // NOT UPDATING PROPERLY??????
-    const setSelectionRepresentation = async (stage, sele, structures, re, update/*, re_others = null*/) => {
+    const setSelectionRepresentation = async (stage, component, sele, structures, re, update/*, re_others = null*/) => {
 
         // FIX re_others and control defaultrepresentation?????
         /*console.log(re_others)
@@ -83,6 +83,9 @@ export default function useRepresentations() {
                 console.log(item)
             })
         }*/
+
+        //console.log(sele)
+        /*if(sele !== 'not(*)')*/ distanceBasedSelection(component, sele)
 
         //console.log(stage.getRepresentationsByName(re))
         /*for(const item of stage.getRepresentationsByName(re).list){

@@ -16,14 +16,12 @@ import Sidebar from 'primevue/sidebar'
 import Dropdown from 'primevue/dropdown'
 import Dialog from 'primevue/dialog'
 import ColorPicker from 'primevue/colorpicker'
-//import ProgressSpinner from 'primevue/progressspinner'
 import MultiSelect from 'primevue/multiselect'
 import Slider from 'primevue/slider'
 import Chip from 'primevue/chip'
 import Listbox from 'primevue/listbox'
 import InputText from 'primevue/inputtext'
 import Message from 'primevue/message'
-import Toast from 'primevue/toast'
 import ToastService from 'primevue/toastservice'
 import Tree from 'primevue/tree'
 import InputNumber from 'primevue/inputnumber'
@@ -33,7 +31,10 @@ import Checkbox from 'primevue/checkbox'
 import Editor from 'primevue/editor'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-//import ScrollTop from 'primevue/scrolltop'
+
+// custom components
+import ScrollTop from '@/components/custom/ScrollTop'
+import CustomToast from '@/components/custom/CustomToast'
 
 // generic components
 import Header from '@/components/global/Header'
@@ -79,14 +80,12 @@ app.component('Sidebar', Sidebar)
 app.component('Dropdown', Dropdown)
 app.component('Dialog', Dialog)
 app.component('ColorPicker', ColorPicker)
-//app.component('ProgressSpinner', ProgressSpinner)
 app.component('MultiSelect', MultiSelect)
 app.component('Slider', Slider)
 app.component('Chip', Chip)
 app.component('Listbox', Listbox)
 app.component('InputText', InputText)
 app.component('Message', Message)
-app.component('Toast', Toast)
 app.component('Tree', Tree)
 app.component('InputNumber', InputNumber)
 app.component('InputSwitch', InputSwitch)
@@ -95,7 +94,8 @@ app.component('Checkbox', Checkbox)
 app.component('Editor', Editor)
 app.component('DataTable', DataTable)
 app.component('Column', Column)
-//app.component('ScrollTop', ScrollTop)
+app.component('ScrollTop', ScrollTop)
+app.component('CustomToast', CustomToast)
 
 // create directives
 app.directive('tooltip', Tooltip)

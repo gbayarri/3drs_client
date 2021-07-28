@@ -118,11 +118,11 @@ export default {
                             toast.add({ 
                                 severity: 'info', 
                                 summary: 'New superposition', 
-                                detail: 'The structures ' 
+                                detail: 'The structures <strong>' 
                                         + name1
-                                        + ' and '
+                                        + '</strong> and <strong>'
                                         +  name2
-                                        + ' have been superposed',
+                                        + '</strong> have been superposed',
                                 life: 10000
                             })
                         }

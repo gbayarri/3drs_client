@@ -14,7 +14,7 @@
 
     <Legend v-if="stageLoaded && !disableComponents" />
 
-    <Toast v-if="!disableComponents" />
+    <CustomToast v-if="!disableComponents" />
 
     <Viewport v-if="loadViewport" v-show="!disableComponents" :project_id="project_id" />
 

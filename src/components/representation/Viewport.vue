@@ -180,7 +180,6 @@ export default {
             })
             // get distance 
             stage.mouseControls.add('clickPick+right', function( stage, pickingProxy ){
-              //console.log(reprMode.value)
               if(reprMode.value && !navigationMode.value && !labelPositionMode.value) getDistance(stage, pickingProxy)
             })
             // get angle
@@ -217,7 +216,7 @@ export default {
               toast.add({ 
                     severity:'warn', 
                     summary: 'Expiration date', 
-                    detail:'Remember that this project will expire on ' + new Date(prjSettings.value.expiration.date).toLocaleDateString("en-GB") + ' unless you share it.', 
+                    detail:'Remember that this project will expire on <strong>' + new Date(prjSettings.value.expiration.date).toLocaleDateString("en-GB") + '</strong> unless you share it.', 
                     life: 10000
                 })
 

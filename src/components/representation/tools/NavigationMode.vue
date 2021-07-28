@@ -28,8 +28,8 @@ export default {
               severity:'info', 
               summary: 'Navigation mode', 
               detail:`Navigation mode has been enabled! From now on, some actions on the stage, 
-              such as select residues and get measurements, are disabled. 
-              To disable it, please click again the Navigation Mode button.`, 
+              such as <strong>select residues</strong> and <strong>get measurements</strong>, are <strong>disabled</strong>. 
+              To disable it, please <strong>click again the Navigation Mode button</strong>.`, 
               life: 15000
           })
           document.querySelector("#stage").style.cursor = 'grabbing'

@@ -697,6 +697,7 @@ incorporate a natural triphosphate into a nascent RNA</p>
         </div>
       </div>
     </Panel>
+    <ScrollTop :threshold="300" />
   </div>
   <Footer />
 </template>

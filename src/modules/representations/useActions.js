@@ -122,26 +122,26 @@ export default function UseActions() {
                         toast.add({ 
                             severity: msg.status, 
                             summary: msg.tit, 
-                            detail: 'The ' + txt_type + ' [ Model ' 
+                            detail: 'The ' + txt_type + ' [ Model <strong>' 
                                     + (p.residue.model + 1)
-                                    + ' | Chain ' 
+                                    + '</strong> | Chain <strong>' 
                                     + p.residue.chain 
-                                    + ' | ' 
+                                    + '</strong> | <strong>' 
                                     + res
-                                    + ' ' 
+                                    + '</strong> ' 
                                     + p.residue.num 
-                                    + ' ] of ' 
+                                    + ' ] of <strong>' 
                                     + p.strName 
-                                    + ' structure has been ' 
+                                    + '</strong> structure has been ' 
                                     + msg.txt 
-                                    + p.currReprSettings.name 
-                                    + ' representation',
+                                    + '</strong>' + p.currReprSettings.name 
+                                    + '</strong> representation',
                             life: 10000
                         })
                     }
                     // check if selection is empty
                     if(selection === 'not(*)' && toastSettings.value) {
-                        toast.add({ severity: 'warn', summary: 'Empty structure', detail: 'Warning! The ' + p.strName + ' structure of the ' + p.currReprSettings.name + ' representation is currently empty.', life: 10000 })
+                        toast.add({ severity: 'warn', summary: 'Empty structure', detail: 'Warning! The <strong>' + p.strName + '</strong> structure of the <strong>' + p.currReprSettings.name + '</strong> representation is currently empty.', life: 10000 })
                     }
                     // save selection representation
                     setSelectionRepresentation(p.stage, selection, structures, p.re, true)
@@ -184,24 +184,24 @@ export default function UseActions() {
                         toast.add({ 
                             severity: msg.status, 
                             summary: msg.tit, 
-                            detail: 'The ' + txt_type + ' [ Model '  
+                            detail: 'The ' + txt_type + ' [ Model <strong>'  
                                     + (p.residue.model + 1)
-                                    + ' | Chain ' 
+                                    + '</strong> | Chain <strong>' 
                                     + p.residue.chain 
-                                    + ' | ' 
+                                    + '</strong> | <strong>' 
                                     + msg.range 
-                                    + ' ] of ' 
+                                    + '</strong> ] of <strong>' 
                                     + p.strName 
-                                    + ' structure has been ' 
+                                    + '</strong> structure has been ' 
                                     + msg.txt 
-                                    + p.currReprSettings.name 
-                                    + ' representation',
+                                    + '<strong>' + p.currReprSettings.name 
+                                    + '</strong> representation',
                             life: 10000
                         })
                     }
                     // check if selection is empty
                     if(selection === 'not(*)' && toastSettings.value) {
-                        toast.add({ severity: 'warn', summary: 'Empty structure', detail: 'Warning! The ' + p.strName + ' structure of the ' + p.currReprSettings.name + ' representation is currently empty.', life: 10000 })
+                        toast.add({ severity: 'warn', summary: 'Empty structure', detail: 'Warning! The <strong>' + p.strName + '</strong> structure of the <strong>' + p.currReprSettings.name + '</strong> representation is currently empty.', life: 10000 })
                     }
                     // save selection representation
                     setSelectionRepresentation(p.stage, selection, structures, p.re, true)
@@ -238,20 +238,20 @@ export default function UseActions() {
                         toast.add({ 
                             severity: msg.status, 
                             summary: msg.tit, 
-                            detail: 'All the ' + p.type + ' of Model ' 
+                            detail: 'All the ' + p.type + ' of Model <strong>' 
                                     + (getCurrentModel(p.currRepr) + 1)
-                                    + ' in ' 
+                                    + '</strong> in <strong>' 
                                     + p.strName 
-                                    + ' structure have been ' 
+                                    + '</strong> structure have been' 
                                     + msg.txt 
-                                    + p.currReprSettings.name 
-                                    + ' representation',
+                                    + '<strong>' + p.currReprSettings.name 
+                                    + '</strong> representation',
                             life: 10000
                         })
                     }
                     // check if selection is empty
                     if(selection === 'not(*)' && toastSettings.value) {
-                        toast.add({ severity: 'warn', summary: 'Empty structure', detail: 'Warning! The ' + p.strName + ' structure of the ' + p.currReprSettings.name + ' representation is currently empty.', life: 10000 })
+                        toast.add({ severity: 'warn', summary: 'Empty structure', detail: 'Warning! The <strong>' + p.strName + '</strong> structure of the <strong>' + p.currReprSettings.name + '</strong> representation is currently empty.', life: 10000 })
                     }
                     // save selection representation
                     setSelectionRepresentation(p.stage, selection, structures, p.re, true)
