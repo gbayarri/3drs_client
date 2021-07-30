@@ -19,7 +19,7 @@ export default function useComponents() {
     const {  setVisibilityRepresentation, setOpacityRepresentation, createAnnotation } = useRepresentations()
     const { currentStructure, updateTrajectorySettings, updateTrajectory } = structureSettings()
     const { addRepresentationToComponent } = drawRepresentation()
-    const { createTrajectoryPlayer, getStage/*, createSelection*/ } = useStage()
+    const { createTrajectoryPlayer, getStage, distanceBasedSelection/*, createSelection*/ } = useStage()
     const { checkTrajectory, setInitPlayer, setTrajectoryPlayer, updateCurrentFrame, setTrajectorySettings } = useTrajectories()
     const { closeModal } = useModals()
     const { createDistance, createAngle } = useMeasurements()
@@ -141,10 +141,18 @@ export default function useComponents() {
                         // representation name
                         const name_new = representation.id + "-" + component.parameters.name
                         // get selection for this structure (check if custom or manual)
-                        const selection = 
+                        let selection = 
                             representation.structures.filter(item => item.id === id)[0].selection.custom === "" ? 
                             representation.structures.filter(item => item.id === id)[0].selection.string :
                             representation.structures.filter(item => item.id === id)[0].selection.custom
+ 
+                        if(representation.structures.filter(item => item.id === id)[0].selection.distance !== undefined && 
+                            representation.structures.filter(item => item.id === id)[0].selection.distance.active) {
+                                //console.log('draw distance-based')
+                                const dAtomSet = distanceBasedSelection(component, selection, representation.structures.filter(item => item.id === id)[0].selection.distance)
+                                selection = dAtomSet.toSeleString()
+                        }
+
                         // add new representation to component
                         const generatedRepresentations = addRepresentationToComponent(representation, component, name_new, selection)
 

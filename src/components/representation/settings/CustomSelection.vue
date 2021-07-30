@@ -22,40 +22,42 @@
                 <Textarea v-model="customSelection" rows="4" :placeholder="placeholder" id="customtextarea" />
             </div>
         </div>
-        <div class="p-grid">
+        <div class="p-grid" v-if="enableDistance">
             <div class="p-col">
-                <InputSwitch v-model="distance" class="margin-top-5" /> 
-                <span style="vertical-align:super; margin-left:10px;">
+                <InputSwitch v-model="distance" class="margin-top-5" :disabled="bDisabled" /> 
+                <span style="position:relative; top:-8px; margin-left:10px;">
                     {{ dst }} <i class="far fa-question-circle" id="custom-help" v-tooltip.left="ttpd"></i>
                 </span>
             </div>
         </div>
-        <div class="p-grid margin-top-10">
-            <div class="p-col">
-                <label>{{ label_radius }}</label>
+        <div v-if="distance">
+            <div class="p-grid margin-top-10">
+                <div class="p-col">
+                    <label>{{ label_radius }} <i class="far fa-question-circle" id="custom-help" v-tooltip.top="ttpr"></i></label>
+                </div>
+                <div class="p-col radius-value">
+                    <label>{{ radius }}</label>
+                </div>
             </div>
-            <div class="p-col radius-value">
-                <label>{{ radius }}</label>
+            <div class="p-grid margin-top-5">
+                <div class="p-col">
+                    <div class="p-inputgroup">
+                        <Slider v-model="radius" :min="0" :max="50" />
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="p-grid margin-top-5">
-            <div class="p-col">
-                <div class="p-inputgroup">
-                    <Slider v-model="radius" :min="0" :max="100" />
+            <div class="p-grid margin-top-10">
+                <div class="p-col">
+                    <label>{{ label_groups }} <i class="far fa-question-circle" id="custom-help" v-tooltip.top="ttpg"></i></label>
+                </div>
+            </div>
+            <div class="p-grid">
+                <div class="p-col">
+                    <InputSwitch v-model="groups" class="margin-top-5" />
                 </div>
             </div>
         </div>
-        <div class="p-grid margin-top-10">
-            <div class="p-col">
-                <label>{{ label_groups }}</label>
-            </div>
-        </div>
-        <div class="p-grid">
-            <div class="p-col">
-                <InputSwitch v-model="groups" class="margin-top-5" />
-            </div>
-        </div>
-        <div class="p-grid">
+        <div class="p-grid margin-top-5" style="border-top: 1px solid #d0dfef;">
             <div class="p-col-4">
                 <Button 
                     icon="pi pi-trash" 
@@ -92,13 +94,14 @@ export default {
         const { openModal } = useModals()
         const { currentRepresentation, setSelectionRepresentation, getCurrentRepresentationSettings } = useRepresentations()
         const { currentStructure, getFileNames } = structureSettings()
-        const { getCurrentSelection, setCurrentCustomSelection } = useSelections()
+        const { getCurrentSelection, getCurrentDistanceBasedSelection, setCurrentCustomSelection/*, setCurrentDistanceSelection*/ } = useSelections()
         const { getProjectSettings } = useProjectSettings()
 
         const isCollapsed = ref(false)
         const currReprVal = computed(() => currentRepresentation.value)
         const currStr = computed(() => currentStructure.value)
         const currReprSettings = computed(() => getCurrentRepresentationSettings())
+        const distBSettings = computed(() => getCurrentDistanceBasedSelection(currReprVal.value, currStr.value))
         const filesList = computed(() => getFileNames())
         const toastSettings = computed(() => getProjectSettings().toasts) 
         const component = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0])
@@ -134,68 +137,49 @@ export default {
             placeholder: "e.g. 10:F.CA/0...",
             ttpst: "Show tips for Custom Selection",
             dst: "Distance-based selection",
-            ttpd: "Click for make a distance-based selection.",
-            label_radius: "Distance from selection",
-            label_groups: "Whole residue(s)"
+            ttpd: "Get a selection of atoms that are within a certain distance of the above selection.",
+            label_radius: "Distance",
+            ttpr: "Distance from selection in Ångstroms.",
+            label_groups: "Whole residue(s)",
+            ttpg: "Whether to select or not the whole residue from the selected atoms."
         })
 
         const openHelp = () => {
             window.open(process.env.VUE_APP_NGL_HELP_URL, '_blank')
         }        
 
+        // DISTANCE-BASED SELECTION
+
+        const enableDistance = computed(() => distBSettings.value !== undefined)
+
         // change distance from switch
         const changeDistance = (value) => {
-            console.log(value)
-            /*const l = value ? "loop": "once"
-            trajSettings.value.loop = value
-            if(!value) trajSettings.value.bounce = false
-            updateTrajectorySettings(trajSettings.value)
-            updatePlayerSetting('mode', l, currStr.value)
-            setTrajectorySettings({ structure: currStr.value, settings: trajSettings.value })
-                .then((r) => {
-                    if(r.code != 404) console.log(r.message)
-                    else console.error(r.message)
-                })*/
+            distBSettings.value.active = value
         }
         const distance = computed({
-            get: () => { return false }, //trajSettings.value.loop,
+            get: () => {
+                if(!enableDistance.value) return false
+                else return bDisabled.value ? false : distBSettings.value.active
+            },
             set: val => changeDistance(val)
         })
 
         // change radius from switch
         const changeRadius = (value) => {
-            console.log(value)
-            /*trajSettings.value.timeout = Math.round(value)
-            updateTrajectorySettings(trajSettings.value)
-            updatePlayerSetting('timeout', value, currStr.value)
-            setTrajectorySettingsTimeout({ structure: currStr.value, settings: trajSettings.value })
-                .then((r) => {
-                    if(r.code != 404) console.log(r.message)
-                    else console.error(r.message)
-                })*/
+            distBSettings.value.radius = value
 
         }
         const radius = computed({
-            get: () => { return 5 }, //Math.round(logarithmicTimeout(trajSettings.value.timeout, false)),
+            get: () => distBSettings.value.radius,
             set: val => changeRadius(val)
         })
 
         // change groups from switch
         const changeGroups = (value) => {
-            console.log(value)
-            /*const l = value ? "loop": "once"
-            trajSettings.value.loop = value
-            if(!value) trajSettings.value.bounce = false
-            updateTrajectorySettings(trajSettings.value)
-            updatePlayerSetting('mode', l, currStr.value)
-            setTrajectorySettings({ structure: currStr.value, settings: trajSettings.value })
-                .then((r) => {
-                    if(r.code != 404) console.log(r.message)
-                    else console.error(r.message)
-                })*/
+            distBSettings.value.groups = value
         }
         const groups = computed({
-            get: () => { return false }, //trajSettings.value.loop,
+            get: () => distBSettings.value.groups,
             set: val => changeGroups(val)
         })
 
@@ -204,7 +188,7 @@ export default {
                 console.log(newSelection, 'redraw!!!')
                 const [old_sele, structures] = setCurrentCustomSelection(stage, currReprVal.value, currStr.value, newSelection)
                 // save selection representation
-                setSelectionRepresentation(stage, component.value, newSelection, structures, re.value, true/*, re_others.value*/)
+                setSelectionRepresentation(stage, newSelection, structures, re.value, true, component.value, distBSettings.value/*, re_others.value*/)
                     .then((r) => {
                         if(r.code != 404) {
                             //console.log(stage)
@@ -234,7 +218,7 @@ export default {
                 //console.log(newSelection, 'redraw!!!')
                 const [sele, structures] = setCurrentCustomSelection(stage, currReprVal.value, currStr.value, '')
                 // save selection representation
-                setSelectionRepresentation(stage, component.value, sele, structures, re.value, true)
+                setSelectionRepresentation(stage, sele, structures, re.value, true)
                     .then((r) => {
                         if(r.code != 404) {
                             //console.log(stage)
@@ -269,7 +253,7 @@ export default {
 
         return { 
             ...toRefs(page), isCollapsed, customSelection, 
-            openHelp, distance, radius, groups, createCustom, removeCustom, bDisabled,
+            openHelp, enableDistance, distance, radius, groups, createCustom, removeCustom, bDisabled,
             showTips
         }
     }

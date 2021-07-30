@@ -70,7 +70,7 @@ export default {
             getFileNames, 
             getCurrentMolecules, 
         } = structureSettings()
-        const { currentRepresentation, getCurrentRepresentationSettings, setSelectionRepresentation } = useRepresentations()
+        const { currentRepresentation, getCurrentRepresentationSettings/*, setSelectionRepresentation*/ } = useRepresentations()
         const { setPositionSettings } = useSettings()
         const { openModal } = useModals()
         const { actionLeaveSingleHetero, actionSelectSingleMolecule, actionSelectAllHeteros } = useActions()

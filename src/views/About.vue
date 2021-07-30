@@ -77,11 +77,13 @@
 import { ref, onMounted } from 'vue'
 import globals from '@/globals'
 import useProjectSettings from '@/modules/structure/useProjectSettings'
+import useDates from '@/modules/common/useDates'
 export default {
   components: {  },
   setup() {
 
     const { getLastProjects } = useProjectSettings()
+    const { dateString, timeString } = useDates()
 
     const header = globals.longName
 
@@ -110,8 +112,10 @@ export default {
       for(const p of projects) {
         pl.push({
           name: truncate(p.projectSettings.title),
-          date: new Date(p.projectSettings.uploadDate.date).toLocaleDateString("en-GB"),
-          time: new Date(p.projectSettings.uploadDate.date).toLocaleTimeString("en-GB"),
+          //date: new Date(p.projectSettings.uploadDate.date).toLocaleDateString("en-GB"),
+          date: dateString(p.projectSettings.uploadDate.date),
+          //time: new Date(p.projectSettings.uploadDate.date).toLocaleTimeString("en-GB"),
+          time: timeString(p.projectSettings.uploadDate.date),
           link: p._id
         })
       }

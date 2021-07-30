@@ -155,7 +155,16 @@ export default function useSelections() {
                   .filter(item => item.id === currStr)[0].selection[type]
   }
 
+  const getCurrentDistanceBasedSelection = function (currReprVal, currStr) {
+    return selection.value
+                  .filter(item => item.id === currReprVal)[0].structures
+                  .filter(item => item.id === currStr)[0].selection.distance
+  }
+
   const setCurrentCustomSelection = function (stage, currReprVal, currStr, str) {
+
+    // TO ADD HERE DISTANCE-BASED
+
     selection.value
                   .filter(item => item.id === currReprVal)[0].structures
                   .filter(item => item.id === currStr)[0].selection.custom = str
@@ -191,6 +200,15 @@ export default function useSelections() {
 
     console.log(selection.value)
     return [string, selection.value.filter(item => item.id === currReprVal)[0].structures ]
+  }
+
+  const setCurrentDistanceSelection = function (currReprVal, currStr, dst) {
+    selection.value
+                  .filter(item => item.id === currReprVal)[0].structures
+                  .filter(item => item.id === currStr)[0].selection.distance = dst
+
+    //console.log(selection.value)
+    return selection.value.filter(item => item.id === currReprVal)[0].structures
   }
 
   const checkSelectionType = function (currReprVal, currStr, defaultRepresentation = null) {
@@ -230,6 +248,11 @@ export default function useSelections() {
           selection: {
             string: '*',
             custom: '',
+            distance: {
+              active: false,
+              radius: 5,
+              groups:false
+            },
             molecules: []
           }
         })
@@ -268,7 +291,9 @@ export default function useSelections() {
     getSelection,
     getSelectionChains,
     getCurrentSelection,
+    getCurrentDistanceBasedSelection,
     setCurrentCustomSelection,
+    setCurrentDistanceSelection,
     checkSelectionType,
     setSelection,
     updateSelection,

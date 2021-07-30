@@ -23,6 +23,7 @@ import useProjectSettings from '@/modules/structure/useProjectSettings'
 import useMeasurements from '@/modules/structure/useMeasurements'
 import mouseObserver from '@/modules/ngl/mouseObserver'
 import useTrajectories from '@/modules/ngl/useTrajectories'
+import useDates from '@/modules/common/useDates'
 export default {
   props: ['project_id', 'hasBg'],
   setup(props) {
@@ -42,6 +43,7 @@ export default {
     const { setProjectSettings, getProjectSettings } = useProjectSettings()
     const { setMeasurements } = useMeasurements()
     const { checkPlayersLoaded } = useTrajectories()
+    const { dateString } = useDates()
 
     const project_id = props.project_id
     const currReprVal = computed(() => currentRepresentation.value)
@@ -216,7 +218,8 @@ export default {
               toast.add({ 
                     severity:'warn', 
                     summary: 'Expiration date', 
-                    detail:'Remember that this project will expire on <strong>' + new Date(prjSettings.value.expiration.date).toLocaleDateString("en-GB") + '</strong> unless you share it.', 
+                    //detail:'Remember that this project will expire on <strong>' + new Date(prjSettings.value.expiration.date).toLocaleDateString("en-GB") + '</strong> unless you share it.', 
+                    detail:'Remember that this project will expire on <strong>' + dateString(prjSettings.value.expiration.date) + '</strong> unless you share it.', 
                     life: 10000
                 })
 

@@ -151,7 +151,7 @@ export default {
         background-size:175px auto; 
         background-repeat: no-repeat; 
         background-image: url("~@/assets/img/logo_corner.png"); 
-        background-color: rgb(123 141 160 / 0.95); 
+        background-color: rgba(123,141,160,0.95); 
         background-position: right bottom;
         width: 100%; 
         height: 100%; 
@@ -166,7 +166,7 @@ export default {
         cursor: pointer;
         -ms-transform: translateY(-50%);
         transform: translateY(-50%);
-        background: rgb(123 141 160 / 0.95)!important;
+        background: rgba(123,141,160,0.95)!important;
         color: #fff!important;
         padding: 25px 15px;
         width: 30px!important;

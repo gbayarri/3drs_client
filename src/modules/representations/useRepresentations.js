@@ -73,7 +73,7 @@ export default function useRepresentations() {
     const shortTimeOut = 500
 
     // NOT UPDATING PROPERLY??????
-    const setSelectionRepresentation = async (stage, component, sele, structures, re, update/*, re_others = null*/) => {
+    const setSelectionRepresentation = async (stage, sele, structures, re, update, component = null, distance = null/*, re_others = null*/) => {
 
         // FIX re_others and control defaultrepresentation?????
         /*console.log(re_others)
@@ -84,19 +84,40 @@ export default function useRepresentations() {
             })
         }*/
 
-        //console.log(sele)
-        /*if(sele !== 'not(*)')*/ distanceBasedSelection(component, sele)
+        let selection = sele
 
-        //console.log(stage.getRepresentationsByName(re))
-        /*for(const item of stage.getRepresentationsByName(re).list){
-            item.setSelection( sele )
-            console.log(sele, item.parameters)
+        // REMOVE FROM HERE?
+        //console.log(distance)
+        if(distance && distance !== undefined && distance.active) {
+
+            const dAtomSet = distanceBasedSelection(component, sele, distance)
+            selection = dAtomSet.toSeleString()
+            //console.log(selection)
+
+            /*stage.getRepresentationsByName(re).list.forEach(function( item ){
+                item.setSelection( dSele )
+                //console.log(sele, item)
+            })*/
+
+        } /*else {
+
+            //console.log(stage.getRepresentationsByName(re))
+            for(const item of stage.getRepresentationsByName(re).list){
+                item.setSelection( sele )
+                console.log(sele, item.parameters)
+            }
+            //console.log(stage)
+            stage.getRepresentationsByName(re).list.forEach(function( item ){
+                item.setSelection( sele )
+                //console.log(sele, item)
+            })
         }*/
-        //console.log(stage)
+
         stage.getRepresentationsByName(re).list.forEach(function( item ){
-            item.setSelection( sele )
+            item.setSelection( selection )
             //console.log(sele, item)
         })
+
         if(update) {
             if(prjID === undefined) prjID = dataProject.value._id
             return await updateRepresentationData(prjID, currentRepresentation.value, { structures: structures })
@@ -132,7 +153,7 @@ export default function useRepresentations() {
         return await cloneRepresentation(prjID, { id: value })
     }
 
-    const setMolecularRepresentation = async (stage, representation, mol_repr, re, strSel, update) => {
+    const setMolecularRepresentation = async (stage, component, representation, mol_repr, re, strSel, update) => {
         //console.log(strSel)
         //return await createRepresentation(prjID, { name: value })
         for(const item of stage.getRepresentationsByName(re).list){
@@ -141,10 +162,18 @@ export default function useRepresentations() {
                 // get current selection
                 const strName = item.parameters.name.split("-")[1]
                 //const sele = strSel.filter(item => item.id === strName)[0].selection.string
-                const sele = 
+                let sele = 
                             strSel.filter(item => item.id === strName)[0].selection.custom === "" ? 
                             strSel.filter(item => item.id === strName)[0].selection.string :
                             strSel.filter(item => item.id === strName)[0].selection.custom
+
+                if(strSel.filter(item => item.id === strName)[0].selection.distance !== undefined && 
+                    strSel.filter(item => item.id === strName)[0].selection.distance.active) {
+                        console.log('draw distance-based')
+                        const dAtomSet = distanceBasedSelection(component, sele, representation.structures.filter(item => item.id === strName)[0].selection.distance)
+                        sele = dAtomSet.toSeleString()
+                }
+
                 // create new
                 const name_new = representation.id + "-" + item.parameters.name.split('-')[1]
                 const generatedRepresentations = addRepresentationToComponent(representation, item.parent, name_new, sele)
@@ -287,6 +316,18 @@ export default function useRepresentations() {
 
         const ann = component.addAnnotation(ap, elm)
         ann.id = representation.id
+
+        // in case of assign label positions by corners
+        /* setTimeout(function(){ 
+            console.log(ann.element.clientWidth, ann.element.clientHeight)
+            ap.x = ap.x + (ann.element.clientWidth / 2)
+            ap.y = ap.y + ann.element.clientHeight
+
+            //setTimeout(function(){ console.log(ann.element.clientWidth) }, 1)
+
+            return ap.toArray()
+
+        }, 1) */
 
         return ap.toArray()
 

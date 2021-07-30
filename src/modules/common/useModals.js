@@ -51,7 +51,7 @@ const blockProperties = [
   {
     status: 'picture',
     header: 'Taking picture',
-    message: 'Taking a picture from stage, this process can take a few seconds.'
+    message: 'Taking a picture from stage, this process can take a few seconds. While the picture is taken the stage will move, but once the process is finished it will come back to the original position.'
   }
 ]
 

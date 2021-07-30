@@ -76,7 +76,7 @@ export default {
     }
 
     const openDocs = () => {
-      window.open(process.env.VUE_APP_HELP_URL, '_blank')
+      window.open(process.env.VUE_APP_DOCS_URL, '_blank')
     }
 
     const openGallery = () => {

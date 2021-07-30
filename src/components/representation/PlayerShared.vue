@@ -167,22 +167,22 @@ export default {
     top: 4.5rem;
     transform: translateX(-50%);
     cursor: pointer;
-    background: rgb(123 141 160 / 0.75); 
+    background: rgba(123,141,160,0.75); 
     color: #fff;
     padding: 0 1rem 0 1rem;
     width: 3rem;
     font-size: 20px;
     border-radius: 0 0 5px 5px ;
-    border-bottom:1px solid rgb(255 255 255 / 0.75);
-    border-left:1px solid rgb(255 255 255 / 0.75);
-    border-right:1px solid rgb(255 255 255 / 0.75);
-    border-top:1px solid rgb(123 141 160 / 0.65);
+    border-bottom:1px solid rgba(255,255,255,0.75);
+    border-left:1px solid rgba(255,255,255,0.75);
+    border-right:1px solid rgba(255,255,255,0.75);
+    border-top:1px solid rgba(123,141,160,0.65);
 }
 #player-shared #unfold-button.folded { top: 0!important; }
 
-#player-shared .double-col { width:25%; margin: 0 auto; background-color: rgb(123 141 160 / 0.75); padding:0 .5rem; }
-#player-shared .double-col.dc-bottom { border-bottom-left-radius: 3px; border-bottom-right-radius: 3px; border-bottom:1px solid rgb(255 255 255 / 0.75); border-left:1px solid rgb(255 255 255 / 0.75);  border-right:1px solid rgb(255 255 255 / 0.75); }
-#player-shared .double-col.dc-top { border-left:1px solid rgb(255 255 255 / 0.75);  border-right:1px solid rgb(255 255 255 / 0.75); }
+#player-shared .double-col { width:25%; margin: 0 auto; background-color: rgba(123,141,160,0.75); padding:0 .5rem; }
+#player-shared .double-col.dc-bottom { border-bottom-left-radius: 3px; border-bottom-right-radius: 3px; border-bottom:1px solid rgba(255,255,255,0.75); border-left:1px solid rgba(255,255,255,0.75);  border-right:1px solid rgba(255,255,255,0.75); }
+#player-shared .double-col.dc-top { border-left:1px solid rgba(255,255,255,0.75);  border-right:1px solid rgba(255,255,255,0.75); }
 #player-shared #player-slider.p-slider.p-slider-horizontal { background: #ccc; width:100%; }
 #player-shared #player-slider.p-slider .p-slider-range { background: #fff; }
 #player-shared #player-slider.p-slider .p-slider-handle { border-color: #b4cce6; }

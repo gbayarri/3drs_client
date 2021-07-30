@@ -50,7 +50,7 @@ export default {
   border-radius: 4px;
   left: 1%;
   bottom: 1.5%;
-  background-color: rgb(123 141 160 / 0.95);
+  background-color: rgba(123,141,160,0.95);
   color: #fff;
   padding: 10px 15px;
   max-width: 30%;
@@ -76,7 +76,7 @@ export default {
 }
 #capt-title .repr-button:hover { background: #546974!important;}
 #capt-description {
-  background-color: rgb(153 171 191 / 0.5);
+  background-color: rgba(153,171,191,0.5);
   margin-top: 0.5rem;
   padding: 0.5rem 0.5rem;
   /*max-height: 6rem;*/

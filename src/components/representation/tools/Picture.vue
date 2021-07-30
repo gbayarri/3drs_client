@@ -4,6 +4,7 @@
 
 <script>
 import { computed } from 'vue'
+import globals from '@/globals'
 import structureStorage from '@/modules/structure/structureStorage'
 import useModals from '@/modules/common/useModals'
 export default {
@@ -29,7 +30,7 @@ export default {
           transparent: true
       } ).then( function( blob ){
           let link = document.createElement('a');
-          link.download = dataProject.value._id + '.png';
+          link.download = globals.shortName + '.' + dataProject.value._id + '.png';
           let reader = new FileReader();
           reader.readAsDataURL(blob); // converts the blob to base64 and calls onload
           reader.onload = function() {

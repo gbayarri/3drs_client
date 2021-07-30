@@ -82,22 +82,19 @@ export default function useStage() {
         return new NGL.Vector3(array[0], array[1], array[2])
     }
 
-    const distanceBasedSelection = function (o, sele) {
+    const distanceBasedSelection = function (o, sele, distance) {
         var selection = new NGL.Selection( sele )
-        console.log(selection)
-        var radius = 7
-        //console.log(o)
+        var radius = distance.radius
+        // get original selection
         var atomSetOrig = o.structure.getAtomSet( selection )
+        // get distance-based selection
         var atomSet = o.structure.getAtomSetWithinSelection( selection, radius )
-
-        //console.log(atomSetOrig, atomSet)
-
-        var newAS = atomSet.difference(atomSetOrig)
-
+        // substract original selection from distance-based selection leaving only the pocket
+        var outputAS = atomSet.difference(atomSetOrig)
         // expand selection to complete groups
-        var atomSet2 = o.structure.getAtomSetWithinGroup( newAS )
-
-        o.addRepresentation( "surface", { sele: atomSet.toSeleString() } )
+        if(distance.groups) outputAS = o.structure.getAtomSetWithinGroup( outputAS )
+        // return atom set
+        return outputAS
     }
   
     return { 

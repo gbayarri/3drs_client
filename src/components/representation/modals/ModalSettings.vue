@@ -109,20 +109,25 @@
 import { computed, reactive, toRefs } from 'vue'
 import useModals from '@/modules/common/useModals'
 import useProjectSettings from '@/modules/structure/useProjectSettings'
+import useDates from '@/modules/common/useDates'
 export default {
     components: {  },
     setup() {
 
         const { dialog, closeModal } = useModals()
         const { getProjectSettings, updateProjectSettings, updateProjectSettingsTimeout } = useProjectSettings()
+        const { dateString, timeString } = useDates()
 
         const settings = computed(() => getProjectSettings())
         const expires = computed(() => getProjectSettings().status === 'w' || getProjectSettings().status === 'wf')
-        const creationDate = new Date(settings.value.uploadDate.date).toLocaleDateString("en-GB")
-        const creationTime = new Date(settings.value.uploadDate.date).toLocaleTimeString("en-GB")
+        //const creationDate = new Date(settings.value.uploadDate.date).toLocaleDateString("en-GB")
+        //const creationTime = new Date(settings.value.uploadDate.date).toLocaleTimeString("en-GB")
+        const creationDate = dateString(settings.value.uploadDate.date)
+        const creationTime = timeString(settings.value.uploadDate.date)
         //const lastUpdate = computed(() => new Date(settings.value.lastUpdate.date).toLocaleDateString("en-GB"))
         //const lastUpdateTime = computed(() => new Date(settings.value.lastUpdate.date).toLocaleTimeString("en-GB"))
-        const expirationDate = new Date(settings.value.expiration.date).toLocaleDateString("en-GB")
+        //const expirationDate = new Date(settings.value.expiration.date).toLocaleDateString("en-GB")
+        const expirationDate = dateString(settings.value.expiration.date)
         const daysToExpire = Math.floor((new Date(settings.value.expiration.date).getTime() - new Date().getTime()) / (1000 * 3600 * 24))
 
         const updating = reactive({

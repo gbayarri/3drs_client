@@ -277,6 +277,8 @@ export default {
         const toastSettings = computed(() => getProjectSettings().toasts) 
         const filesList = computed(() => getFileNames())
 
+        const component = computed(() => stage.compList.filter(item => item.parameters.name === currStr.value)[0])
+
         const re = computed(() => new RegExp('(' + currReprVal.value + '\-[0-9a-z]*\-[a-z]*)', 'g'))
 
         const page = reactive({
@@ -414,7 +416,7 @@ export default {
                 updateRepresentationProperty('mol_repr',value.id)
                 // get selections for current representation
                 const str = getStructureSelection(currReprVal.value)
-                setMolecularRepresentation(stage, currReprSettings.value, value.id, re.value, str, true)
+                setMolecularRepresentation(stage, component.value, currReprSettings.value, value.id, re.value, str, true)
                     .then((r) => {
                         if(r.code != 404) console.log(r.message)
                         else console.error(r.message)
@@ -785,7 +787,7 @@ export default {
         bottom: 0;
         width: 20%;
         padding:0.2rem 0.25rem 0 0.25rem;
-        background-color: rgb(123 141 160 / 0.95); 
+        background-color: rgba(123,141,160,0.95); 
         border-radius: 5px 5px 0 0;
         -webkit-box-shadow: 0px 0px 3px 1px rgba(0,0,0,0.6);
         -moz-box-shadow: 0px 0px 3px 1px rgba(0,0,0,0.6);
@@ -832,7 +834,7 @@ export default {
         top: -2.2rem;
         transform: translateX(-50%);
         cursor: pointer;
-        background: rgb(123 141 160 / 0.95); 
+        background: rgba(123,141,160,0.95); 
         color: #fff;
         padding: .5rem 1rem 0 1rem;
         width: 3rem;
