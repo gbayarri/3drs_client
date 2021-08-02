@@ -46,7 +46,7 @@ export default {
 <style>
 #caption {
   position: absolute;
-  z-index: 2;
+  z-index: 4;
   border-radius: 4px;
   left: 1%;
   bottom: 1.5%;
