@@ -154,6 +154,7 @@ export default function useTrajectories() {
     const updateCurrentFrame = (f, str) => {
         //console.log(f)
         player.filter(item => item.str === str)[0].frame = f
+        //console.log(player)
         //currentFrame.value = parseInt(f)    
         //currentFrame.filter(item => item.str === str)[0].frame = parseInt(f)    
     }

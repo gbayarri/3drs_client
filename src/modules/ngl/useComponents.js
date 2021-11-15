@@ -74,7 +74,8 @@ export default function useComponents() {
 
                 if(traj !== null) {
                     console.log('loading', traj.path, 'size', traj.size)
-                    const t = component.addTrajectory( process.env.VUE_APP_MDSRV_DIR + '/trajectories/' + traj.path, {centerPdb: true, removePbc: true, superpose: true, initialFrame: 0} )
+                    //const t = component.addTrajectory( process.env.VUE_APP_MDSRV_DIR + '/trajectories/' + traj.path, {centerPdb: true, removePbc: true, superpose: true, initialFrame: 0} )
+                    const t = component.addTrajectory( process.env.VUE_APP_MDSRV_DIR + '/trajectories/' + traj.path, {centerPdb: false, removePbc: false, superpose: false, initialFrame: 0} )
                     //console.log(t)
                     // initialising players
                     setInitPlayer(id, traj)
@@ -107,6 +108,7 @@ export default function useComponents() {
                             //setFlagStatus('trajectoryLoaded', true)
                             // SET SOME FLAG HERE FOR ACTIVATE Trajectory.vue
                             let prev_f = null
+                            //console.log(trajectory.signals)
                             trajectory.signals.frameChanged.add((f) => {
                                 if(prev_f !== f && f < settings.range[1]) {
                                     prev_f = f

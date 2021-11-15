@@ -139,8 +139,11 @@ export default {
 
     const aboutPanel = {
       header: " About us",
-      description: `<p>` + globals.longName + ` has been developed by the <a href="https://mmb.irbbarcelona.org" target="_blank">Molecular Modeling and Bioinformatics</a> laboratory at the <a href="https://irbbarcelona.org" target="_blank">IRB Barcelona</a>.</p>
-                    <p>Genís Bayarri <a href="https://www.irbbarcelona.org/en/profile/genis-bayarri" target="_blank"><i class="fas fa-envelope"></i></a> , Adam Hospital and Modesto Orozco.</p>`
+      description: `<p>
+                    <a href="https://doi.org/10.3389/fmolb.2021.726232" target="_blank">3dRS, a Web-Based Tool to Share Interactive Representations of 3D Biomolecular Structures and Molecular Dynamics Trajectories</a><br>
+                    Genís Bayarri, Adam Hospital <a href="https://www.irbbarcelona.org/en/profile/adam-hospital" target="_blank"><i class="fas fa-envelope"></i></a> and Modesto Orozco <a href="https://www.irbbarcelona.org/en/profile/modesto-orozco" target="_blank"><i class="fas fa-envelope"></i></a>.<br>
+                    <em>Front. Mol. Biosci.</em>, 13 August 2021, doi: <a href="https://doi.org/10.3389/fmolb.2021.726232" target="_blank">10.3389/fmolb.2021.726232</a>.
+                    </p>`
     }
 
     return { header, welcomePanel, projectsPanel, projectsList, openLink, aboutPanel }
