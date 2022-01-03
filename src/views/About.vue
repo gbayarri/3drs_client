@@ -47,6 +47,17 @@
       <div v-html="aboutPanel.description"></div>
     </Panel>
 
+    <Panel class="p-shadow-2 p-mb-3" id="header-about">
+      <template #header>
+          <span class="fa-stack" style="vertical-align: top;font-size: 0.6em;">
+            <i class="fas fa-desktop fa-stack-2x"></i>
+            <i class="fas fa-user-graduate fa-stack-1x"></i>
+          </span>
+          <div class="p-panel-title">{{ webinarsPanel.header }}</div>
+      </template>
+      <div v-html="webinarsPanel.description"></div>
+    </Panel>
+
     <Card class="p-shadow-2 p-mb-6" id="card-footer">
         <template #content>
             <div class="p-grid">
@@ -146,7 +157,14 @@ export default {
                     </p>`
     }
 
-    return { header, welcomePanel, projectsPanel, projectsList, openLink, aboutPanel }
+    const webinarsPanel = {
+      header: " Webinars",
+      description: `<ul style="list-style-type: circle;">
+                      <li><a href="https://www.youtube.com/watch?v=Fc9WluNXTAc" target="_blank">BioExcel Webinar #56: 3dRS - Interactive Representations of 3D Structures and MD Trajectories</a></li>
+                    </ul>`
+    }
+
+    return { header, welcomePanel, projectsPanel, projectsList, openLink, aboutPanel, webinarsPanel }
   }
 }
 </script>
