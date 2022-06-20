@@ -45,9 +45,10 @@ import App from '@/App.vue'
 import router from '@/router'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+import VueGtag from 'vue-gtag';
 
 // import PrimeVue resources
-import 'primevue/resources/themes/saga-blue/theme.css'      
+import 'primevue/resources/themes/saga-blue/theme.css'
 import 'primevue/resources/primevue.min.css'                
 import 'primeicons/primeicons.css'                          
 import 'primeflex/primeflex.css'
@@ -63,6 +64,7 @@ app.use(router)
 app.use(VueAxios, axios)
 app.use(PrimeVue, {ripple: true})
 app.use(ToastService)
+app.use(VueGtag, { config: { id: process.env.VUE_APP_GA4 } }, router)
 
 // create global components
 app.component('TabMenu', TabMenu)
