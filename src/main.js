@@ -45,7 +45,7 @@ import App from '@/App.vue'
 import router from '@/router'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
-import VueGtag from 'vue-gtag';
+import VueGtag from 'vue-gtag'
 
 // import PrimeVue resources
 import 'primevue/resources/themes/saga-blue/theme.css'
